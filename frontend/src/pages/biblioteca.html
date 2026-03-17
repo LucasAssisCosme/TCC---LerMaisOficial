@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ler Mais - Biblioteca</title>
+
+    <link rel="stylesheet" href="/frontend/src/css/biblioteca.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body class="home-page">
+   <header class="app-navbar">
+  <div class="container-fluid navbar-content">
+
+    <!-- Logo + Perfil -->
+    <div class="left-area">
+      <img class="logo" src="/frontend/logo.png" alt="logo">
+
+      <div class="perfil">
+        <span class="icon">👤</span>
+        <nav class="nav-links">
+        <a href="/">PERFIL</a>
+      </nav>
+      </div>
+    </div>
+ 
+    <!-- Menu -->
+    <nav class="nav-links">
+      <a href="/frontend/src/pages/index.html"><img src="" alt=""> INÍCIO</a>
+      <a href="/frontend/src/pages/cadastroLivro.html"><img src="" alt=""> CADASTRAR LIVRO</a>
+      <a href="/frontend/src/pages/biblioteca.html"><img src="" alt="">  BIBLIOTECA</a>
+      <a href="/frontend/login.html"><img src="" alt="">  SAÍDA</a>
+    </nav>
+
+  </div>
+</header>
+
+        <button
+          class="btn btn-sm btn-light d-md-none"
+          type="button"
+          aria-label="Menu"
+          id="navbarToggle"
+        >
+          ☰
+        </button>
+      </div>
+
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="/" class="mobile-link active">INÍCIO</a>
+        <a href="/" class="mobile-link">PERFIL</a>
+        <a href="/" class="mobile-link">CADASTRAR LIVRO</a>
+        <a href="/" class="mobile-link">BIBLIOTECA</a>
+        <a href="/" class="mobile-link">SAÍDA</a>
+      </div>
+    </header>
+
+    <main class="home-content container py-4">
+      <section class="overview-card p-4 rounded-4 mb-4">
+        <div
+          class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+
+          <div class="d-flex gap-3 flex-column">
+            <div class="status-pill d-flex gap-2 align-items-center">
+              <span class="pill pill-lido" aria-hidden="true"></span>
+              <span>Lido</span>
+            </div>
+            
+            <div class="status-pill d-flex gap-2 align-items-center">
+              <span class="pill pill-quero" aria-hidden="true"></span>
+              <span>Quero ler</span>
+
+            </div>
+            
+            <div class="status-pill d-flex gap-2 align-items-center">
+              <span class="pill pill-lendo" aria-hidden="true"></span>
+              <span>Lendo</span>
+            
+            </div>
+          </div>
+
+          <div class="text-end flex-col">
+            <span class="badge bg-light text-dark">Paginômetro 31.780</span>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h2 class="mb-2">
+            Você está em <strong>3º lugar</strong> no ranking de mais páginas
+            lidas da sua universidade!
+          </h2>
+        </div>
+      </section>
+
+      <section class="books-grid">
+        <div
+          class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 gap-3"
+        >
+          <h3 class="m-0 text-white">96 itens encontrados</h3>
+             <hr>
+          <div class="search-wrapper input-group w-100 w-md-auto">
+            <span class="input-group-text">🔍</span>
+            <input
+              type="search"
+              class="form-control"
+              placeholder="Buscar livros"
+              aria-label="Buscar livros"
+            />
+          </div>
+        </div>
+
+        <div class="row gx-3 gy-4">
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-lido" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/000000/ffffff?text=Powerless&quot;);
+                "
+                aria-label="Capa do livro Powerless"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Powerless</h4>
+                <p class="book-author mb-0">Lauren Roberts</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-quero" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/2d6a4f/ffffff?text=O+Ver%C3%A3o+Que+Mudou&quot;);
+                "
+                aria-label="Capa do livro O Verão que Mudou minha Vida"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">O verão que mudou minha vida</h4>
+                <p class="book-author mb-0">Jenny Han</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-lendo" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/5e548e/ffffff?text=Amor+Teoricamente&quot;);
+                "
+                aria-label="Capa do livro Amor, teoricamente"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Amor, teoricamente</h4>
+                <p class="book-author mb-0">Ali Hazelwood</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-lido" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/1b4332/ffffff?text=Tudo+que+meu+cora%C3%A7%C3%A3o+grita&quot;);
+                "
+                aria-label="Capa do livro Tudo que meu coração grita"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Tudo que meu coração grita</h4>
+                <p class="book-author mb-0">Catherine Fridman</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-quero" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/3a0ca3/ffffff?text=Coven&quot;);
+                "
+                aria-label="Capa do livro Coven"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Coven</h4>
+                <p class="book-author mb-0">Harper L. Woods</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-lido" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/2d1b1b/ffffff?text=Spawn&quot;);
+                "
+                aria-label="Capa do livro Spawn"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Spawn</h4>
+                <p class="book-author mb-0">Todd McFarlane</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-quero" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/7f0000/ffffff?text=Kindred&quot;);
+                "
+                aria-label="Capa do livro Kindred"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Kindred</h4>
+                <p class="book-author mb-0">Octavia E. Butler</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-lendo" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/2b2d42/ffffff?text=A+Raz%C3%A3o+do+Amor&quot;);
+                "
+                aria-label="Capa do livro A razão do amor"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">A razão do amor</h4>
+                <p class="book-author mb-0">Ali Hazelwood</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-lendo" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/1b262c/ffffff?text=Promessas+Cru%C3%A9is&quot;);
+                "
+                aria-label="Capa do livro Promessas cruéis"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Promessas cruéis</h4>
+                <p class="book-author mb-0">Rebecca Ross</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+            <article class="book-card">
+              <div class="book-ribbon ribbon-quero" aria-hidden="true"></div>
+              <div
+                class="book-cover"
+                style="
+                  background-image: url(&quot;https://via.placeholder.com/320x460/264653/ffffff?text=N%C3%A3o+%C3%A9+como+nos+filmes&quot;);
+                "
+                aria-label="Capa do livro Não é como nos filmes"
+              ></div>
+              <div class="book-info p-3">
+                <h4 class="book-title mb-1">Não é como nos filmes</h4>
+                <p class="book-author mb-0">Lynn Painter</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+ <footer class="app-footer">
+
+  <div class="footer-left">
+    <a href="/frontend/src/pages/index.html">Home</a>
+    <a href="/">Perfil</a>
+  </div>
+
+  <div class="footer-center">
+    <img src="/frontend/logo.png" alt="Logo" class="footer-logo">
+  </div>
+
+  <div class="footer-right">
+    <small>Todos os direitos reservados</small>
+  </div>
+
+</footer>
+
+    <script src="/script.js"></script>
+    <script>
+      const toggle = document.getElementById("navbarToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+      toggle?.addEventListener("click", () => {
+        mobileMenu.classList.toggle("open");
+      });
+    </script>
+  </body>
+</html>
