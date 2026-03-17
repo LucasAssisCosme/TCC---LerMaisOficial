@@ -1,5 +1,6 @@
 const express =  require('express')
 const cors = require('cors')
+const path = require('path')
 
 const app = express()
 
@@ -21,6 +22,8 @@ const rankingRoutes = require("./routes/rankingRoutes")
 
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
+
+app.use(express.static(path.join(__dirname, '..', 'frontend')))
 
 app.use("/livros", livrosRoutes)
 app.use("/usuario", usuarioRoutes)

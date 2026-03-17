@@ -21,8 +21,11 @@ roteador.get("/", usuarioControler.listarUsuarios)
 //Retorna as informações de um usuário apenas
 
 roteador.get("/:id", usuarioControler.buscarUsuario)
-//Rota mudar senha
+//Rota mudar senha (por ID + email)
 roteador.post("/esqueceuSenha/:id", usuarioControler.mudarSenhaUsuario)
+
+//Rota mudar senha (por email)
+roteador.post("/esqueceuSenha", usuarioControler.mudarSenhaUsuarioPorEmail)
 
 //R = Obter informações de usuarios
 //Retorna as informações de todos os usuarios

@@ -103,7 +103,6 @@ mudarSenhaUsuario(req, res) {
     confirmarSenha
   } = req.body
 
-  // verifica se as senhas são iguais
   if (novaSenha !== confirmarSenha) {
     return res.status(400).json({
       mensagem: "As senhas não coincidem"
@@ -128,6 +127,30 @@ mudarSenhaUsuario(req, res) {
       })
     }
   )
+},
+
+mudarSenhaUsuarioPorEmail(req, res) {
+  const { email, novaSenha, confirmarSenha } = req.body
+
+  if (!email || !novaSenha || !confirmarSenha) {
+    return res.status(400).json({ mensagem: "Email e senhas são obrigatórios" })
+  }
+
+  if (novaSenha !== confirmarSenha) {
+    return res.status(400).json({ mensagem: "As senhas não coincidem" })
+  }
+
+  usuarioModels.esqueceuSenhaPorEmail(email, novaSenha, (erro, resultado) => {
+    if (erro) {
+      return res.status(500).json({ mensagem: erro.message })
+    }
+
+    if (!resultado) {
+      return res.status(404).json({ mensagem: "Email ou usuário não encontrado" })
+    }
+
+    res.json({ titulo: "Nova senha confirmada", usuario: resultado })
+  })
 },
 
   atualizarUsuario(req, res) {
