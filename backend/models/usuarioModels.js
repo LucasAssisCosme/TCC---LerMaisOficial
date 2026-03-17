@@ -130,6 +130,29 @@ esqueceuSenha: (email, senha, id, callback) => {
       callback(null, usuarioAtualizado)
     })
   })
+},
+
+esqueceuSenhaPorEmail: (email, senha, callback) => {
+  bcrypt.hash(senha, 10, (erroHash, hash) => {
+    if (erroHash) {
+      return callback(erroHash, null);
+    }
+
+    const sql = `UPDATE usuarios SET senha = ? WHERE email = ?`
+    const valores = [hash, email]
+
+    conn.query(sql, valores, (erro, resultado) => {
+      if (erro) {
+        return callback(erro, null)
+      }
+
+      if (resultado.affectedRows === 0) {
+        return callback(null, null)
+      }
+
+      callback(null, { email, senha: hash })
+    })
+  })
 }, 
  atualizar: (id, dados, callback) => {
   // Filtrar apenas campos com valores válidos (não undefined e não vazios)

@@ -38,7 +38,7 @@ async function cadastrarUsuario(formData) {
     alert('Cadastro realizado com sucesso!');
 
     // Redireciona para a tela de login (ajuste se necessário)
-    window.location.href = '/src/pages/index.html';
+    window.location.href = '/frontend/src/pages/index.html';
 
     return data;
   } catch (error) {
@@ -85,7 +85,7 @@ async function loginUsuario(formData) {
     alert('Login realizado com sucesso!');
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
-    window.location.href = '/src/pages/index.html';
+    window.location.href =  '/frontend/src/pages/index.html';
 
     return data;
   } catch (error) {
@@ -109,16 +109,13 @@ function initLogin() {
 
 async function redefinirSenha(formData) {
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id') || '1'; // ajuste conforme seu fluxo de identificação
-
     const payload = {
       email: formData.get('email'),
       novaSenha: formData.get('nova_senha'),
       confirmarSenha: formData.get('senha')
     };
 
-    const resposta = await fetch(`http://localhost:3000/usuario/esqueceuSenha/${id}`, {
+    const resposta = await fetch('http://localhost:3000/usuario/esqueceuSenha', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -133,7 +130,7 @@ async function redefinirSenha(formData) {
 
     const data = await resposta.json();
     alert('Senha redefinida com sucesso!');
-    window.location.href = '/src/pages/index.html';
+    window.location.href =  '/frontend/login.html';
     return data;
   } catch (error) {
     console.error('Erro ao redefinir senha:', error);
