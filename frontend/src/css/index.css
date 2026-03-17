@@ -1,0 +1,251 @@
+/* Home page styles */
+body.home-page {
+    min-height: 100vh;
+    background-color: #DAC1B1;
+    color: #fff;
+   
+}
+
+.mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 180ms ease;
+    background: rgba(122, 31, 5, 0.92);
+}
+
+.mobile-menu.open {
+    max-height: 240px;
+}
+
+.mobile-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    text-decoration: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.mobile-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.home-content {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-top: 1.5rem;
+    
+}
+
+.overview-card {
+    background: #7f1f0ec0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    color: #fff;
+    ;
+}
+
+.status-pill {
+    font-weight: 600;
+}
+
+.pill {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.pill-lido {
+    background: #27ae60;
+}
+
+.pill-quero {
+    background: #3498db;
+}
+
+.pill-lendo {
+    background: #f1c40f;
+}
+
+.text-highlight {
+    color: #f1c40f;
+}
+
+.books-grid h3 {
+    color: #fff;
+}
+
+.book-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #ffffff;
+    color: #212121;
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.25);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.book-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 36px rgba(0, 0, 0, 0.35);
+}
+
+.book-ribbon {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 12px;
+    height: 42px;
+    border-radius: 6px;
+}
+
+.ribbon-lido {
+    background: #27ae60;
+}
+
+.ribbon-quero {
+    background: #3498db;
+}
+
+.ribbon-lendo {
+    background: #f1c40f;
+}
+
+.book-cover {
+    height: 220px;
+    background-size: cover;
+    background-position: center;
+}
+
+.book-title {
+    font-size: 1rem;
+    margin: 0.75rem 0 0.25rem;
+}
+
+.book-author {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 0.25rem;
+}
+
+.app-footer {
+    background: rgba(122, 31, 5, 0.9);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto; 
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;   
+}
+.brand-icon img {
+  width: 29px;
+  height: 30px;
+  margin: auto;
+}
+
+.imagem img {
+  width: 60px;
+ border-radius: 60px ;
+}
+
+/* NAVBAR */
+.app-navbar{
+  background-color:#8b2a12;
+  height:60px;
+  display:flex;
+  align-items:center;
+}
+
+.navbar-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+
+.left-area{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+
+.logo{
+  height:35px;
+  border-radius: 20px;
+}
+
+
+.perfil{
+  display:flex;
+  align-items:center;
+  gap: 4px;
+   text-decoration: none;
+  color:white;
+  font-size: 18px;
+}
+
+
+
+.nav-links{
+  display:flex;
+  gap:25px;
+}
+
+.nav-links a{
+  color:white;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:500;
+}
+
+.nav-links a:hover{
+  opacity:0.8;
+}
+.app-footer{
+display:flex;
+align-items:center;
+justify-content:space-between;
+background:#8b2a12;
+color:white;
+padding:15px 30px;
+position:relative;
+}
+
+/* esquerda */
+
+.footer-left{
+display:flex;
+gap:20px;
+}
+
+.footer-left a{
+color:white;
+text-decoration:none;
+font-size:14px;
+}
+
+/* centro */
+
+.footer-center{
+position:absolute;
+left:50%;
+transform:translateX(-50%);
+}
+
+.footer-logo{
+height:35px;
+border-radius: 20px;
+}
+
+/* direita */
+
+.footer-right{
+font-size:13px;
+}
