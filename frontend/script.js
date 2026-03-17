@@ -82,6 +82,11 @@ async function loginUsuario(formData) {
 
     const data = await resposta.json();
 
+    // Salva usuário logado para usar biblioteca/ranking
+    if (data.usuario && data.usuario.id) {
+      localStorage.setItem('usuarioLogadoId', data.usuario.id);
+    }
+
     alert('Login realizado com sucesso!');
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
@@ -163,9 +168,14 @@ function getStatusTag(progresso) {
   }
 }
 
+function getUsuarioLogadoId() {
+  return localStorage.getItem('usuarioLogadoId') || '1';
+}
+
 async function fetchBiblioteca() {
   try {
-    const resposta = await fetch('http://localhost:3000/biblioteca/');
+    const usuarioId = getUsuarioLogadoId();
+    const resposta = await fetch(`http://localhost:3000/biblioteca/usuario/${usuarioId}`);
     if (!resposta.ok) throw new Error(`Erro ${resposta.status}`);
     const data = await resposta.json();
     return data.status || [];
@@ -254,7 +264,8 @@ async function initBibliotecaGrid() {
   const [books, bibliotecaStatus] = await Promise.all([fetchLivros(), fetchBiblioteca()]);
   renderBooks(books, bibliotecaStatus);
 
-  const ranking = await fetchRanking(1); // substituir pelo ID do usuário logado se disponível
+  const usuarioId = getUsuarioLogadoId();
+  const ranking = await fetchRanking(usuarioId);
   if (ranking) {
     renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
   }

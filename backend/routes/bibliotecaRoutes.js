@@ -9,6 +9,8 @@ router.post("/cadastrar", bibliotecaController.salvarStatus)
 
 router.get("/", bibliotecaController.listarTodos)
 
+router.get("/usuario/:usuarioId", bibliotecaController.listarPorUsuario)
+
 router.get("/:id", bibliotecaController.buscarStatus)
 
 router.patch("/:id", bibliotecaController.atualizarStatus)

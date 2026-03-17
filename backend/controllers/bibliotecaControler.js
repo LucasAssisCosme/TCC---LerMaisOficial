@@ -38,6 +38,21 @@ module.exports = {
         })
     },
 
+    listarPorUsuario(req, res) {
+        const usuarioId = req.params.usuarioId;
+
+        bibliotecaModels.listaPorUsuario(usuarioId, (erro, status) => {
+            if (erro) {
+                return res.status(500).json({ mensagem: "Erro ao listar biblioteca do usuário" })
+            }
+
+            res.json({
+                titulo: "Status do usuário",
+                status
+            })
+        })
+    },
+
     buscarStatus(req, res) {
 
         const id = req.params.id

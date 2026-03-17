@@ -18,7 +18,7 @@ module.exports = {
       }
       // Se conseguiu manda uma mensagem de confirmação
       else {
-        res.json({ message: "Bem vindo", usuario: logado.nome });
+        res.json({ message: "Bem vindo", usuario: logado });
       }
     });
   },
