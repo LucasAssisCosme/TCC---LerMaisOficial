@@ -93,6 +93,11 @@ async function loginUsuario(formData) {
       console.log('[Login realizado]', { usuarioId: userId, usuarioTipo: tipo });
     }
 
+    // Salva o token JWT
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
+
     alert('Login realizado com sucesso!');
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
@@ -192,6 +197,17 @@ function getUsuarioLogadoTipo() {
   return normalizarTipo(localStorage.getItem('usuarioLogadoTipo') || 'aluno');
 }
 
+function getToken() {
+  return localStorage.getItem('token');
+}
+
+function logout() {
+  localStorage.removeItem('usuarioLogadoId');
+  localStorage.removeItem('usuarioLogadoTipo');
+  localStorage.removeItem('token');
+  window.location.href = '/frontend/login.html';
+}
+
 function isBibliotecariaLogada() {
   const tipo = getUsuarioLogadoTipo();
   const libera = ['bibliotecaria', 'bibliotecario', 'professor', 'bibliotecaria', 'bibliotecario'].includes(tipo);
@@ -261,7 +277,22 @@ async function atualizarBibliotecaELista() {
 async function fetchBiblioteca() {
   try {
     const usuarioId = getUsuarioLogadoId();
-    const resposta = await fetch(`http://localhost:3000/biblioteca/usuario/${usuarioId}`);
+    const token = getToken();
+    if (!token) {
+      console.error('Token não encontrado! Redirecionando para login.');
+      logout();
+      return [];
+    }
+    const resposta = await fetch(`http://localhost:3000/biblioteca/usuario/${usuarioId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (resposta.status === 401 || resposta.status === 403) {
+      alert('Sessão expirada. Faça login novamente.');
+      logout();
+      return [];
+    }
     if (!resposta.ok) throw new Error(`Erro ${resposta.status}`);
     const data = await resposta.json();
     return data.status || [];
@@ -325,7 +356,22 @@ function renderBooks(books, bibliotecaStatus) {
 
 async function fetchRanking(usuarioId = 1) {
   try {
-    const resposta = await fetch(`http://localhost:3000/ranking/paginometro/${usuarioId}`);
+    const token = getToken();
+    if (!token) {
+      console.error('Token não encontrado! Redirecionando para login.');
+      logout();
+      return null;
+    }
+    const resposta = await fetch(`http://localhost:3000/ranking/paginometro/${usuarioId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (resposta.status === 401 || resposta.status === 403) {
+      alert('Sessão expirada. Faça login novamente.');
+      logout();
+      return null;
+    }
     if (!resposta.ok) throw new Error(`Erro ${resposta.status}`);
     return await resposta.json();
   } catch (error) {
