@@ -172,6 +172,35 @@ function getUsuarioLogadoId() {
   return localStorage.getItem('usuarioLogadoId') || '1';
 }
 
+let bibliotecaAutoRefreshId = null;
+let bibliotecaCachedBooks = [];
+let bibliotecaCachedStatus = [];
+
+async function atualizarBibliotecaELista() {
+  const [books, bibliotecaStatus] = await Promise.all([fetchLivros(), fetchBiblioteca()]);
+  bibliotecaCachedBooks = books;
+  bibliotecaCachedStatus = bibliotecaStatus;
+
+  const inputSearch = document.querySelector('.books-grid input[type="search"]');
+  const termo = inputSearch ? inputSearch.value.trim().toLowerCase() : '';
+
+  if (termo) {
+    const filtrados = books.filter((book) =>
+      book.titulo.toLowerCase().includes(termo) || book.autor.toLowerCase().includes(termo)
+    );
+    renderBooks(filtrados, bibliotecaStatus);
+  } else {
+    renderBooks(books, bibliotecaStatus);
+  }
+
+  const usuarioId = getUsuarioLogadoId();
+  const ranking = await fetchRanking(usuarioId);
+  if (ranking) {
+    renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
+  }
+}
+
+
 async function fetchBiblioteca() {
   try {
     const usuarioId = getUsuarioLogadoId();
@@ -261,26 +290,29 @@ function renderRank(posicao, totalPaginas) {
 }
 
 async function initBibliotecaGrid() {
-  const [books, bibliotecaStatus] = await Promise.all([fetchLivros(), fetchBiblioteca()]);
-  renderBooks(books, bibliotecaStatus);
+  const inputSearch = document.querySelector('.books-grid input[type="search"]');
 
-  const usuarioId = getUsuarioLogadoId();
-  const ranking = await fetchRanking(usuarioId);
-  if (ranking) {
-    renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
+  if (inputSearch) {
+    inputSearch.addEventListener('input', () => {
+      const termo = inputSearch.value.trim().toLowerCase();
+      const filtrados = bibliotecaCachedBooks.filter((book) =>
+        book.titulo.toLowerCase().includes(termo) || book.autor.toLowerCase().includes(termo)
+      );
+      renderBooks(filtrados, bibliotecaCachedStatus);
+    });
   }
 
-  const inputSearch = document.querySelector('.books-grid input[type="search"]');
-  if (!inputSearch) return;
+  await atualizarBibliotecaELista();
 
-  inputSearch.addEventListener('input', () => {
-    const termo = inputSearch.value.trim().toLowerCase();
-    const filtrados = books.filter((book) =>
-      book.titulo.toLowerCase().includes(termo) || book.autor.toLowerCase().includes(termo)
-    );
-    renderBooks(filtrados, bibliotecaStatus);
-  });
+  if (bibliotecaAutoRefreshId !== null) {
+    clearInterval(bibliotecaAutoRefreshId);
+  }
+
+  bibliotecaAutoRefreshId = setInterval(async () => {
+    await atualizarBibliotecaELista();
+  }, 1000);
 }
+
 
 // Inicializa comportamentos quando a página estiver pronta
 window.addEventListener('DOMContentLoaded', () => {
