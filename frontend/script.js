@@ -84,7 +84,13 @@ async function loginUsuario(formData) {
 
     // Salva usuário logado para usar biblioteca/ranking
     if (data.usuario && data.usuario.id) {
-      localStorage.setItem('usuarioLogadoId', data.usuario.id);
+      const userId = String(data.usuario.id).trim();
+      localStorage.setItem('usuarioLogadoId', userId);
+
+      const tipo = normalizarTipo(String(data.usuario.tipo || 'aluno'));
+      localStorage.setItem('usuarioLogadoTipo', tipo);
+
+      console.log('[Login realizado]', { usuarioId: userId, usuarioTipo: tipo });
     }
 
     alert('Login realizado com sucesso!');
@@ -169,7 +175,54 @@ function getStatusTag(progresso) {
 }
 
 function getUsuarioLogadoId() {
-  return localStorage.getItem('usuarioLogadoId') || '1';
+  const id = localStorage.getItem('usuarioLogadoId');
+  return id ? id.trim() : null;
+}
+
+function normalizarTipo(tipo) {
+  if (!tipo || typeof tipo !== 'string') return 'aluno';
+  return tipo
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+}
+
+function getUsuarioLogadoTipo() {
+  return normalizarTipo(localStorage.getItem('usuarioLogadoTipo') || 'aluno');
+}
+
+function isBibliotecariaLogada() {
+  const tipo = getUsuarioLogadoTipo();
+  const libera = ['bibliotecaria', 'bibliotecario', 'professor', 'bibliotecaria', 'bibliotecario'].includes(tipo);
+  console.log('[Acesso Pedido]', { tipo, libera, usuarioLogadoId: getUsuarioLogadoId() });
+  return libera;
+}
+
+function atualizarAcessoCadastroLivro() {
+  const podeCadastrar = isBibliotecariaLogada();
+
+  document.querySelectorAll('a[href*="cadastroLivro.html"]').forEach((link) => {
+    if (podeCadastrar) {
+      link.style.display = '';
+    } else {
+      link.style.display = 'none';
+    }
+  });
+
+  if (!podeCadastrar && window.location.href.includes('cadastroLivro.html')) {
+    alert('Acesso negado: apenas bibliotecárias podem cadastrar livros.');
+    window.location.href = '/frontend/src/pages/index.html';
+  }
+
+  // Ajusta texto de navbar para usuários não bibliotecários
+  if (!podeCadastrar) {
+    document.querySelectorAll('.nav-links a, .mobile-menu a').forEach((link) => {
+      if (link.getAttribute('href')?.includes('cadastroLivro.html')) {
+        link.style.display = 'none';
+      }
+    });
+  }
 }
 
 let bibliotecaAutoRefreshId = null;
@@ -194,9 +247,13 @@ async function atualizarBibliotecaELista() {
   }
 
   const usuarioId = getUsuarioLogadoId();
-  const ranking = await fetchRanking(usuarioId);
-  if (ranking) {
-    renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
+  if (usuarioId) {
+    const ranking = await fetchRanking(usuarioId);
+    if (ranking) {
+      renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
+    }
+  } else {
+    renderRank('-', '-');
   }
 }
 
@@ -243,7 +300,7 @@ function renderBooks(books, bibliotecaStatus) {
     const status = getStatusTag(progresso);
     const capa = book.imagem_capa && book.imagem_capa.trim()
       ? book.imagem_capa
-      : `https://via.placeholder.com/320x460/333/fff?text=${encodeURIComponent(book.titulo)}`;
+      : 'https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png';
 
     const card = `
       <div class="col-6 col-md-4 col-lg-3 col-xl-2">
@@ -319,6 +376,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initCadastroUsuario();
   initLogin();
   initRedefinirSenha();
+  atualizarAcessoCadastroLivro();
   initBibliotecaGrid();
   buscarUsuarios();
 })

@@ -6,7 +6,12 @@ module.exports = {
     },
 
     salvarLivro(req, res) {
-        const { titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora } = req.body
+        const { titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora, tipo_usuario } = req.body;
+
+        const tipoUsuario = (tipo_usuario || '').toLowerCase().trim();
+        if (!['bibliotecaria', 'bibliotecario', 'professor'].includes(tipoUsuario)) {
+            return res.status(403).json({ mensagem: 'Apenas bibliotecárias/bibliotecários podem cadastrar livros.' });
+        }
 
         livrosModels.guardar({ titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora }, (erro, novoLivro) => {
             if (erro) {
@@ -14,25 +19,43 @@ module.exports = {
                 return res.status(500).json({ mensagem: "Erro ao salvar livro" });
             }
 
-
             res.json({
                 titulo: "Cadastro confirmado",
                 tipo: "cadastro",
                 novoLivro
-            })
-        })
+            });
+        });
     },
     listarLivros(req, res) {
+        const capaPadrao = 'https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png';
+
         livrosModels.listarGeral((erro, livros) => {
             if (erro) {
                 return res.status(500).json({ mensagem: "Erro ao ver lista livros" })
             }
-            
-            
+
+            const livrosAtualizados = livros.map((livro) => {
+                const capa = livro.imagem_capa && livro.imagem_capa.toString().trim()
+                    ? livro.imagem_capa
+                    : capaPadrao;
+
+                return { ...livro, imagem_capa: capa };
+            });
+
+            // Atualiza permanentemente os livros sem capa no banco para evitar repetição futura.
+            const livrosParaAtualizar = livrosAtualizados.filter((livro) => livro.imagem_capa === capaPadrao);
+            if (livrosParaAtualizar.length > 0) {
+                const ids = livrosParaAtualizar.map((livro) => livro.id);
+                livrosModels.atualizarImagemCapaPadrao(ids, capaPadrao, (err) => {
+                    if (err) {
+                        console.error('Erro ao definir imagem de capa padrão nos livros:', err);
+                    }
+                });
+            }
 
             res.json({
                 titulo: "lista produtos",
-                livros
+                livros: livrosAtualizados
             })
         })
     },
