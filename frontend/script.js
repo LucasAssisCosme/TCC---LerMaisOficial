@@ -1,12 +1,4 @@
-async function buscarUsuarios ()  {
-    try {
-        const resposta = await fetch('http://localhost:3000/usuario/')
-        const json = await resposta.json()
 
-    } catch (error) {   
-        console.log(error)
-    }
-}
 async function cadastrarUsuario(formData) {
   try {
     const payload = {
@@ -38,7 +30,9 @@ async function cadastrarUsuario(formData) {
     alert('Cadastro realizado com sucesso!');
 
     // Redireciona para a tela de login (ajuste se necessário)
-    window.location.href = '/frontend/src/pages/index.html';
+    setTimeout(() => {
+      window.location.href = '/frontend/src/pages/index.html';
+    }, 500);
 
     return data;
   } catch (error) {
@@ -101,7 +95,9 @@ async function loginUsuario(formData) {
     alert('Login realizado com sucesso!');
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
-    window.location.href =  '/frontend/src/pages/index.html';
+    setTimeout(() => {
+      window.location.href =  '/frontend/src/pages/index.html';
+    }, 500);
 
     return data;
   } catch (error) {
@@ -146,7 +142,9 @@ async function redefinirSenha(formData) {
 
     const data = await resposta.json();
     alert('Senha redefinida com sucesso!');
-    window.location.href =  '/frontend/login.html';
+    setTimeout(() => {
+      window.location.href =  '/frontend/login.html';
+    }, 500);
     return data;
   } catch (error) {
     console.error('Erro ao redefinir senha:', error);
@@ -205,7 +203,16 @@ function logout() {
   localStorage.removeItem('usuarioLogadoId');
   localStorage.removeItem('usuarioLogadoTipo');
   localStorage.removeItem('token');
-  window.location.href = '/frontend/login.html';
+  
+  // Limpa o intervalo de atualização se estiver ativo
+  if (bibliotecaAutoRefreshId !== null) {
+    clearInterval(bibliotecaAutoRefreshId);
+    bibliotecaAutoRefreshId = null;
+  }
+  
+  setTimeout(() => {
+    window.location.href = '/frontend/login.html';
+  }, 300);
 }
 
 function isBibliotecariaLogada() {
@@ -244,13 +251,17 @@ function atualizarAcessoCadastroLivro() {
 let bibliotecaAutoRefreshId = null;
 let bibliotecaCachedBooks = [];
 let bibliotecaCachedStatus = [];
+let paginasCarregadas = new Set();
 
 async function atualizarBibliotecaELista() {
+  // Verifica se os elementos necessários existem
+  const inputSearch = document.querySelector('.books-grid input[type="search"]');
+  const row = document.querySelector('.books-grid .row');
+  if (!inputSearch || !row) return;
   const [books, bibliotecaStatus] = await Promise.all([fetchLivros(), fetchBiblioteca()]);
   bibliotecaCachedBooks = books;
   bibliotecaCachedStatus = bibliotecaStatus;
 
-  const inputSearch = document.querySelector('.books-grid input[type="search"]');
   const termo = inputSearch ? inputSearch.value.trim().toLowerCase() : '';
 
   if (termo) {
@@ -393,7 +404,11 @@ function renderRank(posicao, totalPaginas) {
 }
 
 async function initBibliotecaGrid() {
+  // Verifica se os elementos da biblioteca existem
   const inputSearch = document.querySelector('.books-grid input[type="search"]');
+  const row = document.querySelector('.books-grid .row');
+
+  if (!inputSearch || !row) return;
 
   if (inputSearch) {
     inputSearch.addEventListener('input', () => {
@@ -413,16 +428,28 @@ async function initBibliotecaGrid() {
 
   bibliotecaAutoRefreshId = setInterval(async () => {
     await atualizarBibliotecaELista();
-  }, 1000);
+  }, 5000);
 }
 
 
 // Inicializa comportamentos quando a página estiver pronta
 window.addEventListener('DOMContentLoaded', () => {
+  // Identifica qual página está sendo carregada
+  const currentPage = window.location.pathname;
+  paginasCarregadas.add(currentPage);
+
+  // Evita carregar mais de uma vez na mesma página
+  if (paginasCarregadas.size > 1) return;
+
   initCadastroUsuario();
   initLogin();
   initRedefinirSenha();
   atualizarAcessoCadastroLivro();
-  initBibliotecaGrid();
-  buscarUsuarios();
+  
+  // Apenas inicializa biblioteca se o usuário estiver logado (tem token)
+  const token = getToken();
+  const usuarioId = getUsuarioLogadoId();
+  if (token && usuarioId) {
+    initBibliotecaGrid();
+  }
 })

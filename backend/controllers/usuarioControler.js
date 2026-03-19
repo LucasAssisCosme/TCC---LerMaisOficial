@@ -1,4 +1,5 @@
 const usuarioModels = require("../models/usuarioModels");
+const autenticacao = require("../middleware/autenticacao");
 
 module.exports = {
   formLogin(req, res) {
@@ -18,7 +19,8 @@ module.exports = {
       }
       // Se conseguiu manda uma mensagem de confirmação
       else {
-        res.json({ message: "Bem vindo", usuario: logado });
+        const token = autenticacao.gerarToken(logado);
+        res.json({ message: "Bem vindo", usuario: logado, token });
       }
     });
   },
