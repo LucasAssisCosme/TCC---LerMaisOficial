@@ -493,13 +493,17 @@ async function initBibliotecaGrid() {
 
   await atualizarBibliotecaELista();
 
-  if (bibliotecaAutoRefreshId !== null) {
-    clearInterval(bibliotecaAutoRefreshId);
-  }
-
-  bibliotecaAutoRefreshId = setInterval(async () => {
+  // Listener para atualizar biblioteca quando um livro é adicionado
+  document.addEventListener('LivroAdicionado', async () => {
+    console.log('[Evento] Livro adicionado - atualizando biblioteca');
     await atualizarBibliotecaELista();
-  }, 5000);
+  });
+
+  // Listener para atualizar biblioteca quando o status de um livro é alterado
+  document.addEventListener('StatusLivroAlterado', async () => {
+    console.log('[Evento] Status de livro alterado - atualizando biblioteca');
+    await atualizarBibliotecaELista();
+  });
 }
 
 
