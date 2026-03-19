@@ -1,10 +1,65 @@
 
+// Função para validar senha conforme requisitos
+function validarSenha(senha) {
+  // Validações básicas
+  if (!senha || typeof senha !== 'string') {
+    return { valida: false, mensagem: 'Senha inválida' };
+  }
+
+  // Verificar comprimento (8 a 32 caracteres)
+  if (senha.length < 8 || senha.length > 32) {
+    return { valida: false, mensagem: 'Senha deve ter entre 8 e 32 caracteres' };
+  }
+
+  // Verificar espaços
+  if (/\s/.test(senha)) {
+    return { valida: false, mensagem: 'Senha não pode conter espaços' };
+  }
+
+  // Verificar acentuação
+  const semAcentos = senha.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (semAcentos !== senha) {
+    return { valida: false, mensagem: 'Senha não pode conter acentuação' };
+  }
+
+  // Verificar letra maiúscula
+  if (!/[A-Z]/.test(senha)) {
+    return { valida: false, mensagem: 'Senha deve conter pelo menos uma letra maiúscula' };
+  }
+
+  // Verificar letra minúscula
+  if (!/[a-z]/.test(senha)) {
+    return { valida: false, mensagem: 'Senha deve conter pelo menos uma letra minúscula' };
+  }
+
+  // Verificar número
+  if (!/\d/.test(senha)) {
+    return { valida: false, mensagem: 'Senha deve conter pelo menos um número' };
+  }
+
+  // Verificar símbolo (caracteres especiais permitidos)
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
+    return { valida: false, mensagem: `Senha deve conter pelo menos um símbolo: !@#$%^&*()_+-=[]{};\\':"\\|,.<>/?` };
+  }
+
+  return { valida: true, mensagem: 'Senha válida' };
+}
+
 async function cadastrarUsuario(formData) {
   try {
+    const senha = formData.get('senha');
+
+    // Validar senha
+    const validacaoSenha = validarSenha(senha);
+    if (!validacaoSenha.valida) {
+      alert(validacaoSenha.mensagem);
+      return;
+    }
+
     const payload = {
       nome: formData.get('nome'),
       email: formData.get('email'),
-      senha: formData.get('senha'),
+      senha: senha,
       tipo: formData.get('tipo_usuario') || 'aluno',
       // Campos adicionais opcionais (ajuste conforme sua UI)
       foto_perfil: null,
@@ -121,10 +176,26 @@ function initLogin() {
 
 async function redefinirSenha(formData) {
   try {
+    const novaSenha = formData.get('nova_senha');
+    const confirmarSenha = formData.get('senha');
+
+    // Validar nova senha
+    const validacaoSenha = validarSenha(novaSenha);
+    if (!validacaoSenha.valida) {
+      alert(validacaoSenha.mensagem);
+      return;
+    }
+
+    // Validar se as senhas coincidem
+    if (novaSenha !== confirmarSenha) {
+      alert('As senhas não coincidem');
+      return;
+    }
+
     const payload = {
       email: formData.get('email'),
-      novaSenha: formData.get('nova_senha'),
-      confirmarSenha: formData.get('senha')
+      novaSenha: novaSenha,
+      confirmarSenha: confirmarSenha
     };
 
     const resposta = await fetch('http://localhost:3000/usuario/esqueceuSenha', {
@@ -422,13 +493,17 @@ async function initBibliotecaGrid() {
 
   await atualizarBibliotecaELista();
 
-  if (bibliotecaAutoRefreshId !== null) {
-    clearInterval(bibliotecaAutoRefreshId);
-  }
-
-  bibliotecaAutoRefreshId = setInterval(async () => {
+  // Listener para atualizar biblioteca quando um livro é adicionado
+  document.addEventListener('LivroAdicionado', async () => {
+    console.log('[Evento] Livro adicionado - atualizando biblioteca');
     await atualizarBibliotecaELista();
-  }, 5000);
+  });
+
+  // Listener para atualizar biblioteca quando o status de um livro é alterado
+  document.addEventListener('StatusLivroAlterado', async () => {
+    console.log('[Evento] Status de livro alterado - atualizando biblioteca');
+    await atualizarBibliotecaELista();
+  });
 }
 
 
