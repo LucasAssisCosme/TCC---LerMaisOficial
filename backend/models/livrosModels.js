@@ -2,11 +2,15 @@ const conn = require("../config/banco")
 
 module.exports = {
      guardar: ({titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora}, callback) => {
-           //Variavel que guarda consulta sql
+           //Tem fallback de capa também no backend
+         const capaPadrao = 'https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png';
+         const capaFinal = imagem_capa && imagem_capa.toString().trim() ? imagem_capa : capaPadrao;
+
+         //Variavel que guarda consulta sql
          const sql = `INSERT INTO livros(titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora)
          VALUES(?, ?, ?, ?, ?,?, ?, ?)`
 
-         const valores = [titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora]
+         const valores = [titulo, autor, genero, ano, numero_paginas, descricao, capaFinal, editora]
 
           conn.query( sql, valores, (erro, resultados) => {
           if(erro){
@@ -71,7 +75,19 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
     }
     callback(null, { id, ...camposValidos });
   });
-},
+},      atualizarImagemCapaPadrao: (ids, capaPadrao, callback) => {
+          if (!Array.isArray(ids) || ids.length === 0) {
+              return callback(null, null);
+          }
+
+          const sql = `UPDATE livros SET imagem_capa = ? WHERE id IN (?)`;
+          conn.query(sql, [capaPadrao, ids], (erro, resultado) => {
+              if (erro) {
+                  return callback(erro, null);
+              }
+              callback(null, resultado);
+          });
+      },
       deletar: (id, callback) => {
             //Variavel sql que guarda a consulta desejada
                  const sql = `DELETE FROM livros WHERE id = ?`

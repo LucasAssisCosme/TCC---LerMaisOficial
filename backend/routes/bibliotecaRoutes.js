@@ -2,17 +2,20 @@ const express = require("express")
 const router = express.Router()
 
 const bibliotecaController = require("../controllers/bibliotecaControler")
+const autenticacao = require("../middleware/autenticacao")
 
-router.get("/cadastrar", bibliotecaController.cadastrarStatus)
+router.get("/cadastrar", autenticacao.verificarToken, bibliotecaController.cadastrarStatus)
 
-router.post("/cadastrar", bibliotecaController.salvarStatus)
+router.post("/cadastrar", autenticacao.verificarToken, bibliotecaController.salvarStatus)
 
-router.get("/", bibliotecaController.listarTodos)
+router.get("/", autenticacao.verificarToken, bibliotecaController.listarTodos)
 
-router.get("/:id", bibliotecaController.buscarStatus)
+router.get("/usuario/:usuarioId", autenticacao.verificarToken, bibliotecaController.listarPorUsuario)
 
-router.patch("/:id", bibliotecaController.atualizarStatus)
+router.get("/:id", autenticacao.verificarToken, bibliotecaController.buscarStatus)
 
-router.delete("/deletar/:id", bibliotecaController.deletarStatus)
+router.patch("/:id", autenticacao.verificarToken, bibliotecaController.atualizarStatus)
+
+router.delete("/deletar/:id", autenticacao.verificarToken, bibliotecaController.deletarStatus)
 
 module.exports = router

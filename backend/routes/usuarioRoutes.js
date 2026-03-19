@@ -5,7 +5,7 @@ const roteador = express.Router()
 
 //Importando tudo que tem no arquivo de controller do usuario 
 const usuarioControler = require("../controllers/usuarioControler")
-
+const autenticacao = require("../middleware/autenticacao")
 
 //Crud
 roteador.get("/login", usuarioControler.formLogin)
@@ -17,10 +17,10 @@ roteador.get("/cadastrar", usuarioControler.usuarioCadastro)
 roteador.post("/cadastrar", usuarioControler.salvarUsuario)
 //Rota para enviar dados da página de cadastro
 //Retorna as informações de todos os usuarios
-roteador.get("/", usuarioControler.listarUsuarios)
+roteador.get("/", autenticacao.verificarToken, usuarioControler.listarUsuarios)
 //Retorna as informações de um usuário apenas
 
-roteador.get("/:id", usuarioControler.buscarUsuario)
+roteador.get("/:id", autenticacao.verificarToken, usuarioControler.buscarUsuario)
 //Rota mudar senha (por ID + email)
 roteador.post("/esqueceuSenha/:id", usuarioControler.mudarSenhaUsuario)
 
@@ -32,11 +32,11 @@ roteador.post("/esqueceuSenha", usuarioControler.mudarSenhaUsuarioPorEmail)
 
 // U = Atualizar um usuario
 
-roteador.patch("/:id", usuarioControler.atualizarUsuario)
+roteador.patch("/:id", autenticacao.verificarToken, usuarioControler.atualizarUsuario)
 
 // D = Deletar um usuario
 
-roteador.delete("/deletar/:id", usuarioControler.deletarUsuario)
+roteador.delete("/deletar/:id", autenticacao.verificarToken, usuarioControler.deletarUsuario)
 
 
 

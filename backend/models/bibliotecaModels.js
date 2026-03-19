@@ -42,6 +42,18 @@ module.exports = {
         })
     },
 
+    listaPorUsuario: (usuario_id, callback) => {
+        const sql = `SELECT * FROM biblioteca WHERE usuario_id = ?`
+
+        conn.query(sql, [usuario_id], (erro, resultados) => {
+            if (erro) {
+                return callback(erro, null)
+            }
+
+            callback(null, resultados)
+        })
+    },
+
     listarStatusPorid: (id, callback) => {
 
         const sql = `SELECT * FROM biblioteca WHERE id = ?`
