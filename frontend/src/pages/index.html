@@ -1,100 +1,51 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - Início</title>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Ler Mais</title>
+  <link rel="stylesheet" href="/frontend/src/css/index.css">
 
-    <link rel="stylesheet" href="/frontend/src/css/index.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-  </head>
+</head>
+<body class="home-page">
+  <header>
+    <div class="header container"> 
+      <div class="info-perfil">
+            <img src="../../logo.png" alt="">    
+            <div class="perfil">
+              <img src="../../User.png" alt="">
+              <span>PERFIL</span>
+            </div>
+      </div>        
 
-  <body class="home-page">
-   <header class="app-navbar">
-  <div class="container-fluid navbar-content">
+      <nav>
+        <ul class="nav-list">
+          <li class="item-list">
+            <a href="/frontend/src/pages/index.html">Inicio</a>
+          </li>
+          <li class="item-list">
+            <a href="/frontend/src/pages/cadastroLivro.html">Cadastrar Livros</a>
+          </li>
+          <li class="item-list">
+            <a href="/frontend/src/pages/biblioteca.html">Biblioteca</a>
+          </li>
+          <li class="item-list">
+            <a href="/frontend/login.html">Saida</a>
+          </li>
 
-    <!-- Logo + Perfil -->
-    <div class="left-area">
-      <img class="logo" src="/frontend/logo.png" alt="logo">
-
-      <div class="perfil">
-        <span class="icon">👤</span>
-        <nav class="nav-links">
-        <a href="/">PERFIL</a>
+        </ul>
       </nav>
-      </div>
     </div>
- 
-    <!-- Menu -->
-    <nav class="nav-links">
-      <a href="/frontend/src/pages/index.html"><img src="" alt=""> INÍCIO</a>
-      <a href="/frontend/src/pages/cadastroLivro.html"><img src="" alt=""> CADASTRAR LIVRO</a>
-      <a href="/frontend/src/pages/biblioteca.html"><img src="" alt="">  BIBLIOTECA</a>
-      <a href="/"><img src="" alt="">  SAÍDA</a>
-    </nav>
+  </header>
 
-  </div>
-</header>
 
-        <button
-          class="btn btn-sm btn-light d-md-none"
-          type="button"
-          aria-label="Menu"
-          id="navbarToggle"
-        >
-          ☰
-        </button>
-      </div>
 
-      <div class="mobile-menu" id="mobileMenu">
-        <a href="/frontend/src/pages/index.html" class="mobile-link active">INÍCIO</a>
-        <a href="/frontend/src/pages/perfil.html" class="mobile-link">PERFIL</a>
-        <a href="/frontend/src/pages/cadastroLivro.html" class="mobile-link">CADASTRAR LIVRO</a>
-        <a href="/frontend/src/pages/biblioteca.html" class="mobile-link">BIBLIOTECA</a>
-        <a href="/frontend/login.html" class="mobile-link">SAÍDA</a>
-      </div>
-      
-    </header>
 
-    <main>
-    <section>
 
-    </section>
-         
-    <section>
 
-    </section>
-    </main>
-   
- <footer class="app-footer">
 
-  <div class="footer-left">
-    <a href="/frontend/src/pages/index.html">Home</a>
-    <a href="/">Perfil</a>
-  </div>
 
-  <div class="footer-center">
-    <img src="/frontend/logo.png" alt="Logo" class="footer-logo">
-  </div>
 
-  <div class="footer-right">
-    <small>Todos os direitos reservados</small>
-  </div>
 
-</footer>
 
-    <script src="/script.js"></script>
-    <script>
-      const toggle = document.getElementById("navbarToggle");
-      const mobileMenu = document.getElementById("mobileMenu");
-      toggle?.addEventListener("click", () => {
-        mobileMenu.classList.toggle("open");
-      });
-    </script>
-  </body>
+</body>
 </html>
