@@ -9,10 +9,14 @@
 .home-page {
     background-color: #DAC1B1
 }
+img {
+  max-width: 100%;
+}
 
 .container{
   max-width: 1800px;
   margin: 0 auto;
+
 }
 
 header{
@@ -44,6 +48,7 @@ justify-content: space-between;
 }
 .perfil a{
 color: white;
+text-decoration: none;
 }
 
 .nav-list {

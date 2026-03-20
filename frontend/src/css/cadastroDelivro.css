@@ -42,7 +42,7 @@ justify-content: space-between;
   align-items: center;
   gap: 8px;
 }
-.perfil span{
+.perfil a{
 color: white;
 }
 
@@ -65,6 +65,15 @@ color: white;
    
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
 .app-footer{
 display:flex;
 align-items:center;
@@ -72,6 +81,8 @@ justify-content:space-between;
 background:#8b2a12;
 color:white;
 padding:15px 30px;
+margin-top: auto;
+
 
 }
 
@@ -104,7 +115,6 @@ border-radius: 20px;
 .footer-right{
 font-size:13px;
 }
-
 
 body {
   background-color: #d2b8a3;
