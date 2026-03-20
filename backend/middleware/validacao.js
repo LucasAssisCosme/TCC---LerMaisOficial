@@ -33,17 +33,16 @@ const validarCadastroUsuario = [
   body('tipo')
     .optional()
     .trim()
-    .isIn(['aluno', 'professor', 'bibliotecario', 'bibliotecaria', 'admin'])
-    .withMessage('Tipo de usuário inválido'),
+    .isIn(['aluno', 'bibliotecaria'])
+    .withMessage('Tipo de usuário inválido. Use: aluno ou bibliotecaria'),
   
-  body('bio')
-    .optional()
-    .trim()
-    .isLength({ max: 500 }).withMessage('Bio não pode exceder 500 caracteres'),
+  body('genero_favorito')
+    .notEmpty().withMessage('Gênero favorito é obrigatório')
+    .isIn(['Romance', 'Fantasia', 'Terror', 'Aventura', 'Ficcao_Cientifica', 'Drama', 'Autoajuda', 'Outro'])
+    .withMessage('Gênero favorito inválido'),
   
   body('apelido')
-    .optional()
-    .trim()
+    .notEmpty().withMessage('Apelido é obrigatório')
     .isLength({ min: 2, max: 50 }).withMessage('Apelido deve ter entre 2 e 50 caracteres'),
   
   tratarErrosValidacao

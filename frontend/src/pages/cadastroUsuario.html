@@ -47,14 +47,39 @@
           <div class="mb-3">
             <label for="inputTipoUsuario" class="form-label">Tipo de Usuário</label>
             <select name="tipo_usuario" id="inputTipoUsuario" class="form-control form-control-lg">
-              <option value="">Selecione o tipo de usuário</option>
+              <option>Selecione o tipo de usuário</option>
               <option value="aluno">Aluno</option>
-              <option value="bibliotecario">Bibliotecário</option>
+             <option value="bibliotecaria">Bibliotecária</option>
+            </select>
+          </div>
+
+          <div class="mb-3">            <label for="inputGeneroFavorito" class="form-label">Gênero Favorito</label>
+            <select name="genero_favorito" id="inputGeneroFavorito" class="form-control form-control-lg" required>
+              <option value="">Selecione seu gênero favorito</option>
+              <option value="Romance">Romance</option>
+              <option value="Fantasia">Fantasia</option>
+              <option value="Terror">Terror</option>
+              <option value="Aventura">Aventura</option>
+              <option value="Ficcao_Cientifica">Ficção Científica</option>
+              <option value="Drama">Drama</option>
+              <option value="Autoajuda">Autoajuda</option>
+              <option value="Outro">Outro</option>
             </select>
           </div>
 
           <div class="mb-3">
-            <label for="inputSenha" class="form-label">Senha</label>
+            <label for="inputApelido" class="form-label">Apelido</label>
+            <input
+              type="text"
+              id="inputApelido"
+              class="form-control form-control-lg"
+              placeholder="Digite seu apelido"
+              name="apelido"
+              required
+            />
+          </div>
+
+          <div class="mb-3">            <label for="inputSenha" class="form-label">Senha</label>
             <input
               type="password"
               id="inputSenha"
