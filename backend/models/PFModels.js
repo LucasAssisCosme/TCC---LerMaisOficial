@@ -64,11 +64,14 @@ module.exports = {
     },
 
     atualizarPF: (id, dados, callback) => {
-
+        // ✅ WHITELIST: Colunas permitidas para atualização
+        const colunasPermitidas = ['trecho'];
+        
         const camposValidos = {}
 
         Object.keys(dados).forEach(key => {
-            if (dados[key] !== undefined && dados[key] !== "") {
+            // ✅ Validar se coluna está na whitelist
+            if (colunasPermitidas.includes(key) && dados[key] !== undefined && dados[key] !== "") {
                 camposValidos[key] = dados[key]
             }
         })
