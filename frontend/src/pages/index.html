@@ -136,15 +136,16 @@
           img.title = livro.titulo;
           img.style.cursor = 'pointer';
           
-          // Adicionar clique para adicionar à biblioteca
+          // Clique abre detalhes ou não faz nada (sem adicionar à biblioteca)
           img.addEventListener('click', () => {
             const usuarioId = getUsuarioLogadoId();
             if (!usuarioId) {
-              alert('Você precisa estar logado para adicionar livros à biblioteca');
+              alert('Você precisa estar logado para ver mais detalhes');
               window.location.href = '/frontend/login.html';
               return;
             }
-            salvarStatusBiblioteca(usuarioId, livro.id, 'quero_ler');
+            // Aqui pode ir para uma página de detalhes caso deseje.
+            // Ex: window.location.href = `/frontend/src/pages/informacoes.html?livroId=${livro.id}`;
           });
           
           livrosDiv.appendChild(img);
@@ -191,6 +192,11 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => {
+      carregarCategoriasLivros();
+    });
+
+    // Atualizar lista de livros quando um novo livro é cadastrado
+    document.addEventListener('LivroCadastrado', () => {
       carregarCategoriasLivros();
     });
   </script>
