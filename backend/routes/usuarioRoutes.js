@@ -10,7 +10,8 @@ const {
   validarCadastroUsuario, 
   validarLoginUsuario, 
   validarRedefinirSenha, 
-  validarIdUsuario 
+  validarIdUsuario,
+  validarAtualizacaoUsuario
 } = require("../middleware/validacao")
 
 //Crud
@@ -38,7 +39,7 @@ roteador.post("/esqueceuSenha", validarRedefinirSenha, usuarioControler.mudarSen
 
 // U = Atualizar um usuario
 
-roteador.patch("/:id", autenticacao.verificarToken, usuarioControler.atualizarUsuario)
+roteador.patch("/:id", autenticacao.verificarToken, validarAtualizacaoUsuario, usuarioControler.atualizarUsuario)
 
 // D = Deletar um usuario
 

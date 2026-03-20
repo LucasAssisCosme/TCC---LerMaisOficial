@@ -155,10 +155,14 @@ esqueceuSenhaPorEmail: (email, senha, callback) => {
   })
 }, 
  atualizar: (id, dados, callback) => {
-  // Filtrar apenas campos com valores válidos (não undefined e não vazios)
+  // ✅ WHITELIST: Colunas permitidas para atualização
+  const colunasPermitidas = ['nome', 'email', 'bio', 'genero_favorito', 'apelido', 'foto_perfil', 'senha'];
+  
+  // Filtrar apenas campos com valores válidos (não undefined e não vazios) e permitidos
   const camposValidos = {};
   Object.keys(dados).forEach(key => {
-    if (dados[key] !== undefined && dados[key] !== '') {
+    // ✅ Validar se coluna está na whitelist
+    if (colunasPermitidas.includes(key) && dados[key] !== undefined && dados[key] !== '') {
       camposValidos[key] = dados[key];
     }
   });

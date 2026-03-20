@@ -61,11 +61,8 @@ async function cadastrarUsuario(formData) {
       email: formData.get('email'),
       senha: senha,
       tipo: formData.get('tipo_usuario') || 'aluno',
-      // Campos adicionais opcionais (ajuste conforme sua UI)
-      foto_perfil: null,
-      bio: null,
-      genero_favorito: null,
-      apelido: null
+      genero_favorito: formData.get('genero_favorito'),
+      apelido: formData.get('apelido')
     };
 
     const resposta = await fetch('http://localhost:3000/usuario/cadastrar', {
@@ -84,10 +81,20 @@ async function cadastrarUsuario(formData) {
     const data = await resposta.json();
     alert('Cadastro realizado com sucesso!');
 
-    // Redireciona para a tela de login (ajuste se necessário)
-    setTimeout(() => {
-      window.location.href = '/frontend/src/pages/index.html';
-    }, 500);
+    // Auto-login após cadastro bem-sucedido
+    try {
+      const loginFormData = new FormData();
+      loginFormData.append('email', formData.get('email'));
+      loginFormData.append('senha', senha);
+      
+      await loginUsuario(loginFormData, true); // true = auto-login, não mostra alert
+    } catch (loginError) {
+      console.error('Erro no auto-login:', loginError);
+      // Se auto-login falhar, redireciona para login manual
+      setTimeout(() => {
+        window.location.href = '/frontend/login.html';
+      }, 500);
+    }
 
     return data;
   } catch (error) {
@@ -109,7 +116,7 @@ function initCadastroUsuario() {
   });
 }
 
-async function loginUsuario(formData) {
+async function loginUsuario(formData, isAutoLogin = false) {
   try {
     const payload = {
       email: formData.get('email'),
@@ -147,7 +154,10 @@ async function loginUsuario(formData) {
       localStorage.setItem('token', data.token);
     }
 
-    alert('Login realizado com sucesso!');
+    // Só mostra alert se não for auto-login
+    if (!isAutoLogin) {
+      alert('Login realizado com sucesso!');
+    }
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
     setTimeout(() => {
@@ -325,10 +335,14 @@ let bibliotecaCachedStatus = [];
 let paginasCarregadas = new Set();
 
 async function atualizarBibliotecaELista() {
+  console.log('[Função] atualizarBibliotecaELista chamada');
   // Verifica se os elementos necessários existem
   const inputSearch = document.querySelector('.books-grid input[type="search"]');
   const row = document.querySelector('.books-grid .row');
-  if (!inputSearch || !row) return;
+  if (!inputSearch || !row) {
+    console.log('[Função] Elementos não encontrados, saindo');
+    return;
+  }
   
   const [livrosDaBiblioteca, bibliotecaStatus] = await Promise.all([fetchBiblioteca()]);
   bibliotecaCachedBooks = livrosDaBiblioteca;
@@ -361,6 +375,7 @@ async function atualizarBibliotecaELista() {
 
 
 async function fetchBiblioteca() {
+  console.log('[Função] fetchBiblioteca chamada');
   try {
     const usuarioId = getUsuarioLogadoId();
     const token = getToken();
@@ -460,10 +475,11 @@ async function salvarStatusBiblioteca(usuarioId, livroId, progresso = 'quero_ler
 
     console.log('[Frontend] Status salvo com sucesso:', data);
     alert('Livro adicionado à biblioteca!');
-    
+
     // Dispara evento para atualizar biblioteca
+    console.log('[Evento] Disparando StatusLivroAlterado');
     document.dispatchEvent(new Event('StatusLivroAlterado'));
-    
+
     return data;
   } catch (error) {
     console.error('[Frontend] Erro ao salvar status:', error);
@@ -473,6 +489,7 @@ async function salvarStatusBiblioteca(usuarioId, livroId, progresso = 'quero_ler
 }
 
 function renderBooks(books, bibliotecaStatus) {
+  console.log('[Função] renderBooks chamada com', books.length, 'livros');
   const row = document.querySelector('.books-grid .row');
   const countEl = document.querySelector('.books-header h3');
   if (!row) return;

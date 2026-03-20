@@ -33,17 +33,16 @@ const validarCadastroUsuario = [
   body('tipo')
     .optional()
     .trim()
-    .isIn(['aluno', 'professor', 'bibliotecario', 'bibliotecaria', 'admin'])
-    .withMessage('Tipo de usuário inválido'),
+    .isIn(['aluno', 'bibliotecaria'])
+    .withMessage('Tipo de usuário inválido. Use: aluno ou bibliotecaria'),
   
-  body('bio')
-    .optional()
-    .trim()
-    .isLength({ max: 500 }).withMessage('Bio não pode exceder 500 caracteres'),
+  body('genero_favorito')
+    .notEmpty().withMessage('Gênero favorito é obrigatório')
+    .isIn(['Romance', 'Fantasia', 'Terror', 'Aventura', 'Ficcao_Cientifica', 'Drama', 'Autoajuda', 'Outro'])
+    .withMessage('Gênero favorito inválido'),
   
   body('apelido')
-    .optional()
-    .trim()
+    .notEmpty().withMessage('Apelido é obrigatório')
     .isLength({ min: 2, max: 50 }).withMessage('Apelido deve ter entre 2 e 50 caracteres'),
   
   tratarErrosValidacao
@@ -175,6 +174,79 @@ const validarIdLivro = [
   tratarErrosValidacao
 ];
 
+// ✅ Validações para Atualização de Usuário
+const validarAtualizacaoUsuario = [
+  param('id')
+    .isInt({ min: 1 }).withMessage('ID de usuário inválido'),
+  
+  body('nome')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 100 }).withMessage('Nome deve ter entre 2 e 100 caracteres')
+    .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('Nome pode conter apenas letras e espaços'),
+  
+  body('email')
+    .optional()
+    .trim()
+    .isEmail().withMessage('Email inválido')
+    .normalizeEmail(),
+  
+  body('senha')
+    .optional()
+    .isLength({ min: 8, max: 32 }).withMessage('Senha deve ter entre 8 e 32 caracteres'),
+  
+  body('bio')
+    .optional()
+    .trim()
+    .isLength({ max: 500 }).withMessage('Bio não pode exceder 500 caracteres'),
+  
+  body('apelido')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 50 }).withMessage('Apelido deve ter entre 2 e 50 caracteres'),
+  
+  body('genero_favorito')
+    .optional()
+    .trim()
+    .isLength({ max: 50 }).withMessage('Gênero favorito não pode exceder 50 caracteres'),
+  
+  body('foto_perfil')
+    .optional()
+    .trim()
+    .isURL().withMessage('URL da foto de perfil inválida'),
+  
+  tratarErrosValidacao
+];
+
+// ✅ Validações para Cadastro de Partes Favoritas
+const validarCadastroPF = [
+  body('usuario_id')
+    .isInt({ min: 1 }).withMessage('ID do usuário inválido'),
+  
+  body('livro_id')
+    .isInt({ min: 1 }).withMessage('ID do livro inválido'),
+  
+  body('trecho')
+    .trim()
+    .notEmpty().withMessage('Trecho é obrigatório')
+    .isLength({ min: 5, max: 1000 }).withMessage('Trecho deve ter entre 5 e 1000 caracteres'),
+  
+  tratarErrosValidacao
+];
+
+// ✅ Validações para Atualização de Partes Favoritas
+const validarAtualizacaoPF = [
+  param('id')
+    .isInt({ min: 1 }).withMessage('ID de parte favorita inválido'),
+  
+  body('trecho')
+    .optional()
+    .trim()
+    .isLength({ min: 5, max: 1000 }).withMessage('Trecho deve ter entre 5 e 1000 caracteres'),
+  
+  tratarErrosValidacao
+];
+
 // Validações para Biblioteca
 const validarStatusBiblioteca = [
   body('usuario_id')
@@ -211,9 +283,12 @@ module.exports = {
   validarLoginUsuario,
   validarRedefinirSenha,
   validarIdUsuario,
+  validarAtualizacaoUsuario,
   validarCadastroLivro,
   validarAtualizacaoLivro,
   validarIdLivro,
+  validarCadastroPF,
+  validarAtualizacaoPF,
   validarStatusBiblioteca,
   validarAvaliacao,
   tratarErrosValidacao
