@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ler-mais Cadastro de Livro</title>
-    <link rel="stylesheet" href="/frontend/src/css/index.css" />
+    <link rel="stylesheet" href="/frontend/src/css/cadastroDelivro.css" />
 
   </head>
     <body class="home-page">
@@ -38,11 +38,81 @@
       </nav>
     </div>
   </header>
+<main class="cadastro-box">
 
+  <h1>CADASTRAR LIVRO</h1>
 
+  <form class="formulario">
 
+    <!-- ESQUERDA -->
+    <div class="lado-esquerdo">
+    
+      <label>Nome Livro</label> 
+      <input type="text" name="nome">
 
+      <label>Descrição</label>
+      <input type="text" name="descricao">
 
+      <div class="linha">
+        <div class="campo">
+          <label>Número de páginas</label>
+          <input type="number" name="paginas">
+        </div>
+      </div>
+
+      <div>
+      <label>Ano</label>
+      <input type="number" name="ano">
+</div>
+
+<div>
+      <label>Editora</label>
+      <input type="text" name="editora">
+
+      <label>Assunto</label>
+      <select name="assunto">
+        <option>Romance</option>
+        <option>Terror</option>
+        <option>Ficção</option>
+        <option>Ação</option>
+      </select>
+</div>
+
+<div>
+      <label>Autor</label>
+      <input type="text" name="autor">
+</div>
+    </div>
+
+    <!-- DIREITA -->
+   <div class="lado-direito">
+
+  <div class="campo2">
+    <label>Imagem Livro</label>
+    <input type="url" id="inputImagem" name="imagem" placeholder="Cole a URL da imagem">
+  </div>
+
+  <img 
+    id="previewImagem"
+    src="https://static.vecteezy.com/ti/vetor-gratis/p1/26619142-padrao-avatar-perfil-icone-do-social-meios-de-comunicacao-do-utilizador-foto-imagem-vetor.jpg"
+    class="preview">
+
+  <button type="submit">Confirmar</button>
+
+</div>
+  </form>
+
+<script>
+const inputImagem = document.getElementById("inputImagem");
+const previewImagem = document.getElementById("previewImagem");
+
+const imagemPadrao = "https://static.vecteezy.com/ti/vetor-gratis/p1/26619142-padrao-avatar-perfil-icone-do-social-meios-de-comunicacao-do-utilizador-foto-imagem-vetor.jpg";
+
+inputImagem.addEventListener("input", () => {
+  previewImagem.src = inputImagem.value || imagemPadrao;
+});
+</script>
+</main>
 
 
  <footer class="app-footer">
