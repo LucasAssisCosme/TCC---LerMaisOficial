@@ -6,9 +6,6 @@
   text-decoration: none;
 
 }
-.home-page {
-    background-color: #DAC1B1
-}
 img {
   max-width: 100%;
 }
@@ -107,7 +104,6 @@ font-size:14px;
 
 
 .footer-center{
-
 left:50%;
 transform:translateX(-50%);
 }
@@ -119,4 +115,121 @@ border-radius: 20px;
 
 .footer-right{
 font-size:13px;
+}
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #853030dc;
+  color: white;
+}
+
+.perfil-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 40px;
+}
+
+
+.titulo {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+
+.foto-perfil {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.circulo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: auto;
+
+  background: url("https://cdn-icons-png.flaticon.com/512/149/149071.png");
+  background-size: cover;
+  background-position: center;
+  transition: 0.3s;
+}
+
+.circulo:hover {
+  transform: scale(1.05);
+}
+
+.grid-perfil {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 25px;
+}
+
+
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.grande {
+  grid-column: span 3;
+}
+
+
+input, textarea {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+
+  background: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+ 
+  backdrop-filter: blur(5px);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #aaa;
+  resize: none;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border: none;
+}
+
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 40px;
+  gap: 15px;
+}
+span{
+    font-size: 30px;
+}
+.btn-cancelar {
+ background: #e50914;
+  border: none;
+  padding: 10px 25px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-salvar {
+  background: #e50914;
+  border: none;
+  padding: 10px 25px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-salvar:hover {
+  background: #b20710;
+}
+label{
+    font-size: 25px;
 }
