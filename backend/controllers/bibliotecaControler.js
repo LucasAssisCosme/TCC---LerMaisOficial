@@ -10,12 +10,33 @@ module.exports = {
 
         const { usuario_id, livro_id, progresso } = req.body
 
+        console.log('[Biblioteca] Tentando salvar status:', { usuario_id, livro_id, progresso });
+
+        // Validar dados
+        if (!usuario_id || !livro_id || !progresso) {
+            console.error('[Biblioteca] Dados incompletos:', { usuario_id, livro_id, progresso });
+            return res.status(400).json({ mensagem: "usuario_id, livro_id e progresso são obrigatórios" })
+        }
+
+        if (!['lido', 'lendo', 'quero_ler'].includes(progresso)) {
+            console.error('[Biblioteca] Progresso inválido:', progresso);
+            return res.status(400).json({ mensagem: "Progresso deve ser: lido, lendo ou quero_ler" })
+        }
+
         bibliotecaModels.guardar({ usuario_id, livro_id, progresso }, (erro, novoStatus) => {
 
             if (erro) {
-                return res.status(500).json({ mensagem: "Erro ao salvar status" })
+                console.error('[Biblioteca] Erro ao salvar:', erro.message || erro.sqlMessage || erro);
+                
+                // Verifica se é erro de violação de constraint (livro já adicionado)
+                if (erro.code === 'ER_DUP_ENTRY') {
+                    return res.status(409).json({ mensagem: "Este livro já está na sua biblioteca" })
+                }
+                
+                return res.status(500).json({ mensagem: "Erro ao salvar status", erro: erro.message })
             }
 
+            console.log('[Biblioteca] Status salvo com sucesso:', novoStatus);
             res.json({
                 titulo: "Status salvo",
                 novoStatus
@@ -47,8 +68,8 @@ module.exports = {
             }
 
             res.json({
-                titulo: "Status do usuário",
-                status
+                titulo: "Livros do usuário",
+                status: status
             })
         })
     },

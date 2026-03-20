@@ -2,17 +2,19 @@ const express = require("express")
 const router = express.Router()
 
 const avaliacoesController = require("../controllers/avaliacoesControler")
+const autenticacao = require("../middleware/autenticacao")
+const { validarAvaliacao, validarIdLivro } = require("../middleware/validacao")
 
-router.get("/cadastrar", avaliacoesController.cadastrarAvaliacao)
+router.get("/cadastrar", autenticacao.verificarToken, avaliacoesController.cadastrarAvaliacao)
 
-router.post("/cadastrar", avaliacoesController.salvarAvaliacao)
+router.post("/cadastrar", autenticacao.verificarToken, validarAvaliacao, avaliacoesController.salvarAvaliacao)
 
 router.get("/", avaliacoesController.listarTodas)
 
-router.get("/:id", avaliacoesController.buscarAvaliacao)
+router.get("/:id", validarIdLivro, avaliacoesController.buscarAvaliacao)
 
-router.patch("/:id", avaliacoesController.atualizarAvaliacao)
+router.patch("/:id", autenticacao.verificarToken, validarAvaliacao, avaliacoesController.atualizarAvaliacao)
 
-router.delete("/deletar/:id", avaliacoesController.deletarAvaliacao)
+router.delete("/deletar/:id", autenticacao.verificarToken, validarIdLivro, avaliacoesController.deletarAvaliacao)
 
 module.exports = router

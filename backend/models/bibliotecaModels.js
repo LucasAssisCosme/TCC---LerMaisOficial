@@ -43,7 +43,25 @@ module.exports = {
     },
 
     listaPorUsuario: (usuario_id, callback) => {
-        const sql = `SELECT * FROM biblioteca WHERE usuario_id = ?`
+        const sql = `
+        SELECT 
+            biblioteca.id,
+            biblioteca.usuario_id,
+            biblioteca.livro_id,
+            biblioteca.progresso,
+            livros.titulo,
+            livros.autor,
+            livros.genero,
+            livros.ano,
+            livros.numero_paginas,
+            livros.descricao,
+            livros.imagem_capa,
+            livros.editora
+        FROM biblioteca
+        JOIN livros ON biblioteca.livro_id = livros.id
+        WHERE biblioteca.usuario_id = ?
+        ORDER BY livros.titulo ASC
+        `
 
         conn.query(sql, [usuario_id], (erro, resultados) => {
             if (erro) {

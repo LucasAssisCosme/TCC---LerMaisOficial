@@ -329,19 +329,23 @@ async function atualizarBibliotecaELista() {
   const inputSearch = document.querySelector('.books-grid input[type="search"]');
   const row = document.querySelector('.books-grid .row');
   if (!inputSearch || !row) return;
-  const [books, bibliotecaStatus] = await Promise.all([fetchLivros(), fetchBiblioteca()]);
-  bibliotecaCachedBooks = books;
-  bibliotecaCachedStatus = bibliotecaStatus;
+  
+  const [livrosDaBiblioteca, bibliotecaStatus] = await Promise.all([fetchBiblioteca()]);
+  bibliotecaCachedBooks = livrosDaBiblioteca;
+  bibliotecaCachedStatus = livrosDaBiblioteca.map(livro => ({
+    livro_id: livro.livro_id,
+    progresso: livro.progresso
+  }));
 
   const termo = inputSearch ? inputSearch.value.trim().toLowerCase() : '';
 
   if (termo) {
-    const filtrados = books.filter((book) =>
-      book.titulo.toLowerCase().includes(termo) || book.autor.toLowerCase().includes(termo)
+    const filtrados = livrosDaBiblioteca.filter((livro) =>
+      livro.titulo.toLowerCase().includes(termo) || livro.autor.toLowerCase().includes(termo)
     );
-    renderBooks(filtrados, bibliotecaStatus);
+    renderBooks(filtrados, bibliotecaCachedStatus);
   } else {
-    renderBooks(books, bibliotecaStatus);
+    renderBooks(livrosDaBiblioteca, bibliotecaCachedStatus);
   }
 
   const usuarioId = getUsuarioLogadoId();
@@ -396,9 +400,81 @@ async function fetchLivros() {
   }
 }
 
+async function salvarStatusBiblioteca(usuarioId, livroId, progresso = 'quero_ler') {
+  try {
+    // Validações no frontend
+    const uId = parseInt(usuarioId);
+    const lId = parseInt(livroId);
+    
+    if (!uId || !lId) {
+      console.error('Dados inválidos:', { usuarioId, livroId });
+      alert('Erro: IDs inválidos. Abra o console para detalhes.');
+      return null;
+    }
+
+    if (!['lido', 'lendo', 'quero_ler'].includes(progresso)) {
+      alert('Erro: Progresso inválido. Use: lido, lendo ou quero_ler');
+      return null;
+    }
+
+    const token = getToken();
+    if (!token) {
+      alert('Você precisa estar logado');
+      logout();
+      return null;
+    }
+
+    const payload = {
+      usuario_id: uId,
+      livro_id: lId,
+      progresso: progresso
+    };
+
+    console.log('[Frontend] Enviando status:', payload);
+
+    const resposta = await fetch('http://localhost:3000/biblioteca/cadastrar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    console.log('[Frontend] Status HTTP:', resposta.status);
+
+    if (resposta.status === 401 || resposta.status === 403) {
+      alert('Sessão expirada. Faça login novamente.');
+      logout();
+      return null;
+    }
+
+    const data = await resposta.json();
+
+    if (!resposta.ok) {
+      console.error('[Frontend] Erro na resposta:', data);
+      const mensagem = data.mensagem || `Erro ${resposta.status}`;
+      alert('Erro ao salvar: ' + mensagem);
+      return null;
+    }
+
+    console.log('[Frontend] Status salvo com sucesso:', data);
+    alert('Livro adicionado à biblioteca!');
+    
+    // Dispara evento para atualizar biblioteca
+    document.dispatchEvent(new Event('StatusLivroAlterado'));
+    
+    return data;
+  } catch (error) {
+    console.error('[Frontend] Erro ao salvar status:', error);
+    alert('Erro: ' + error.message);
+    return null;
+  }
+}
+
 function renderBooks(books, bibliotecaStatus) {
   const row = document.querySelector('.books-grid .row');
-  const countEl = document.querySelector('.books-grid h3');
+  const countEl = document.querySelector('.books-header h3');
   if (!row) return;
 
   const statusMap = new Map();
@@ -409,7 +485,7 @@ function renderBooks(books, bibliotecaStatus) {
   row.innerHTML = '';
 
   books.forEach((book) => {
-    const progresso = statusMap.get(book.id) || 'quero_ler';
+    const progresso = statusMap.get(book.livro_id) || 'quero_ler';
     const status = getStatusTag(progresso);
     const capa = book.imagem_capa && book.imagem_capa.trim()
       ? book.imagem_capa
@@ -463,7 +539,7 @@ async function fetchRanking(usuarioId = 1) {
 }
 
 function renderRank(posicao, totalPaginas) {
-  const rankElem = document.querySelector('.overview-card .mb-2');
+  const rankElem = document.querySelector('.ranking-text.mb-2');
   if (rankElem) {
     rankElem.innerHTML = `Você está em <strong>${posicao}º lugar</strong> no ranking de mais páginas lidas da sua universidade!`;
   }
