@@ -5,6 +5,12 @@ const roteador = express.Router()
 
 //Importando tudo que tem no arquivo de controller do usuario 
 const livrosControler = require("../controllers/livrosControler")
+const autenticacao = require("../middleware/autenticacao")
+const { 
+  validarCadastroLivro, 
+  validarAtualizacaoLivro, 
+  validarIdLivro 
+} = require("../middleware/validacao")
 
 
 //Crud
@@ -13,7 +19,7 @@ const livrosControler = require("../controllers/livrosControler")
 //Rota para solicitar a página de cadastro
 roteador.get("/cadastrar", livrosControler.livroCadastro)
 //Rota para enviar dados da página de cadastro
-roteador.post("/cadastrar", livrosControler.salvarLivro)
+roteador.post("/cadastrar", autenticacao.verificarToken, validarCadastroLivro, livrosControler.salvarLivro)
 
 
 
@@ -21,15 +27,15 @@ roteador.post("/cadastrar", livrosControler.salvarLivro)
 //Retorna as informações de todos os usuarios
 roteador.get("/", livrosControler.listarLivros)
 //Retorna as informações de um usuário apenas
-roteador.get("/:id", livrosControler.buscarLivro)
+roteador.get("/:id", validarIdLivro, livrosControler.buscarLivro)
 
 // U = Atualizar um usuario
 
-roteador.patch("/:id", livrosControler.atualizarLivro)
+roteador.patch("/:id", autenticacao.verificarToken, validarAtualizacaoLivro, livrosControler.atualizarLivro)
 
 // D = Deletar um usuario
 
-roteador.delete("/deletar/:id", livrosControler.deletarLivro)
+roteador.delete("/deletar/:id", autenticacao.verificarToken, validarIdLivro, livrosControler.deletarLivro)
 
 
 

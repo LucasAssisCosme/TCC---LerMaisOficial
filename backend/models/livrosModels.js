@@ -51,10 +51,14 @@ module.exports = {
 },
 
 Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
-  // Filtrar apenas campos com valores válidos
+  // Lista de colunas permitidas para atualização
+  const colunasPermitidas = ['titulo', 'autor', 'genero', 'ano', 'numero_paginas', 'descricao', 'editora'];
+  
+  // Filtrar apenas campos com valores válidos e permitidos
   const camposValidos = {};
   Object.keys(dados).forEach(key => {
-    if (dados[key] !== undefined && dados[key] !== '') {
+    // ✅ Validar se coluna está na whitelist
+    if (colunasPermitidas.includes(key) && dados[key] !== undefined && dados[key] !== '') {
       camposValidos[key] = dados[key];
     }
   });
@@ -63,6 +67,7 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
     return callback(new Error('Nenhum campo válido para atualizar'), null);
   }
 
+  // Construir dinamicamente apenas com colunas validadas
   const setClause = Object.keys(camposValidos).map(key => `${key} = ?`).join(', ');
   const valores = Object.values(camposValidos);
   valores.push(id);
