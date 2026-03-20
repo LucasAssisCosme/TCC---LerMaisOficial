@@ -104,6 +104,77 @@ async function cadastrarUsuario(formData) {
   }
 }
 
+async function cadastrarLivro(formData) {
+  try {
+    const token = getToken();
+    if (!token) {
+      alert('Você precisa estar logado para cadastrar livros');
+      window.location.href = '/frontend/login.html';
+      return;
+    }
+
+    const usuarioId = getUsuarioLogadoId();
+    if (!usuarioId) {
+      alert('Erro: ID do usuário não encontrado');
+      return;
+    }
+
+    const payload = {
+      titulo: formData.get('nome'),
+      autor: formData.get('autor'),
+      genero: formData.get('assunto'),
+      ano: parseInt(formData.get('ano')),
+      numero_paginas: parseInt(formData.get('paginas')),
+      descricao: formData.get('descricao'),
+      imagem_capa: formData.get('imagem'),
+      editora: formData.get('editora'),
+      tipo_usuario: getUsuarioLogadoTipo()
+    };
+
+    // Frontend guard: campo ano dentro do intervalo aceito pelo backend
+    if (!payload.ano || payload.ano < 1000 || payload.ano > new Date().getFullYear()) {
+      alert('Ano inválido. Use um ano entre 1000 e ' + new Date().getFullYear() + '.');
+      return;
+    }
+
+    if (!payload.numero_paginas || payload.numero_paginas < 1) {
+      alert('Número de páginas inválido.');
+      return;
+    }
+
+    console.log('Enviando dados do livro:', payload);
+
+    const resposta = await fetch('http://localhost:3000/livros/cadastrar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await resposta.json().catch(() => ({}));
+    if (!resposta.ok) {
+      if (resposta.status === 400 && data.detalhes) {
+        const detalhes = data.detalhes.map(d => `${d.param}: ${d.msg}`).join(' | ');
+        throw new Error(`Erro 400 - validação: ${detalhes}`);
+      }
+      throw new Error(data.mensagem || `Erro ${resposta.status}`);
+    }
+
+    console.log('Livro cadastrado com sucesso:', data);
+
+    alert('Livro cadastrado com sucesso!');
+
+    // Redirecionar para a página inicial
+    window.location.href = '/frontend/src/pages/index.html';
+
+  } catch (error) {
+    console.error('Erro ao cadastrar livro:', error);
+    alert('Erro ao cadastrar livro: ' + (error.message || error));
+  }
+}
+
 function initCadastroUsuario() {
   const form = document.querySelector('form.cadastro-form');
   if (!form) return;
@@ -113,6 +184,18 @@ function initCadastroUsuario() {
 
     const formData = new FormData(form);
     await cadastrarUsuario(formData);
+  });
+}
+
+function initCadastroLivro() {
+  const form = document.querySelector('form.cadastro-livro-form');
+  if (!form) return;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    await cadastrarLivro(formData);
   });
 }
 
@@ -147,6 +230,9 @@ async function loginUsuario(formData, isAutoLogin = false) {
       localStorage.setItem('usuarioLogadoTipo', tipo);
 
       console.log('[Login realizado]', { usuarioId: userId, usuarioTipo: tipo });
+
+      // Atualiza acesso aos recursos baseado no tipo de usuário
+      atualizarAcessoCadastroLivro();
     }
 
     // Salva o token JWT
@@ -299,33 +385,29 @@ function logout() {
 function isBibliotecariaLogada() {
   const tipo = getUsuarioLogadoTipo();
   const libera = ['bibliotecaria', 'bibliotecario', 'professor', 'bibliotecaria', 'bibliotecario'].includes(tipo);
-  console.log('[Acesso Pedido]', { tipo, libera, usuarioLogadoId: getUsuarioLogadoId() });
   return libera;
 }
 
 function atualizarAcessoCadastroLivro() {
   const podeCadastrar = isBibliotecariaLogada();
 
-  document.querySelectorAll('a[href*="cadastroLivro.html"]').forEach((link) => {
+  // Seleciona todos os links que contenham "cadastroLivro.html" no href
+  const links = document.querySelectorAll('a[href*="cadastroLivro.html"]');
+
+  links.forEach((link) => {
     if (podeCadastrar) {
       link.style.display = '';
+      link.parentElement.style.display = ''; // Mostra também o elemento pai (li)
     } else {
       link.style.display = 'none';
+      link.parentElement.style.display = 'none'; // Esconde também o elemento pai (li)
     }
   });
 
+  // Verifica se usuário não autorizado está na página de cadastro
   if (!podeCadastrar && window.location.href.includes('cadastroLivro.html')) {
     alert('Acesso negado: apenas bibliotecárias podem cadastrar livros.');
     window.location.href = '/frontend/src/pages/index.html';
-  }
-
-  // Ajusta texto de navbar para usuários não bibliotecários
-  if (!podeCadastrar) {
-    document.querySelectorAll('.nav-links a, .mobile-menu a').forEach((link) => {
-      if (link.getAttribute('href')?.includes('cadastroLivro.html')) {
-        link.style.display = 'none';
-      }
-    });
   }
 }
 
@@ -335,14 +417,10 @@ let bibliotecaCachedStatus = [];
 let paginasCarregadas = new Set();
 
 async function atualizarBibliotecaELista() {
-  console.log('[Função] atualizarBibliotecaELista chamada');
   // Verifica se os elementos necessários existem
   const inputSearch = document.querySelector('.books-grid input[type="search"]');
   const row = document.querySelector('.books-grid .row');
-  if (!inputSearch || !row) {
-    console.log('[Função] Elementos não encontrados, saindo');
-    return;
-  }
+  if (!inputSearch || !row) return;
   
   const [livrosDaBiblioteca, bibliotecaStatus] = await Promise.all([fetchBiblioteca()]);
   bibliotecaCachedBooks = livrosDaBiblioteca;
@@ -375,7 +453,6 @@ async function atualizarBibliotecaELista() {
 
 
 async function fetchBiblioteca() {
-  console.log('[Função] fetchBiblioteca chamada');
   try {
     const usuarioId = getUsuarioLogadoId();
     const token = getToken();
@@ -477,7 +554,6 @@ async function salvarStatusBiblioteca(usuarioId, livroId, progresso = 'quero_ler
     alert('Livro adicionado à biblioteca!');
 
     // Dispara evento para atualizar biblioteca
-    console.log('[Evento] Disparando StatusLivroAlterado');
     document.dispatchEvent(new Event('StatusLivroAlterado'));
 
     return data;
@@ -489,7 +565,6 @@ async function salvarStatusBiblioteca(usuarioId, livroId, progresso = 'quero_ler
 }
 
 function renderBooks(books, bibliotecaStatus) {
-  console.log('[Função] renderBooks chamada com', books.length, 'livros');
   const row = document.querySelector('.books-grid .row');
   const countEl = document.querySelector('.books-header h3');
   if (!row) return;
@@ -588,13 +663,11 @@ async function initBibliotecaGrid() {
 
   // Listener para atualizar biblioteca quando um livro é adicionado
   document.addEventListener('LivroAdicionado', async () => {
-    console.log('[Evento] Livro adicionado - atualizando biblioteca');
     await atualizarBibliotecaELista();
   });
 
   // Listener para atualizar biblioteca quando o status de um livro é alterado
   document.addEventListener('StatusLivroAlterado', async () => {
-    console.log('[Evento] Status de livro alterado - atualizando biblioteca');
     await atualizarBibliotecaELista();
   });
 }
@@ -612,6 +685,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initCadastroUsuario();
   initLogin();
   initRedefinirSenha();
+  initCadastroLivro();
   atualizarAcessoCadastroLivro();
   
   // Apenas inicializa biblioteca se o usuário estiver logado (tem token)

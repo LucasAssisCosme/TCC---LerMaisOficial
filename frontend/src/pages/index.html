@@ -193,6 +193,11 @@
     window.addEventListener('DOMContentLoaded', () => {
       carregarCategoriasLivros();
     });
+
+    // Atualizar lista de livros quando um novo livro é cadastrado
+    document.addEventListener('LivroCadastrado', () => {
+      carregarCategoriasLivros();
+    });
   </script>
 </body>
 </html>

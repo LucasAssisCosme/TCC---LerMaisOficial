@@ -42,7 +42,7 @@
 
   <h1>CADASTRAR LIVRO</h1>
 
-  <form class="formulario">
+  <form class="formulario cadastro-livro-form">
 
     <!-- ESQUERDA -->
     <div class="lado-esquerdo">
@@ -62,7 +62,7 @@
 
       <div>
       <label>Ano</label>
-      <input type="number" name="ano">
+      <input type="number" name="ano" min="1000" max="2026" required>
 </div>
 
 <div>
@@ -132,7 +132,7 @@ inputImagem.addEventListener("input", () => {
 
 </footer>
 
-    <script src="/script.js"></script>
+    <script src="/frontend/script.js"></script>
     <script>
       const toggle = document.getElementById("navbarToggle");
       const mobileMenu = document.getElementById("mobileMenu");
