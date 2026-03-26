@@ -116,42 +116,47 @@ border-radius: 20px;
 .footer-right{
 font-size:13px;
 }
-
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #853030dc;
-  color: white;
+background: linear-gradient(135deg, #d8c2b5, #b58a78);
 }
 
+
 .perfil-container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 40px;
+  background: linear-gradient(160deg, #a8644f, #7a3e30);
+  margin: 20px;
+  border-radius: 20px;
+  padding: 30px 50px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 
 .titulo {
-  font-size: 40px;
-  margin-bottom: 20px;
+  font-size: 35px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 10px;
 }
 
-
 .foto-perfil {
-  text-align: center;
-  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0 20px;
 }
 
 .circulo {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  margin: auto;
-
-  background: url("https://cdn-icons-png.flaticon.com/512/149/149071.png");
-  background-size: cover;
-  background-position: center;
+  border: 3px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.1);
+  cursor: pointer;
   transition: 0.3s;
 }
 
@@ -159,10 +164,19 @@ body {
   transform: scale(1.05);
 }
 
+.foto-perfil span {
+  font-size: 35px;
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+
 .grid-perfil {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 25px;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 40px;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 
@@ -171,65 +185,63 @@ body {
   flex-direction: column;
 }
 
-
-.grande {
-  grid-column: span 3;
+.campo label {
+  font-size: 25px;
+  margin-bottom: 6px;
+  opacity: 0.8;
 }
 
-
-input, textarea {
-  margin-top: 8px;
+.campo input,
+.campo textarea {
+  background: #f3e5dc;
+  border: none;
+  border-radius: 10px;
   padding: 12px;
-  border-radius: 8px;
-  border: none;
-
-  background: rgb(255, 255, 255);
-  color: rgb(0, 0, 0);
- 
-  backdrop-filter: blur(5px);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #aaa;
-  resize: none;
-}
-
-input:focus, textarea:focus {
+  transition: 0.2s;
   outline: none;
-  border: none;
 }
+
+
+.campo input:focus,
+.campo textarea:focus {
+  box-shadow: 0 0 0 2px #ff8c5a;
+}
+
+.campo.grande textarea {
+  height: 70px;
+}
+
 
 .botoes {
   display: flex;
   justify-content: flex-end;
-  margin-top: 40px;
   gap: 15px;
+  margin-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.3);
+  padding-top: 20px;
 }
-span{
-    font-size: 30px;
-}
-.btn-cancelar {
- background: #e50914;
+
+button {
+  color: white;
   border: none;
   padding: 10px 25px;
-  color: white;
-  border-radius: 5px;
+  border-radius: 20px;
   cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
 }
+
+/* BOTÃO CANCELAR */
+.btn-cancelar {
+  background: #6b2f25;
+}
+
 
 .btn-salvar {
-  background: #e50914;
-  border: none;
-  padding: 10px 25px;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+  background: linear-gradient(45deg, #ff6b3d, #ff8c5a);
 }
 
-.btn-salvar:hover {
-  background: #b20710;
-}
-label{
-    font-size: 25px;
+
+button:hover {
+  transform: scale(1.05);
 }

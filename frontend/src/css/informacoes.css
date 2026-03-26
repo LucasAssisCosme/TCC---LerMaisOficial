@@ -7,7 +7,7 @@
 
 }
 .home-page {
-    background-color: #DAC1B1
+    background-color: #7f1f0ecb
 }
 img {
   max-width: 100%;
@@ -117,4 +117,135 @@ border-radius: 20px;
 
 .footer-right{
 font-size:13px;
+}
+
+/* FUNDO COM IMAGEM */
+.book-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 60px;
+
+  background: url('/estante.jpeg') center/cover no-repeat;
+  font-family: 'Georgia', serif;
+  color: #f5e9e2;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 10, 5, 0.75);
+  backdrop-filter: blur(12px);
+}
+
+.book-hero,
+.book-description {
+  position: relative;
+  z-index: 2;
+}
+
+
+.book-hero {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+ 
+}
+
+
+.book-cover {
+  width: 260px;
+  border-radius: 12px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+  transition: 0.4s;
+}
+
+.book-cover:hover {
+  transform: scale(1.06);
+}
+.book-title {
+  font-size: 64px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.book-title span {
+  color: #ffd7c2;
+}
+.book-meta {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.book-meta p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+
+.book-rating {
+  margin-top: 10px;
+  font-size: 20px;
+  color: #ffd27a;
+}
+
+.book-rating span {
+  margin-left: 10px;
+  font-size: 16px;
+  color: #eee;
+}
+
+
+.btn-info {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  padding: 12px 28px;
+  border-radius: 25px;
+  border: none;
+
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+
+  color: #fff;
+  font-size: 30px;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+.btn-info:hover {
+  background: rgba(255,255,255,0.4);
+  transform: scale(1.05);
+}
+.book-description {
+  margin-top: 80px;
+  max-width: 650px;
+}
+.book-description h2 {
+  font-size: 30px;
+  margin-bottom: 15px;
+}
+.book-description p {
+  font-size: 18px;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+.btn-voltar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #9c5a46;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.btn-voltar:hover {
+  background-color: #7a4636;
 }

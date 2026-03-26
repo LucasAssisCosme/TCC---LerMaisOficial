@@ -6,7 +6,9 @@
   text-decoration: none;
 }
 .home-page {
-    background-color: #DAC1B1
+  background: linear-gradient(135deg, #e6d3c5, #c2a18d);
+
+
 }
 
 container{
@@ -64,244 +66,77 @@ color: white;
       text-decoration: none;
    
 }
+* {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  list-style: none;
+  text-decoration: none;
 
-/* CONTAINER */
-.main-container {
-  max-width: 1200px;
+}
+.home-page {
+    background-color: #DAC1B1
+}
+img {
+  max-width: 100%;
+
+}
+
+.container{
+  max-width: 1800px;
   margin: 0 auto;
-  padding: 20px;
 }
 
-/* CARD SUPERIOR */
-.overview-card {
-  background-color: #9c5a46;
-  color: white;
-  padding: 20px;
-  border-radius: 20px;
-  margin-bottom: 30px;
+header{
+  background-color: #7F1F0E;
+  padding: 12px;
 }
 
-.overview-top {
+.header{
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.info-perfil{
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  gap: 24px;
+  align-items: center;
 }
 
-.status-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.info-perfil img {
+  height: 45px;
+  border-radius: 50px;
 
-.status-item {
+}
+.perfil{
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-/* PILLS */
-.pill {
-  width: 16px;
-  height: 30px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.pill-lido { background: #2ecc71; }
-.pill-quero { background: #3498db; }
-.pill-lendo { background: #f1c40f; }
-
-.paginometro {
-  background: white;
-  color: black;
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-}
-
-.ranking-text {
-  margin-top: 20px;
-  font-size: 22px;
-}
-
-/* HEADER LIVROS */
-.books-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  background: white;
-  padding: 5px 10px;
-  border-radius: 8px;
   gap: 8px;
 }
+.perfil a{
+color: white;
+}
 
-
-
-/* GRID */
-.books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+.nav-list {
+    display: flex;
   gap: 20px;
+  list-style: none;
+
 }
-
-/* CARD LIVRO */
-.book-card {
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  text-align: center;
-  padding-bottom: 10px;
-  position: relative;
-}
-
-.cover {
-  width: 100%;
-  height: 220px;
-  background-size: cover;
-  background-position: center;
-}
-
-/* RIBBON */
-.ribbon {
-  width: 10px;
-  height: 40px;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  border-radius: 3px;
-}
-
-.ribbon.lido { background: #2ecc71; }
-.ribbon.quero { background: #3498db; }
-.ribbon.lendo { background: #f1c40f; }
-
-/* RIBBON CLASSES PARA RENDERIZAÇÃO DINÂMICA */
-.ribbon-lido { background: #2ecc71; }
-.ribbon-quero { background: #3498db; }
-.ribbon-lendo { background: #f1c40f; }
-
-/* CARD LIVRO DINÂMICO */
-.book-card {
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  text-align: center;
-  position: relative;
+.item-list{
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  gap: 24px;
+  align-items: center;
+
+
+}
+.item-list a {
+    color: aliceblue;
+    text-decoration: none;
+   
 }
 
-.book-ribbon {
-  width: 10px;
-  height: 40px;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  border-radius: 3px;
-  z-index: 1;
-}
-
-.book-cover {
-  width: 100%;
-  height: 220px;
-  background-size: cover;
-  background-position: center;
-  flex-shrink: 0;
-}
-
-.book-info {
-  padding: 10px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.book-title {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  line-height: 1.2;
-}
-
-.book-author {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.text-white-50 {
-  font-size: 11px;
-  color: #999;
-  font-weight: 500;
-}
-
-/* BOOTSTRAP-like COLUMN UTILITIES */
-.col-6 { width: 50%; }
-.col-md-4 { width: 33.33%; }
-.col-lg-3 { width: 25%; }
-.col-xl-2 { width: 20%; }
-
-/* GRID COM COL */
-.books-grid .row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 20px;
-  width: 100%;
-}
-
-.books-grid .row > div {
-  width: 100%;
-}
-
-/* BADGE STYLES */
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.bg-light { background-color: #f8f9fa; }
-.text-dark { color: #333; }
-
-/* BOOTSTRAP-like PADDING/MARGIN UTILITIES */
-.p-3 { padding: 15px; }
-.mb-1 { margin-bottom: 5px; }
-.mb-0 { margin-bottom: 0; }
-.mb-2 { margin-bottom: 10px; }
-
-.book-card h4 {
-  font-size: 14px;
-  margin: 10px 5px 5px;
-}
-
-.book-card p {
-  font-size: 12px;
-  color: #555;
-}
-
-/* RESPONSIVO */
-@media (max-width: 600px) {
-  .overview-top {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .books-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-}
 html, body {
   height: 100%;
   margin: 0;
@@ -311,11 +146,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* Faz o conteúdo crescer e empurrar o footer */
-main {
-  flex: 1;
-}
 .app-footer{
 display:flex;
 align-items:center;
@@ -323,6 +153,8 @@ justify-content:space-between;
 background:#8b2a12;
 color:white;
 padding:15px 30px;
+margin-top: auto;
+
 
 }
 
@@ -354,4 +186,150 @@ border-radius: 20px;
 
 .footer-right{
 font-size:13px;
+}
+.layout {
+  display: flex;
+  gap: 40px;
+  padding: 30px;
+}
+
+/* ESQUERDA */
+.books-area {
+  flex: 3;
+}
+
+/* 🔍 BUSCA MELHORADA */
+.search-box {
+  margin-bottom: 15px;
+}
+
+.search-box input {
+  width: 350px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  border: none;
+  background: #9c5a46;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  outline: none;
+}
+
+.search-box input::placeholder {
+  color: #f1f1f1;
+}
+
+/* TEXTO */
+.result-text {
+  margin: 10px 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+/* GRID MELHOR */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 25px;
+  margin-top: 15px;
+}
+
+/* CARD DO LIVRO */
+.book {
+  position: relative;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+
+.book img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+
+
+.book:hover {
+  transform: scale(1.08);
+}
+
+
+.tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 30px;
+  border-radius: 0 0 5px 0;
+}
+
+/* CORES */
+.verde { background: #00ff88; }
+.azul { background: #2196f3; }
+.amarelo { background: #ffc107; }
+
+
+.card-quadrado {
+  flex: 1;
+  background: linear-gradient(180deg, #a8644f, #8b4d3b);
+  color: white;
+  padding: 25px;
+  border-radius: 25px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+
+.card-quadrado h2 {
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  font-size: 30px;
+
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+
+.flag {
+  width: 25px;
+  height: 30px;
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+}
+
+
+.paginometro {
+  margin-top: auto;
+  font-size: 18px;
+  text-align: center;
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 10px;
+}
+.imagem{
+ width: 1200px;
+  height: 350px;
+
 }

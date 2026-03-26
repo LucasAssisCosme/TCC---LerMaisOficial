@@ -124,10 +124,10 @@ body {
 
 .cadastro-box {
   background-color: #9b4f3c;
-  width: 95%;
-  max-width: 1400px;
+  width: 100%;
+  max-width: 1200px;
   margin: 40px auto;
-  padding: 50px;
+  padding: 30px;
   border-radius: 35px;
   color: white;
 }
@@ -139,7 +139,7 @@ body {
 label {
   font-size: 30px;
   margin: 0 auto;
- margin-top: 20px;
+ margin-top: 2000px;
   display: block;
 }
 
@@ -150,7 +150,7 @@ label {
 
 
 .lado-esquerdo {
-  flex: 2;
+  flex: 1;
 }
 .lado-esquerdo > input {
     width: 100%;
@@ -162,21 +162,21 @@ label {
   padding: 26px;
   
 }
+
 .lado-direito {
   flex: 1;
   display: flex;
   flex-direction: column;
-margin-top: 60px;
-  gap: 20px;
+  gap: 15px;
   justify-content: flex-start;
+  margin-top: 40px;
 }
 
 .lado-direito .campo2 {
   width: 100%;
-  margin-top: 2px;
+  margin-top: 90px;
   height: 100px;
 }
-
 input,
 select {
   width: 100%;
@@ -186,40 +186,51 @@ select {
   background-color: #d9cfcf;
   font-size: 24px;
 }
-
-
 .linha {
   display: flex;
   gap: 100px;
 }
-
 .ano{
     width: 800px;
 }
 .campo {
   flex: 1;
- 
 }
-
-
 .preview {
-  width: 500px;
-    height: 404px;
-    margin-top: 60px;
-    border-radius: 29px;
+  width: 220px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 20px;
+    object-fit: cover;
  
 }
-
-
 button {
   background-color: #7a2d1f;
   color: white;
 padding: 16px 70px;
 border-radius: 30px;
 border: none;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 button:hover {
   background-color: #5e2117;
 }
+.descricao-box {
+  width: 100%;
+  height: 130px; /* altura grande */
+  border-radius: 15px;
+  border: none;
+  padding: 15px;
+  font-size: 18px;
+  background-color: #d9d9d9;
+  resize: none; /* não deixa puxar */
 
+  
+}
+
+ label {
+  margin: 4px;
+  
+}
