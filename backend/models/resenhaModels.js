@@ -73,7 +73,19 @@ module.exports = {
     callback(null, resultado[0])
   })
 },
+buscarResenhaPorUsuarioLivro: (usuarioId, livroId, callback) => {
 
+  const sql = `SELECT * FROM resenha WHERE usuario_id = ? AND livro_id = ?`
+
+  conn.query(sql, [usuarioId, livroId], (erro, resultado) => {
+
+    if (erro) {
+      return callback(erro, null)
+    }
+
+    callback(null, resultado[0] || null)
+  })
+},
 atualizarResenha: (id, texto, callback) => {
 
   const sql = `UPDATE resenha SET texto = ? WHERE id = ?`

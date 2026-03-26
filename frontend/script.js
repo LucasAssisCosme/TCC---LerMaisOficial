@@ -781,8 +781,8 @@ function renderBooks(books, bibliotecaStatus) {
         : "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
 
     const card = `
-      <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-        <article class="book-card">
+      <div class="col-6 col-md-4 col-lg-3 col-xl-2" data-livro-id="${book.livro_id}">
+        <article class="book-card" style="cursor: pointer;" onclick="irParaAvaliacao(${book.livro_id})">
           <div class="book-ribbon ${status.ribbonClass}" aria-hidden="true"></div>
           <div class="book-cover" style="background-image:url('${capa}');" aria-label="Capa do livro ${book.titulo}"></div>
           <div class="book-info p-3">
@@ -878,6 +878,420 @@ async function initBibliotecaGrid() {
   });
 }
 
+// ======================== FUNÇÕES DE AVALIAÇÃO E LIVROS ========================
+
+let livroAtualId = null;
+let avaliacaoAtual = 0;
+
+// Redireciona para página de avaliação
+function irParaAvaliacao(livroId) {
+  if (livroId) {
+    localStorage.setItem("livroAtualId", livroId);
+  }
+  window.location.href = "/frontend/src/pages/Avaliacao.html";
+}
+
+// Redireciona para página de informações
+function irParaInformacoes() {
+  const livroId = localStorage.getItem("livroAtualId");
+  if (livroId) {
+    window.location.href = "/frontend/src/pages/informacoes.html";
+  }
+}
+
+// Carrega dados do livro na página de avaliação
+async function carregarDadosLivroAvaliacao() {
+  try {
+    const livroId = localStorage.getItem("livroAtualId");
+    if (!livroId) {
+      alert("Livro não especificado");
+      return;
+    }
+
+    const token = getToken();
+    const usuarioId = getUsuarioLogadoId();
+
+    // Buscar dados do livro
+    const respostaLivro = await fetch(`http://localhost:3000/livros/${livroId}`);
+    if (!respostaLivro.ok) throw new Error("Erro ao buscar livro");
+    
+    const dataLivro = await respostaLivro.json();
+    const livro = dataLivro.livro;
+
+    // Atualizar UI
+    document.getElementById("tituloLivro").textContent = livro.titulo || "";
+    document.getElementById("descricaoLivro").textContent = livro.descricao || "";
+    
+    if (livro.imagem_capa && livro.imagem_capa.trim()) {
+      document.getElementById("capaLivro").src = livro.imagem_capa;
+    }
+
+    livroAtualId = livroId;
+
+    // Se usuário logado, buscar dados
+    if (token && usuarioId) {
+      try {
+        const respostaResenha = await fetch(`http://localhost:3000/resenha/usuario/${usuarioId}/livro/${livroId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (respostaResenha.ok) {
+          const dataResenha = await respostaResenha.json();
+          if (dataResenha.resenha) {
+            document.getElementById("resenhaTexto").textContent = dataResenha.resenha.texto || "";
+            document.getElementById("resenhaInput").value = dataResenha.resenha.texto || "";
+          }
+        }
+      } catch (e) {
+        console.log("Sem resenha salva");
+      }
+
+      try {
+        const respostaFavorita = await fetch(`http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (respostaFavorita.ok) {
+          const dataFavorita = await respostaFavorita.json();
+          if (dataFavorita.favorita) {
+            document.getElementById("favoritaTexto").textContent = dataFavorita.favorita.parte_favorita || "";
+            document.getElementById("favoritaInput").value = dataFavorita.favorita.parte_favorita || "";
+          }
+        }
+      } catch (e) {
+        console.log("Sem favorita salva");
+      }
+
+      try {
+        const respostaAvaliacao = await fetch(`http://localhost:3000/avaliacoes/usuario/${usuarioId}/livro/${livroId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (respostaAvaliacao.ok) {
+          const dataAvaliacao = await respostaAvaliacao.json();
+          if (dataAvaliacao.avaliacao) {
+            avaliacaoAtual = dataAvaliacao.avaliacao.estrelas || 0;
+            atualizarEstrelas(avaliacaoAtual);
+          }
+        }
+      } catch (e) {
+        console.log("Sem avaliação salva");
+      }
+    }
+
+    setupEstrelasListeners();
+
+  } catch (erro) {
+    console.error("Erro ao carregar livro:", erro);
+    alert("Erro ao carregar livro");
+  }
+}
+
+// Setup de listeners das estrelas
+function setupEstrelasListeners() {
+  const estrelas = document.querySelectorAll("#avaliacaoEstrelas .star");
+  
+  estrelas.forEach(star => {
+    star.style.cursor = "pointer";
+    star.addEventListener("click", function() {
+      const valor = parseInt(this.dataset.value);
+      salvarAvaliacao(valor);
+    });
+    
+    star.addEventListener("mouseover", function() {
+      const valor = parseInt(this.dataset.value);
+      atualizarEstrelas(valor);
+    });
+  });
+
+  document.getElementById("avaliacaoEstrelas").addEventListener("mouseleave", function() {
+    atualizarEstrelas(avaliacaoAtual);
+  });
+}
+
+// Atualiza visualmente as estrelas
+function atualizarEstrelas(valor) {
+  const estrelas = document.querySelectorAll("#avaliacaoEstrelas .star");
+  estrelas.forEach((star, index) => {
+    if (index < valor) {
+      star.style.opacity = "1";
+    } else {
+      star.style.opacity = "0.3";
+    }
+  });
+}
+
+// Salva avaliação no servidor
+async function salvarAvaliacao(estrelas) {
+  try {
+    const token = getToken();
+    const usuarioId = getUsuarioLogadoId();
+
+    if (!token || !usuarioId || !livroAtualId) {
+      alert("Você precisa estar logado");
+      return;
+    }
+
+    const payload = {
+      usuario_id: parseInt(usuarioId),
+      livro_id: parseInt(livroAtualId),
+      estrelas: estrelas
+    };
+
+    const response = await fetch("http://localhost:3000/avaliacoes/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      avaliacaoAtual = estrelas;
+      atualizarEstrelas(estrelas);
+      console.log("Avaliação salva!");
+    }
+  } catch (erro) {
+    console.error("Erro ao salvar avaliação:", erro);
+  }
+}
+
+// Edição de Resenha
+function habilitarEdicaoResenha() {
+  const p = document.getElementById("resenhaTexto");
+  const textarea = document.getElementById("resenhaInput");
+  const botoes = document.getElementById("botoesResenha");
+
+  textarea.value = p.textContent;
+  p.style.display = "none";
+  textarea.style.display = "block";
+  botoes.style.display = "block";
+  
+  document.querySelector(".secao:nth-child(1) .btn-editar").style.display = "none";
+}
+
+function cancelarResenha() {
+  const p = document.getElementById("resenhaTexto");
+  const textarea = document.getElementById("resenhaInput");
+  const botoes = document.getElementById("botoesResenha");
+
+  p.style.display = "block";
+  textarea.style.display = "none";
+  botoes.style.display = "none";
+  
+  document.querySelector(".secao:nth-child(1) .btn-editar").style.display = "block";
+}
+
+async function salvarResenha() {
+  try {
+    const token = getToken();
+    const usuarioId = getUsuarioLogadoId();
+    const texto = document.getElementById("resenhaInput").value;
+
+    if (!token || !usuarioId || !livroAtualId) {
+      alert("Erro ao salvar");
+      return;
+    }
+
+    const payload = {
+      usuario_id: parseInt(usuarioId),
+      livro_id: parseInt(livroAtualId),
+      texto: texto
+    };
+
+    const response = await fetch("http://localhost:3000/resenha/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      document.getElementById("resenhaTexto").textContent = texto;
+      cancelarResenha();
+      alert("Resenha salva!");
+    }
+  } catch (erro) {
+    console.error("Erro ao salvar resenha:", erro);
+  }
+}
+
+// Edição de Favorita
+function habilitarEdicaoFavorita() {
+  const p = document.getElementById("favoritaTexto");
+  const textarea = document.getElementById("favoritaInput");
+  const botoes = document.getElementById("botoesFavorita");
+
+  textarea.value = p.textContent;
+  p.style.display = "none";
+  textarea.style.display = "block";
+  botoes.style.display = "block";
+  
+  document.querySelector(".secao:nth-child(2) .btn-editar").style.display = "none";
+}
+
+function cancelarFavorita() {
+  const p = document.getElementById("favoritaTexto");
+  const textarea = document.getElementById("favoritaInput");
+  const botoes = document.getElementById("botoesFavorita");
+
+  p.style.display = "block";
+  textarea.style.display = "none";
+  botoes.style.display = "none";
+  
+  document.querySelector(".secao:nth-child(2) .btn-editar").style.display = "block";
+}
+
+async function salvarFavorita() {
+  try {
+    const token = getToken();
+    const usuarioId = getUsuarioLogadoId();
+    const texto = document.getElementById("favoritaInput").value;
+
+    if (!token || !usuarioId || !livroAtualId) {
+      alert("Erro ao salvar");
+      return;
+    }
+
+    const payload = {
+      usuario_id: parseInt(usuarioId),
+      livro_id: parseInt(livroAtualId),
+      parte_favorita: texto
+    };
+
+    const response = await fetch("http://localhost:3000/livros/favorita/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      document.getElementById("favoritaTexto").textContent = texto;
+      cancelarFavorita();
+      alert("Favorita salva!");
+    }
+  } catch (erro) {
+    console.error("Erro ao salvar favorita:", erro);
+  }
+}
+
+// Carrega dados na página de informações
+async function carregarDadosLivroInformacoes() {
+  try {
+    const livroId = localStorage.getItem("livroAtualId");
+    if (!livroId) {
+      alert("Livro não especificado");
+      return;
+    }
+
+    const response = await fetch(`http://localhost:3000/livros/${livroId}`);
+    if (!response.ok) throw new Error("Erro ao buscar livro");
+    
+    const data = await response.json();
+    const livro = data.livro;
+
+    document.getElementById("tituloInfo").textContent = livro.titulo || "";
+    document.getElementById("autorInfo").textContent = livro.autor || "";
+    document.getElementById("generoInfo").textContent = `Gênero: ${livro.genero || "N/A"}`;
+    document.getElementById("anoInfo").textContent = `Ano: ${livro.ano || "N/A"}`;
+    document.getElementById("paginasInfo").textContent = `Páginas: ${livro.numero_paginas || "N/A"}`;
+    document.getElementById("descricaoInfo").textContent = livro.descricao || "";
+    
+    if (livro.imagem_capa && livro.imagem_capa.trim()) {
+      document.getElementById("capaCapa").src = livro.imagem_capa;
+    }
+
+  } catch (erro) {
+    console.error("Erro ao carregar livro:", erro);
+  }
+}
+
+// Carrega foto de perfil do usuário no header em todas as páginas
+async function carregarFotoPerfilHeader() {
+  try {
+    const id = getUsuarioLogadoId();
+    const token = getToken();
+    
+    // Se não estiver logado, não tenta carregar
+    if (!id || !token) {
+      return;
+    }
+
+    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+
+    // Atualiza a imagem de perfil no header se houver foto
+    if (data.usuario && data.usuario.foto_perfil) {
+      const imagemHeader = document.querySelector(".info-perfil .perfil img");
+      if (imagemHeader) {
+        imagemHeader.src = data.usuario.foto_perfil;
+      }
+    }
+  } catch (erro) {
+    console.error('Erro ao carregar foto de perfil:', erro);
+  }
+}
+
+// Setup de listeners para upload de imagem
+function setupImageUpload() {
+  // Listener para input do header (inputFotoPerfil)
+  const inputFotoPerfil = document.getElementById("inputFotoPerfil");
+  if (inputFotoPerfil) {
+    inputFotoPerfil.addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          // Atualiza ambas as imagens
+          const fotoPerfilElements = document.querySelectorAll("#fotoPerfil");
+          fotoPerfilElements.forEach(img => {
+            img.src = event.target.result;
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Listener para input da página de perfil (inputFoto)
+  const inputFoto = document.getElementById("inputFoto");
+  if (inputFoto && !inputFoto.hasAttribute("data-listener-added")) {
+    inputFoto.addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          // Atualiza ambas as imagens
+          const fotoPerfilElements = document.querySelectorAll("#fotoPerfil");
+          fotoPerfilElements.forEach(img => {
+            img.src = event.target.result;
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    // Marca que o listener foi adicionado
+    inputFoto.setAttribute("data-listener-added", "true");
+  }
+}
+
 // Inicializa comportamentos quando a página estiver pronta
 window.addEventListener("DOMContentLoaded", () => {
   // Identifica qual página está sendo carregada
@@ -915,6 +1329,22 @@ window.addEventListener("DOMContentLoaded", () => {
   if (token && usuarioId) {
     initBibliotecaGrid();
   }
+
+  // Carrega dados da página de avaliação
+  if (currentPage.includes("/frontend/src/pages/Avaliacao.html")) {
+    carregarDadosLivroAvaliacao();
+  }
+
+  // Carrega dados da página de informações
+  if (currentPage.includes("/frontend/src/pages/informacoes.html")) {
+    carregarDadosLivroInformacoes();
+  }
+
+  // Carrega foto de perfil
+  carregarFotoPerfilHeader();
+
+  // Setup de uploads de imagem
+  setupImageUpload();
 });
 
 

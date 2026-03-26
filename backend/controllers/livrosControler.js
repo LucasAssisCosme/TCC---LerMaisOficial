@@ -100,6 +100,33 @@ module.exports = {
         });
 
     },
+    salvarFavorita(req, res) {
+        const { usuario_id, livro_id, parte_favorita } = req.body;
+
+        livrosModels.salvarFavorita({ usuario_id, livro_id, parte_favorita }, (erro, resultado) => {
+            if (erro) {
+                return res.status(500).json({ mensagem: "Erro ao salvar favorita" });
+            }
+
+            res.json({
+                titulo: "Favorita salva",
+                favorita: resultado
+            });
+        });
+    },
+    buscarFavorita(req, res) {
+        const { livroId, usuarioId } = req.params;
+
+        livrosModels.buscarFavorita(usuarioId, livroId, (erro, resultado) => {
+            if (erro) {
+                return res.status(500).json({ mensagem: "Erro ao buscar favorita" });
+            }
+
+            res.json({
+                favorita: resultado || null
+            });
+        });
+    },
     deletarLivro(req, res) {
         const id = req.params.id
 

@@ -64,6 +64,22 @@ criarResenha(req, res) {
     }
   )
 },
+    buscarResenhaPorUsuarioLivro(req, res) {
+
+  const { usuarioId, livroId } = req.params
+
+  resenhaModels.buscarResenhaPorUsuarioLivro(usuarioId, livroId, (erro, resultado) => {
+    if (erro) {
+      return res.status(500).json({
+        mensagem: "Erro ao buscar resenha"
+      })
+    }
+
+    res.json({
+      resenha: resultado || null
+    })
+  })
+},
     atualizarResenha(req, res) {
 
   const id = req.params.id

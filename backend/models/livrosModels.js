@@ -104,6 +104,42 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
                           }
                           callback(null, resultado.affectedRows > 0)
              })
+      },
+      salvarFavorita: ({usuario_id, livro_id, parte_favorita}, callback) => {
+            // Primeiro deleta qualquer favorita anterior
+            const sqlDelete = `DELETE FROM partes_favoritas WHERE usuario_id = ? AND livro_id = ?`
+            
+            conn.query(sqlDelete, [usuario_id, livro_id], (erroDelete) => {
+
+                  // Depois insere a nova
+                  const sqlInsert = `INSERT INTO partes_favoritas (usuario_id, livro_id, trecho) VALUES (?, ?, ?)`
+                  const valores = [usuario_id, livro_id, parte_favorita]
+
+                  conn.query(sqlInsert, valores, (erro, resultado) => {
+                        if(erro){
+                              return callback(erro, null)
+                        }
+
+                        const favorita = {
+                              usuario_id,
+                              livro_id,
+                              parte_favorita
+                        }
+
+                        callback(null, favorita)
+                  })
+            })
+      },
+      buscarFavorita: (usuarioId, livroId, callback) => {
+            const sql = `SELECT id, usuario_id, livro_id, trecho as parte_favorita FROM partes_favoritas WHERE usuario_id = ? AND livro_id = ?`
+
+            conn.query(sql, [usuarioId, livroId], (erro, resultado) => {
+                  if(erro){
+                        return callback(erro, null)
+                  }
+
+                  callback(null, resultado[0] || null)
+            })
       }
 }
 

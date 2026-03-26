@@ -15,7 +15,8 @@
       <div class="info-perfil">
             <img src="/frontend/logo.png" alt="">    
             <div class="perfil">
-              <img src="/frontend/User.png" alt="">
+              <img id="fotoPerfil" src="/frontend/User.png" alt="Foto de perfil" style="cursor: pointer;" onclick="document.getElementById('inputFotoPerfil').click()">
+              <input id="inputFotoPerfil" type="file" accept="image/*" style="display: none;">
                 <a href="/frontend/src/pages/perfil.html">PERFIL</a>
             </div>
       </div>        
@@ -51,10 +52,10 @@
     <label>Foto de perfil</label>
   
   <!-- imagem -->
-  <img id="fotoPerfil" src="/frontend/User.png" alt="Foto de perfil">
+  <img id="fotoPerfil" src="/frontend/User.png" alt="Foto de perfil" style="cursor: pointer;" onclick="document.getElementById('inputFoto').click()">
 
   <!-- input -->
-  <input id="inputFoto" type="file" accept="image/*">
+  <input id="inputFoto" type="file" accept="image/*" style="display: none;">
 </div>
 
   <!-- FORM -->

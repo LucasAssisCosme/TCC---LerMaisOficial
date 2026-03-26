@@ -15,6 +15,8 @@ router.get("/:id", validarIdLivro, avaliacoesController.buscarAvaliacao)
 
 router.patch("/:id", autenticacao.verificarToken, validarAvaliacao, avaliacoesController.atualizarAvaliacao)
 
+router.get("/usuario/:usuarioId/livro/:livroId", autenticacao.verificarToken, avaliacoesController.buscarAvaliacaoPorUsuarioLivro)
+
 router.delete("/deletar/:id", autenticacao.verificarToken, validarIdLivro, avaliacoesController.deletarAvaliacao)
 
 module.exports = router

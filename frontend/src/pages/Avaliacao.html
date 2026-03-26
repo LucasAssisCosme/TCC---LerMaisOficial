@@ -47,16 +47,20 @@
     <div class="overlay"></div>
 
     <div class="hero-content">
-      <img src="https://covers.openlibrary.org/b/id/11153254-L.jpg" class="capa">
+      <img id="capaLivro" src="https://covers.openlibrary.org/b/id/11153254-L.jpg" class="capa" style="cursor: pointer;" onclick="irParaInformacoes()">
 
       <div class="info">
-        <h1>Amor, Teoricamente</h1>
+        <h1 id="tituloLivro">Amor, Teoricamente</h1>
 
-        <div class="estrelas">
-          ⭐ ⭐ ⭐ ⭐ ⭐
+        <div class="estrelas" id="avaliacaoEstrelas">
+          <span class="star" data-value="1">⭐</span>
+          <span class="star" data-value="2">⭐</span>
+          <span class="star" data-value="3">⭐</span>
+          <span class="star" data-value="4">⭐</span>
+          <span class="star" data-value="5">⭐</span>
         </div>
 
-        <p class="descricao">
+        <p class="descricao" id="descricaoLivro">
           Uma história envolvente que mistura romance, humor e ciência,
           conquistando do começo ao fim.
         </p>
@@ -72,22 +76,32 @@
 
     <div class="secao">
       <h2>Sua resenha</h2>
-      <p>
+      <p id="resenhaTexto">
         Amor, Teoricamente me conquistou do começo ao fim!
         A Elsie é divertida, inteligente e muito humana,
         e o jeito como a história mistura romance, humor
         e ciência é simplesmente encantador.
       </p>
-      <button class="btn-editar">Editar</button>
+      <button class="btn-editar" onclick="habilitarEdicaoResenha()">Editar</button>
+      <textarea id="resenhaInput" style="display: none; width: 100%; min-height: 100px; padding: 10px;"></textarea>
+      <div id="botoesResenha" style="display: none; margin-top: 10px;">
+        <button onclick="salvarResenha()">Salvar</button>
+        <button onclick="cancelarResenha()">Cancelar</button>
+      </div>
     </div>
 
     <div class="secao">
       <h2>Parte favorita</h2>
-      <p>
+      <p id="favoritaTexto">
         Quando Elsie e Jack deixam a rivalidade de lado
         e mostram uma conexão real e sincera.
       </p>
-      <button class="btn-editar">Editar</button>
+      <button class="btn-editar" onclick="habilitarEdicaoFavorita()">Editar</button>
+      <textarea id="favoritaInput" style="display: none; width: 100%; min-height: 100px; padding: 10px;"></textarea>
+      <div id="botoesFavorita" style="display: none; margin-top: 10px;">
+        <button onclick="salvarFavorita()">Salvar</button>
+        <button onclick="cancelarFavorita()">Cancelar</button>
+      </div>
     </div>
 
   </section>

@@ -144,8 +144,8 @@
               window.location.href = '/frontend/login.html';
               return;
             }
-            // Aqui pode ir para uma página de detalhes caso deseje.
-            // Ex: window.location.href = `/frontend/src/pages/informacoes.html?livroId=${livro.id}`;
+            // Ir para página de avaliação
+            irParaAvaliacao(livro.livro_id || livro.id);
           });
           
           livrosDiv.appendChild(img);

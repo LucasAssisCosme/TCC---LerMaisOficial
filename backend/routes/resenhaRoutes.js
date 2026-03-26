@@ -18,6 +18,8 @@ roteador.post("/cadastrar", resenhaControler.criarResenha)
 //R = Obter informações de usuarios
 //Retorna as informações de todos os usuarios
 roteador.get("/", resenhaControler.listarResenhas)
+//Retorna a resenha de um usuário-livro específico
+roteador.get("/usuario/:usuarioId/livro/:livroId", resenhaControler.buscarResenhaPorUsuarioLivro)
 //Retorna as informações de um usuário apenas
 roteador.get("/:id", resenhaControler.buscarResenhaPorId)
 

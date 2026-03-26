@@ -55,6 +55,21 @@ module.exports = {
         })
     },
 
+    buscarAvaliacaoPorUsuarioLivro(req, res) {
+        const { usuarioId, livroId } = req.params
+
+        avaliacoesModels.buscarPorUsuarioLivro(usuarioId, livroId, (erro, avaliacao) => {
+            if (erro) {
+                return res.status(500).json({ mensagem: "Erro ao buscar avaliação" })
+            }
+
+            res.json({
+                titulo: "Avaliação encontrada",
+                avaliacao: avaliacao || null
+            })
+        })
+    },
+
     atualizarAvaliacao(req, res) {
 
         const id = req.params.id

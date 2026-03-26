@@ -56,6 +56,20 @@ module.exports = {
         })
     },
 
+    buscarPorUsuarioLivro: (usuarioId, livroId, callback) => {
+
+        const sql = `SELECT * FROM avaliacoes WHERE usuario_id = ? AND livro_id = ?`
+
+        conn.query(sql, [usuarioId, livroId], (erro, resultado) => {
+
+            if (erro) {
+                return callback(erro, null)
+            }
+
+            callback(null, resultado[0] || null)
+        })
+    },
+
     atualizar: (id, estrelas, callback) => {
 
         const sql = `

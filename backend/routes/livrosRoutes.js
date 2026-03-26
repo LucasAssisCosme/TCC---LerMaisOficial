@@ -33,6 +33,10 @@ roteador.get("/:id", validarIdLivro, livrosControler.buscarLivro)
 
 roteador.patch("/:id", autenticacao.verificarToken, validarAtualizacaoLivro, livrosControler.atualizarLivro)
 
+roteador.post("/favorita/cadastrar", autenticacao.verificarToken, livrosControler.salvarFavorita)
+
+roteador.get("/:livroId/favorita/:usuarioId", autenticacao.verificarToken, livrosControler.buscarFavorita)
+
 // D = Deletar um usuario
 
 roteador.delete("/deletar/:id", autenticacao.verificarToken, validarIdLivro, livrosControler.deletarLivro)
