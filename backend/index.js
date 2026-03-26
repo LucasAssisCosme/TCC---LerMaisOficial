@@ -1,6 +1,7 @@
 const express =  require('express')
 const cors = require('cors')
 const path = require('path')
+const fs = require('fs')
 
 const app = express()
 
@@ -24,6 +25,18 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+
+// Rota de teste para debug
+app.get('/test-uploads', (req, res) => {
+  const uploadPath = path.join(__dirname, 'uploads', 'perfis');
+  const files = fs.readdirSync(uploadPath);
+  res.json({ 
+    mensagem: 'Upload path funcionando', 
+    path: uploadPath,
+    arquivos: files 
+  });
+});
 
 app.use("/livros", livrosRoutes)
 app.use("/usuario", usuarioRoutes)

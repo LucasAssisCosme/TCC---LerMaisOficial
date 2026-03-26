@@ -212,8 +212,7 @@ const validarAtualizacaoUsuario = [
   
   body('foto_perfil')
     .optional()
-    .trim()
-    .isURL().withMessage('URL da foto de perfil inválida'),
+    .trim(),
   
   tratarErrosValidacao
 ];

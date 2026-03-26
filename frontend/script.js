@@ -537,8 +537,15 @@ async function fetchLivros() {
 
 async function carregarPerfil() {
   try {
-    const id = localStorage.getItem("usuarioLogadoId");
-    const token = localStorage.getItem("token");
+    const id = getUsuarioLogadoId();
+    const token = getToken();
+
+    // Se não estiver logado, redirecionar para login
+    if (!id || !token) {
+      alert('Você precisa estar logado para acessar o perfil!');
+      window.location.href = '/frontend/login.html';
+      return;
+    }
 
     const response = await fetch(`http://localhost:3000/usuario/${id}`, {
       method: "GET",
@@ -554,7 +561,7 @@ async function carregarPerfil() {
 
     const data = await response.json();
 
-        console.log(data.usuario.foto_perfil);
+    console.log('Perfil carregado:', data.usuario);
 
     document.getElementById("nome").value = data.usuario.nome || "";
     document.getElementById("bio").value = data.usuario.bio || "";
@@ -562,17 +569,17 @@ async function carregarPerfil() {
     document.getElementById("apelido").value = data.usuario.apelido || "";
     document.getElementById("genero").value = data.usuario.genero_favorito || "";
 
-
-    document.getElementById("fotoPerfil").src =
-      data.usuario.foto_perfil || "/frontend/User.png";
-    
-
-    // console.log("Carregando perfil...");
+    // Se houver foto de perfil, carregar
+    if (data.usuario.foto_perfil) {
+      document.getElementById("fotoPerfil").src = data.usuario.foto_perfil;
+    }
 
   } catch (erro) {
-    console.error("Erro ao carregar perfil:", erro);
+    console.error('Erro ao carregar perfil:', erro);
+    alert('Erro ao carregar perfil: ' + erro.message);
   }
 }
+
 
 function desabilitarCampos() {
   document.getElementById("nome").disabled = true;
@@ -591,6 +598,18 @@ function habilitarEdicao() {
   document.getElementById("genero").disabled = false;
   document.getElementById("inputFoto").disabled = false;
 
+  // Adicionar preview de imagem ao selecionar arquivo
+  document.getElementById("inputFoto").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById("fotoPerfil").src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
   // mostrar botões
   document.querySelector(".btn-salvar").style.display = "inline-block";
   document.querySelector(".btn-cancelar").style.display = "inline-block";
@@ -606,58 +625,51 @@ async function salvarPerfil() {
     const token = getToken();
 
     const formData = new FormData();
-
-formData.append("nome", document.getElementById("nome").value);
-formData.append("bio", document.getElementById("bio").value);
-formData.append("email", document.getElementById("email").value);
-formData.append("apelido", document.getElementById("apelido").value);
-formData.append("genero_favorito", document.getElementById("genero").value);
-const file = document.getElementById("inputFoto").files[0];
-
-if (file) {
-  formData.append("perfil_foto", file);
-}
-
-  const response = await fetch(`http://localhost:3000/usuario/${id}`, {
-  method: "PATCH",
-  headers: {
-    "Authorization": `Bearer ${token}`
-  },
-  body: formData
-});
-
-    if (!response.ok) {
-      throw new Error("Erro ao salvar");
+    formData.append("nome", document.getElementById("nome").value);
+    formData.append("bio", document.getElementById("bio").value);
+    formData.append("email", document.getElementById("email").value);
+    formData.append("apelido", document.getElementById("apelido").value);
+    formData.append("genero_favorito", document.getElementById("genero").value);
+    
+    // Se houver arquivo, adicionar
+    const file = document.getElementById("inputFoto").files[0];
+    if (file) {
+      formData.append("foto_perfil", file);
     }
 
-    alert("Perfil atualizado com sucesso 😏");
+    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    });
 
-    document.getElementById("inputFoto").addEventListener("change", function (event) {
-  const file = event.target.files[0];
+    if (!response.ok) {
+      const erro = await response.json().catch(() => ({}));
+      throw new Error(erro.mensagem || "Erro ao salvar");
+    }
 
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      document.getElementById("fotoPerfil").src = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
-  }
-});
+    const resultado = await response.json();
+    alert("Perfil atualizado com sucesso! 😏");
+    
+    // Atualizar imagem se foi enviada
+    if (resultado.foto_url) {
+      document.getElementById("fotoPerfil").src = resultado.foto_url;
+    }
 
     // volta pra página de perfil
-   desabilitarCampos();
+    desabilitarCampos();
 
-document.querySelector(".btn-salvar").style.display = "none";
-document.querySelector(".btn-cancelar").style.display = "none";
+    document.querySelector(".btn-salvar").style.display = "none";
+    document.querySelector(".btn-cancelar").style.display = "none";
 
-const btnEditar = document.querySelector(".btn-editar");
-if (btnEditar) btnEditar.style.display = "inline-block";
+    const btnEditar = document.querySelector(".btn-editar");
+    if (btnEditar) btnEditar.style.display = "inline-block";
 
   } catch (erro) {
     console.error(erro);
-    alert("Erro ao salvar perfil");
+    alert("Erro ao salvar perfil: " + erro.message);
   }
 }
 
@@ -904,3 +916,5 @@ window.addEventListener("DOMContentLoaded", () => {
     initBibliotecaGrid();
   }
 });
+
+

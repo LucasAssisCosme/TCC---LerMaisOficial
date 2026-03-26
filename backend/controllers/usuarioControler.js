@@ -160,30 +160,37 @@ mudarSenhaUsuarioPorEmail(req, res) {
     const {
       nome,
       email,
-      senha,
-      foto_perfil,
       bio,
       genero_favorito,
-      tipo,
       apelido,
     } = req.body;
 
-    usuarioModels.atualizar(
-      id,
-      { nome, email, senha, foto_perfil, bio, genero_favorito, tipo, apelido },
-      (erro) => {
-        if (erro) {
-          return res
-            .status(500)
-            .json({ mensagem: "Erro ao atualizar usuario" });
-        }
+    console.log("[ATUALIZAR] ID:", id);
+    console.log("[ATUALIZAR] Req.body:", req.body);
+    console.log("[ATUALIZAR] Req.file:", req.file);
 
-        res.json({
-          tipo: "edicao",
-          titulo: "Edição confirmada",
-        });
-      },
-    );
+    // Preparar dados para atualização
+    const dados = { nome, email, bio, genero_favorito, apelido };
+    
+    // Se houver arquivo, adicionar o caminho (vem de req.file, não de req.body)
+    if (req.file) {
+      dados.foto_perfil = `/backend/uploads/perfis/${req.file.filename}`;
+      console.log("[ATUALIZAR] Arquivo salvo em:", dados.foto_perfil);
+    }
+
+    usuarioModels.atualizar(id, dados, (erro) => {
+      if (erro) {
+        console.log("[ERRO] Ao atualizar:", erro.message);
+        return res.status(500).json({ mensagem: "Erro ao atualizar usuario" });
+      }
+
+      console.log("[SUCESSO] Usuário atualizado");
+      res.json({
+        tipo: "edicao",
+        titulo: "Edição confirmada",
+        foto_url: dados.foto_perfil ? `${req.protocol}://${req.get('host')}${dados.foto_perfil}` : null
+      });
+    });
   },
   deletarUsuario(req, res) {
     const id = req.params.id;
