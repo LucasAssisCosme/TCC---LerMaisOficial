@@ -7,7 +7,9 @@
   transition: all 0.3s ease;
 }
 .home-page {
-    background-color: #DAC1B1
+  background-color: #e4cebf;
+  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 img {
   max-width: 100%;
@@ -189,9 +191,9 @@ main {
   color: #999;
 }
 
-/* CONTAINER DOS LIVROS */
+
 .books-container {
-  background: linear-gradient(135deg, #8b4d3b, #6e3a2c);
+  background: linear-gradient(135deg, #a13719, #6e3a2c);
   margin: 40px auto;
   padding: 40px;
   border-radius: 25px;

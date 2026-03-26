@@ -74,9 +74,7 @@ color: white;
   text-decoration: none;
 
 }
-.home-page {
-    background-color: #DAC1B1
-}
+
 img {
   max-width: 100%;
 
@@ -187,18 +185,19 @@ border-radius: 20px;
 .footer-right{
 font-size:13px;
 }
+
 .layout {
   display: flex;
   gap: 40px;
   padding: 30px;
 }
 
-/* ESQUERDA */
+
 .books-area {
   flex: 3;
 }
 
-/* 🔍 BUSCA MELHORADA */
+
 .search-box {
   margin-bottom: 15px;
 }
@@ -208,7 +207,7 @@ font-size:13px;
   padding: 12px 18px;
   border-radius: 30px;
   border: none;
-  background: #9c5a46;
+  background: #993415;
   color: white;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   outline: none;
@@ -218,14 +217,14 @@ font-size:13px;
   color: #f1f1f1;
 }
 
-/* TEXTO */
+
 .result-text {
   margin: 10px 0;
   color: #fff;
   font-size: 20px;
 }
 
-/* GRID MELHOR */
+
 .books-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -233,7 +232,6 @@ font-size:13px;
   margin-top: 15px;
 }
 
-/* CARD DO LIVRO */
 .book {
   position: relative;
   cursor: pointer;
@@ -266,7 +264,7 @@ font-size:13px;
   border-radius: 0 0 5px 0;
 }
 
-/* CORES */
+
 .verde { background: #00ff88; }
 .azul { background: #2196f3; }
 .amarelo { background: #ffc107; }
@@ -274,7 +272,7 @@ font-size:13px;
 
 .card-quadrado {
   flex: 1;
-  background: linear-gradient(180deg, #a8644f, #8b4d3b);
+  background: linear-gradient(180deg, #9b3314, #9c3f25);
   color: white;
   padding: 25px;
   border-radius: 25px;

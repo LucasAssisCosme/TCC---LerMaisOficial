@@ -10,8 +10,9 @@
   position: relative;
   min-height: 100vh;
 
-
-  background: url('/livro3.jpg') center/cover no-repeat;
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(20px);
+  background: url('/image/est.jpg') center/cover no-repeat;
   font-family: 'Georgia', serif;
   color: #f5e9e2;
     
@@ -159,6 +160,7 @@ padding: 40px;
   width: 220px;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    transition: 0.4s;
 }
 
 .info h1 {

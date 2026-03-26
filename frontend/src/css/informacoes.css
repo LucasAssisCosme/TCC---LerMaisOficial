@@ -125,7 +125,7 @@ font-size:13px;
   min-height: 100vh;
   padding: 60px;
 
-  background: url('/estante.jpeg') center/cover no-repeat;
+  background: url('/image/estante.jpeg') center/cover no-repeat;
   font-family: 'Georgia', serif;
   color: #f5e9e2;
 }
