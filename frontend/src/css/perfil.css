@@ -241,7 +241,24 @@ button {
   background: linear-gradient(45deg, #ff6b3d, #ff8c5a);
 }
 
+<<<<<<< HEAD
 
 button:hover {
   transform: scale(1.05);
+=======
+.btn-editar{
+  background: #e50914;
+  border: none;
+  padding: 10px 25px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-salvar:hover {
+  background: #b20710;
+}
+label{
+    font-size: 25px;
+>>>>>>> 5d1ca1ea91a9865aa9ec9550fda35934aab8a552
 }

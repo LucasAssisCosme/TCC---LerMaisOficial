@@ -6,6 +6,7 @@ const roteador = express.Router()
 //Importando tudo que tem no arquivo de controller do usuario 
 const usuarioControler = require("../controllers/usuarioControler")
 const autenticacao = require("../middleware/autenticacao")
+const upload = require("../config/multer")
 const { 
   validarCadastroUsuario, 
   validarLoginUsuario, 
@@ -39,7 +40,7 @@ roteador.post("/esqueceuSenha", validarRedefinirSenha, usuarioControler.mudarSen
 
 // U = Atualizar um usuario
 
-roteador.patch("/:id", autenticacao.verificarToken, validarAtualizacaoUsuario, usuarioControler.atualizarUsuario)
+roteador.patch("/:id", autenticacao.verificarToken, upload.single('foto_perfil'), usuarioControler.atualizarUsuario)
 
 // D = Deletar um usuario
 

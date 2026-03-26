@@ -13,9 +13,9 @@
   <header>
     <div class="header container"> 
       <div class="info-perfil">
-            <img src="../../logo.png" alt="">    
+            <img src="/frontend/logo.png" alt="">    
             <div class="perfil">
-              <img src="../../User.png" alt="">
+              <img src="/frontend/User.png" alt="">
                 <a href="/frontend/src/pages/perfil.html">PERFIL</a>
             </div>
       </div>        
@@ -47,44 +47,44 @@
   <br>
 
   <!-- FOTO -->
-  <div class="foto-perfil">
-    <div class="circulo"></div>
-    <br>
-    <span>ALTERAR FOTO DE PERFIL</span>
-  </div>
+ <div class="foto-perfil">
+    <label>Foto de perfil</label>
+  
+  <!-- imagem -->
+  <img id="fotoPerfil" src="/frontend/User.png" alt="Foto de perfil">
+
+  <!-- input -->
+  <input id="inputFoto" type="file" accept="image/*">
+</div>
 
   <!-- FORM -->
   <div class="grid-perfil">
 
     <div class="campo">
       <label>Nome</label>
-      <input type="text" placeholder="Seu nome">
+      <input id="nome" type="text" placeholder="Seu nome">
     </div>
 
     <div class="campo grande">
       <label>Bio</label>
-      <textarea placeholder="Escreva sobre você..."></textarea>
+      <textarea id="bio" placeholder="Escreva sobre você..."></textarea>
     </div>
 
     <div class="campo">
       <label>Email</label>
-      <input type="text">
+      <input id="email" type="text" placeholder="Seu email">
     </div>
 
     <div class="campo">
       <label>Username</label>
-      <input type="text">
+      <input id="apelido" type="text" placeholder="Como quer ser chamado?">
     </div>
 
     <div class="campo">
       <label>Gênero Preferido</label>
-      <input type="text">
+      <input id="genero" type="text" placeholder="Seu genero favorito?">
     </div>
 
-    <div class="campo">
-      <label>Tipo</label>
-      <input type="text">
-    </div>
 
   </div>
  <br>
@@ -92,8 +92,14 @@
 
   <!-- BOTÕES -->
   <div class="botoes">
+<<<<<<< HEAD
     <a href="/frontend/src/pages/perfil.html"><button class="btn-cancelar">Cancelar</button></a>
     <a href="/frontend/src/pages/index.html"><button class="btn-salvar">Salvar</button></a>
+=======
+    <button class="btn-editar" onclick="habilitarEdicao()">Editar</button>
+   <button class="btn-cancelar" onclick="cancelarEdicao()">Cancelar</button>
+  <button class="btn-salvar" onclick="salvarPerfil()">Salvar</button>
+>>>>>>> 5d1ca1ea91a9865aa9ec9550fda35934aab8a552
   </div>
 
 </main>
