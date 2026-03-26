@@ -118,3 +118,85 @@ border-radius: 20px;
 .footer-right{
 font-size:13px;
 }
+/* FUNDO COM IMAGEM + BLUR */
+.edit-container {
+  height: 100vh;
+  background: url('/est.jpg') center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CAMADA ESCURA */
+.overlay {
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+   inset: 0;
+  background: rgba(20, 10, 5, 0.75);
+  backdrop-filter: blur(12px);
+}
+
+/* TÍTULO */
+.overlay h1 {
+  color: white;
+  margin-bottom: 50px;
+  letter-spacing: 1px;
+  font-size: 40px;
+}
+
+/* CAIXA DO TEXTO */
+.box-text {
+  width: 1000px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.74);
+}
+
+
+.box-text textarea {
+  width: 100%;
+  height: 180px;
+  border: none;
+  background: transparent;
+  color: white;
+  resize: none;
+  outline: none;
+  font-size: 20px;
+}
+
+/* BOTÕES */
+.buttons {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+button {
+  padding: 10px 30px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  
+}
+
+/* CANCELAR */
+.cancelar {
+  background: #a65c4a;
+  color: white;
+
+}
+
+/* CONFIRMAR */
+.confirmar {
+  background: #a65c4a;
+  color: white;
+}

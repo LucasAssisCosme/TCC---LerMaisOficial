@@ -7,7 +7,15 @@
 
 }
 .home-page {
-    background-color: #DAC1B1
+  position: relative;
+  min-height: 100vh;
+
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(20px);
+  background: url('/image/est.jpg') center/cover no-repeat;
+  font-family: 'Georgia', serif;
+  color: #f5e9e2;
+    
 }
 img {
   max-width: 100%;
@@ -118,128 +126,120 @@ border-radius: 20px;
 .footer-right{
 font-size:13px;
 }
-/* BASE */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #141414;
-  color: white;
+
+.avaliacao-container {
+  min-height: 80vh;
+padding: 40px;
+
 }
 
-/* HERO */
-.hero-livro {
+
+.card {
   position: relative;
-  height: 500px;
-  background: url("https://images.unsplash.com/photo-1512820790803-83ca734da794");
-  background-size: cover;
-  background-position: center;
+  z-index: 1;
+  max-width: 1400px;
+  margin: auto;
+  padding: 40px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
-/* OVERLAY ESCURO */
-.overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, #141414, rgba(0,0,0,0.6));
-}
 
-/* CONTEÚDO HERO */
-.hero-content {
-  position: relative;
+.topo {
   display: flex;
-  align-items: center;
   gap: 40px;
-  padding: 60px;
+  align-items: center;
 }
 
-/* CAPA */
+
 .capa {
-  width:  300px;
-  height: 420px;
-  border-radius: 10px;
-
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  transition: 0.3s;
-}
-
-.capa:hover {
-  transform: scale(1.05);
+  width: 220px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    transition: 0.4s;
 }
 
 .info h1 {
-  font-size: 50px;
-  margin: 0;
+  font-size: 3rem;
+  color: #fff;
 }
 
-.descricao {
-  max-width: 500px;
+.tag {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  padding: 12px 28px;
+  border-radius: 25px;
+  border: none;
+ 
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+
+  color: #fff;
+  font-size: 30px;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.linha {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.3);
   margin: 15px 0;
-  color: #ccc;
 }
 
 
 .estrelas {
   color: gold;
-  font-size: 22px;
-}
-
-
-.botoes {
-  margin-top: 20px;
-}
-
-.btn-play {
-  background: white;
-  color: black;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 5px;
-  font-weight: bold;
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-.btn-secundario {
-  background: rgba(109,109,110,0.7);
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 5px;
-  cursor: pointer;
+  font-size: 40px;
 }
 
 
 .conteudo {
-  padding: 40px;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.bloco {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: rgba(255,255,255,0.05);
+  padding: 25px;
+  border-radius: 12px;
 }
 
 
-.secao {
-  margin-bottom: 40px;
+.texto h2 {
+  color: #fff;
+  margin-bottom: 10px;
 }
 
-.secao h2 {
-  font-size: 26px;
-}
-
-
-.secao p {
-  font-size: 18px;
-  line-height: 1.7;
+.texto p {
+  color: #ddd;
   max-width: 800px;
 }
 
-
-.btn-editar {
-  margin-top: 15px;
-  background: #e50914;
+button {
+  background: #9C5343;
+  color: #fff;
   border: none;
-  padding: 10px 18px;
-  color: white;
-  border-radius: 5px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
+<<<<<<< HEAD
 .btn-editar:hover {
   background: #b20710;
 }
@@ -299,4 +299,27 @@ textarea:focus {
 #botoesResenha button:hover,
 #botoesFavorita button:hover {
   background: #b20710;
+=======
+button:hover {
+  background: #691b1b;
+}
+
+
+.btn-voltar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #9c5a46;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.btn-voltar:hover {
+  background-color: #7a4636;
+>>>>>>> 0d78afd84734593e27e32bb96d29f31c4f78b433
 }

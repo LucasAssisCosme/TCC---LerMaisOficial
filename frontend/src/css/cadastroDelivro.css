@@ -116,110 +116,104 @@ border-radius: 20px;
 font-size:13px;
 }
 
-body {
-  background-color: #d2b8a3;
-  font-family: Arial, sans-serif;
-}
 
 
 .cadastro-box {
-  background-color: #9b4f3c;
-  width: 95%;
-  max-width: 1400px;
-  margin: 40px auto;
-  padding: 50px;
-  border-radius: 35px;
+  background: linear-gradient(135deg, #9b4f3c, #8B3A2E);
+  width: 100%;
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 60px;
+  border-radius: 25px;
   color: white;
-}
-.cadastro-box h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-label {
-  font-size: 30px;
-  margin: 0 auto;
- margin-top: 20px;
-  display: block;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
 .cadastro-box h1 {
-
-  font-size: 40px;
+  text-align: center;
+  font-size: 38px;
+  margin-bottom: 30px;
 }
 
-
-.lado-esquerdo {
-  flex: 2;
-}
-.lado-esquerdo > input {
-    width: 100%;
-}
 
 .formulario {
-  gap: 60px;
   display: flex;
-  padding: 26px;
-  
+  gap: 40px;
+
+
 }
+
+
+.lado-esquerdo,
 .lado-direito {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-margin-top: 60px;
-  gap: 20px;
-  justify-content: flex-start;
 }
 
-.lado-direito .campo2 {
-  width: 100%;
-  margin-top: 2px;
-  height: 100px;
+
+.campo {
+  margin-bottom: 18px;
 }
+
+label {
+  font-size: 29px;
+  margin-bottom: 8px;
+  display: block;
+
+}
+
 
 input,
-select {
+select,
+textarea {
   width: 100%;
-  padding: 10px 2px;
-  border-radius: 20px;
+  padding: 12px;
+  border-radius: 12px;
   border: none;
-  background-color: #d9cfcf;
-  font-size: 24px;
+  outline: none;
+  background-color: #f3f3f3;
+  font-size: 27px;
+  transition: 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 2px #e74c3c;
 }
 
 
-.linha {
-  display: flex;
-  gap: 100px;
-}
-
-.ano{
-    width: 800px;
-}
-.campo {
-  flex: 1;
- 
+.descricao-box {
+  height: 120px;
+  resize: none;
 }
 
 
 .preview {
-  width: 500px;
-    height: 404px;
-    margin-top: 60px;
-    border-radius: 29px;
- 
+  width: 180px;
+  height: 250px;
+  margin: 20px auto;
+  border-radius: 15px;
+  object-fit: cover;
+  background: #eee;
+  display: block;
+  border: 2px dashed #ccc;
 }
 
 
 button {
-  background-color: #7a2d1f;
+  display: block;
+  margin: 30px auto 0;
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
   color: white;
-padding: 16px 70px;
-border-radius: 30px;
-border: none;
+  padding: 14px 60px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: 0.2s;
 }
 
 button:hover {
-  background-color: #5e2117;
+  transform: scale(1.05);
 }
-
