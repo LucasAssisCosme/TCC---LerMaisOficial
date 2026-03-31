@@ -27,12 +27,6 @@ module.exports = {
 
             if (erro) {
                 console.error('[Biblioteca] Erro ao salvar:', erro.message || erro.sqlMessage || erro);
-                
-                // Verifica se é erro de violação de constraint (livro já adicionado)
-                if (erro.code === 'ER_DUP_ENTRY') {
-                    return res.status(409).json({ mensagem: "Este livro já está na sua biblioteca" })
-                }
-                
                 return res.status(500).json({ mensagem: "Erro ao salvar status", erro: erro.message })
             }
 

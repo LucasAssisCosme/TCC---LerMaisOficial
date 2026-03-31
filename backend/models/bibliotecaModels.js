@@ -3,10 +3,12 @@ const conn = require("../config/banco")
 module.exports = {
 
     guardar: ({ usuario_id, livro_id, progresso }, callback) => {
-
+        // UPSERT: Atualiza se existe, insere se não existe
         const sql = `
         INSERT INTO biblioteca(usuario_id, livro_id, progresso)
         VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+        progresso = VALUES(progresso)
         `
 
         const valores = [usuario_id, livro_id, progresso]
@@ -18,10 +20,11 @@ module.exports = {
             }
 
             const novoRegistro = {
-                id: resultados.insertId,
+                id: resultados.insertId || null,
                 usuario_id,
                 livro_id,
-                progresso
+                progresso,
+                foiAtualizado: resultados.affectedRows === 2 // Se foi 2, é UPDATE; se 1, é INSERT
             }
 
             callback(null, novoRegistro)

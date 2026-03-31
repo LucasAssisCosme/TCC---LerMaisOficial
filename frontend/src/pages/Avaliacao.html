@@ -41,7 +41,7 @@
   </header>
 <main class="avaliacao-container">
 
-  <!-- HERO (tipo Netflix) -->
+
   <section class="hero-livro">
 
     <div class="overlay"></div>
@@ -51,6 +51,17 @@
 
       <div class="info">
         <h1 id="tituloLivro">Amor, Teoricamente</h1>
+        <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
+          <option value="">Adicionar à biblioteca </option>
+          <option value="lendo">📖 Lendo</option>
+          <option value="lido">✅ Lido</option>
+          <option value="quero_ler">💭 Quero Ler</option>
+        </select>
+   
+        <div class="acoes-livro" id="acoesLivro" style="display: none;">
+          <button class="btn-editar-livro" onclick="habilitarEdicaoLivro()">✏️ Editar Livro</button>
+          <button class="btn-deletar-livro" onclick="deletarLivro()">🗑️ Deletar Livro</button>
+        </div>
 
         <div class="estrelas" id="avaliacaoEstrelas">
           <span class="star" data-value="1">⭐</span>
@@ -61,6 +72,7 @@
         </div>
 
         <p class="descricao" id="descricaoLivro">
+           
           Uma história envolvente que mistura romance, humor e ciência,
           conquistando do começo ao fim.
         </p>

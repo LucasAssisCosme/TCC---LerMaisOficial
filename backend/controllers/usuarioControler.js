@@ -1,5 +1,8 @@
 const usuarioModels = require("../models/usuarioModels");
 const autenticacao = require("../middleware/autenticacao");
+const multerConfig = require("../config/multer");
+const path = require('path');
+const fs = require('fs');
 
 module.exports = {
   formLogin(req, res) {
@@ -172,10 +175,24 @@ mudarSenhaUsuarioPorEmail(req, res) {
     // Preparar dados para atualização
     const dados = { nome, email, bio, genero_favorito, apelido };
     
-    // Se houver arquivo, adicionar o caminho (vem de req.file, não de req.body)
+    // Se houver arquivo, verificar se é duplicado antes de adicionar
     if (req.file) {
-      dados.foto_perfil = `/backend/uploads/perfis/${req.file.filename}`;
-      console.log("[ATUALIZAR] Arquivo salvo em:", dados.foto_perfil);
+      try {
+        // Verificar se imagem duplicada já existe
+        const caminhoTemporario = path.join(multerConfig.uploadDir, req.file.filename);
+        const nomeArquivoFinal = multerConfig.verificarImagemDuplicada(caminhoTemporario);
+        
+        if (nomeArquivoFinal) {
+          dados.foto_perfil = `/backend/uploads/perfis/${nomeArquivoFinal}`;
+          console.log("[ATUALIZAR] Arquivo (verificado de duplicatas):", dados.foto_perfil);
+        } else {
+          console.error("[ATUALIZAR] Erro ao verificar duplicatas");
+          return res.status(500).json({ mensagem: "Erro ao processar imagem" });
+        }
+      } catch (erro) {
+        console.error("[ATUALIZAR] Erro ao processar arquivo:", erro);
+        return res.status(500).json({ mensagem: "Erro ao processar arquivo" });
+      }
     }
 
     usuarioModels.atualizar(id, dados, (erro) => {

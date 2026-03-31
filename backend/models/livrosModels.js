@@ -94,16 +94,45 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
           });
       },
       deletar: (id, callback) => {
-            //Variavel sql que guarda a consulta desejada
-                 const sql = `DELETE FROM livros WHERE id = ?`
-                 const valor = [id]
-             //Executar o comando no banco
-             conn.query(sql, valor, (erro, resultado) => {
-                          if(erro){
-                            return callback(erro, null)
-                          }
-                          callback(null, resultado.affectedRows > 0)
-             })
+            // Deletar em cascata respeitando as foreign keys
+            const sqlDeleteFavoritas = `DELETE FROM partes_favoritas WHERE livro_id = ?`;
+            const sqlDeleteResenha = `DELETE FROM resenha WHERE livro_id = ?`;
+            const sqlDeleteAvaliacoes = `DELETE FROM avaliacoes WHERE livro_id = ?`;
+            const sqlDeleteBiblioteca = `DELETE FROM biblioteca WHERE livro_id = ?`;
+            const sqlDeleteLivro = `DELETE FROM livros WHERE id = ?`;
+
+            // Executar deletações em cascata
+            conn.query(sqlDeleteFavoritas, [id], (erro1) => {
+                  if(erro1){
+                        return callback(erro1, null);
+                  }
+
+                  conn.query(sqlDeleteResenha, [id], (erro2) => {
+                        if(erro2){
+                              return callback(erro2, null);
+                        }
+
+                        conn.query(sqlDeleteAvaliacoes, [id], (erro3) => {
+                              if(erro3){
+                                    return callback(erro3, null);
+                              }
+
+                              conn.query(sqlDeleteBiblioteca, [id], (erro4) => {
+                                    if(erro4){
+                                          return callback(erro4, null);
+                                    }
+
+                                    // Por último, deletar o livro
+                                    conn.query(sqlDeleteLivro, [id], (erro5, resultado) => {
+                                          if(erro5){
+                                                return callback(erro5, null);
+                                          }
+                                          callback(null, resultado.affectedRows > 0);
+                                    });
+                              });
+                        });
+                  });
+            });
       },
       salvarFavorita: ({usuario_id, livro_id, parte_favorita}, callback) => {
             // Primeiro deleta qualquer favorita anterior

@@ -37,8 +37,9 @@ roteador.post("/favorita/cadastrar", autenticacao.verificarToken, livrosControle
 
 roteador.get("/:livroId/favorita/:usuarioId", autenticacao.verificarToken, livrosControler.buscarFavorita)
 
-// D = Deletar um usuario
+// D = Deletar um livro
 
+roteador.delete("/:id", autenticacao.verificarToken, validarIdLivro, livrosControler.deletarLivro)
 roteador.delete("/deletar/:id", autenticacao.verificarToken, validarIdLivro, livrosControler.deletarLivro)
 
 
