@@ -45,6 +45,110 @@ function normalizarUrlMidia(url) {
   return `${API_BASE_URL}/${urlLimpa.replace(/^\.?\//, "")}`;
 }
 
+const PAGE_TRANSITION_DURATION = 280;
+
+function setupPageTransitions() {
+  if (!document.body || document.getElementById("page-transition-style")) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.id = "page-transition-style";
+  style.textContent = `
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body.page-transition-ready {
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        opacity ${PAGE_TRANSITION_DURATION}ms ease,
+        transform ${PAGE_TRANSITION_DURATION}ms ease;
+    }
+
+    body.page-enter {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    body.page-exit {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+  `;
+
+  document.head.appendChild(style);
+  document.body.classList.add("page-transition-ready", "page-enter");
+
+  requestAnimationFrame(() => {
+    document.body.classList.remove("page-enter");
+  });
+}
+
+function navegarComTransicao(url) {
+  if (!url || document.body?.classList.contains("page-exit")) {
+    return;
+  }
+
+  document.body?.classList.add("page-exit");
+
+  window.setTimeout(() => {
+    window.location.href = url;
+  }, PAGE_TRANSITION_DURATION);
+}
+
+function setupTransitionLinks() {
+  if (document.body?.dataset.transitionLinksReady === "true") {
+    return;
+  }
+
+  document.body.dataset.transitionLinksReady = "true";
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href]");
+    if (!link) {
+      return;
+    }
+
+    const href = link.getAttribute("href");
+    if (!href || href === "#" || link.hasAttribute("download")) {
+      return;
+    }
+
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      link.target === "_blank" ||
+      link.dataset.noTransition === "true"
+    ) {
+      return;
+    }
+
+    if (href.startsWith("#")) {
+      const destino = document.querySelector(href);
+      if (destino) {
+        event.preventDefault();
+        destino.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      return;
+    }
+
+    const url = new URL(href, window.location.href);
+    if (url.origin !== window.location.origin) {
+      return;
+    }
+
+    event.preventDefault();
+    navegarComTransicao(url.href);
+  });
+}
+
 // ==================== VALIDAR SENHA ====================
 function validarSenha(senha) {
 // ValidaÃ§Ãµes bÃ¡sicas
@@ -113,6 +217,10 @@ return { valida: true, mensagem: "Senha vÃ¡lida" };
 async function cadastrarUsuario(formData) {
   try {
     const senha = formData.get("senha");
+    const tipoSelecionado = String(formData.get("tipo_usuario") || "").trim();
+    const tipoUsuario = ["aluno", "bibliotecaria"].includes(tipoSelecionado)
+      ? tipoSelecionado
+      : "aluno";
 
     // Validar senha
     const validacaoSenha = validarSenha(senha);
@@ -125,7 +233,7 @@ async function cadastrarUsuario(formData) {
       nome: formData.get("nome"),
       email: formData.get("email"),
       senha: senha,
-      tipo: formData.get("tipo_usuario") || "aluno",
+      tipo: tipoUsuario,
       genero_favorito: formData.get("genero_favorito"),
       apelido: formData.get("apelido"),
     };
@@ -140,7 +248,15 @@ async function cadastrarUsuario(formData) {
 
     if (!resposta.ok) {
       const erroBody = await resposta.json().catch(() => ({}));
-      throw new Error(erroBody.mensagem || `Erro ${resposta.status}`);
+      const detalhes = Array.isArray(erroBody.detalhes)
+        ? erroBody.detalhes
+            .map((item) => `${item.path || item.param || "campo"}: ${item.msg}`)
+            .join("; ")
+        : "";
+
+      throw new Error(
+        detalhes || erroBody.mensagem || erroBody.erro || `Erro ${resposta.status}`,
+      );
     }
 
     const data = await resposta.json();
@@ -323,6 +439,10 @@ async function loginUsuario(formData, isAutoLogin = false) {
       const tipo = normalizarTipo(String(data.usuario.tipo || "aluno"));
       localStorage.setItem("usuarioLogadoTipo", tipo);
 
+      const apelido = String(data.usuario.apelido || data.usuario.nome || "").trim();
+      localStorage.setItem("usuarioLogadoApelido", apelido);
+      atualizarApelidoPerfilHeader(apelido);
+
       console.log("[Login realizado]", {
         usuarioId: userId,
         usuarioTipo: tipo,
@@ -466,10 +586,21 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
+function atualizarApelidoPerfilHeader(apelido) {
+  const linkPerfil = document.querySelector(".info-perfil .perfil a");
+  if (!linkPerfil) return;
+
+  const texto = String(apelido || "").trim();
+  linkPerfil.textContent = texto || "PERFIL";
+}
+
 function logout() {
   localStorage.removeItem("usuarioLogadoId");
   localStorage.removeItem("usuarioLogadoTipo");
+  localStorage.removeItem("usuarioLogadoApelido");
   localStorage.removeItem("token");
+
+  atualizarApelidoPerfilHeader("");
 
   // Limpa o intervalo de atualizaÃ§Ã£o se estiver ativo
   if (bibliotecaAutoRefreshId !== null) {
@@ -535,17 +666,8 @@ async function atualizarBibliotecaELista() {
 
   console.log("[atualizarBibliotecaELista] Buscando livros...");
 
-  // Tenta buscar biblioteca do usuÃ¡rio primeiro
-  let livrosDaBiblioteca = await fetchBiblioteca();
-
-  // Se nÃ£o houver livros na biblioteca, tenta buscar todos os livros
-  if (livrosDaBiblioteca.length === 0) {
-    console.log(
-      "[atualizarBibliotecaELista] Nenhum livro na biblioteca, buscando todos os livros...",
-    );
-    const todosOsLivros = await fetchLivrosPublicos();
-    livrosDaBiblioteca = todosOsLivros;
-  }
+  // A biblioteca deve mostrar apenas os livros salvos com status pelo usuÃ¡rio
+  const livrosDaBiblioteca = await fetchBiblioteca();
 
   console.log("[Biblioteca] Livros carregados:", {
     quantidade: livrosDaBiblioteca.length,
@@ -555,7 +677,7 @@ async function atualizarBibliotecaELista() {
   bibliotecaCachedBooks = livrosDaBiblioteca;
   bibliotecaCachedStatus = livrosDaBiblioteca.map((livro) => ({
     livro_id: livro.livro_id || livro.id,
-    progresso: livro.progresso || "quero_ler",
+    progresso: livro.progresso || "",
   }));
 
   const termo = inputSearch ? inputSearch.value.trim().toLowerCase() : "";
@@ -807,6 +929,9 @@ function habilitarEdicao() {
   // esconder botÃ£o editar
   const btnEditar = document.querySelector(".btn-editar");
   if (btnEditar) btnEditar.style.display = "none";
+
+  const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
+  if (btnExcluirPerfil) btnExcluirPerfil.style.display = "none";
 }
 
 async function salvarPerfil() {
@@ -845,6 +970,10 @@ async function salvarPerfil() {
 
     console.log("[salvarPerfil] Resultado:", resultado);
 
+    const apelidoAtualizado = document.getElementById("apelido").value.trim();
+    localStorage.setItem("usuarioLogadoApelido", apelidoAtualizado);
+    atualizarApelidoPerfilHeader(apelidoAtualizado);
+
     // Atualizar foto no header se foi enviada
     if (resultado.foto_url || resultado.usuario?.foto_perfil) {
       const novaFoto = resultado.foto_url || resultado.usuario?.foto_perfil;
@@ -873,6 +1002,9 @@ async function salvarPerfil() {
     const btnEditar = document.querySelector(".btn-editar");
     if (btnEditar) btnEditar.style.display = "inline-block";
 
+    const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
+    if (btnExcluirPerfil) btnExcluirPerfil.style.display = "inline-block";
+
     // Recarregar dados para garantir sincronizaÃ§Ã£o
     setTimeout(() => {
       carregarPerfil();
@@ -892,6 +1024,53 @@ function cancelarEdicao() {
 
   const btnEditar = document.querySelector(".btn-editar");
   if (btnEditar) btnEditar.style.display = "inline-block";
+
+  const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
+  if (btnExcluirPerfil) btnExcluirPerfil.style.display = "inline-block";
+}
+
+async function excluirPerfil() {
+  try {
+    const id = getUsuarioLogadoId();
+    const token = getToken();
+
+    if (!id || !token) {
+      alert("Voce precisa estar logado para apagar o perfil.");
+      logout();
+      return;
+    }
+
+    const confirmou = window.confirm(
+      "Tem certeza que deseja apagar seu perfil? Essa acao nao pode ser desfeita.",
+    );
+    if (!confirmou) {
+      return;
+    }
+
+    const resposta = await fetch(`http://localhost:3000/usuario/deletar/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await resposta.json().catch(() => ({}));
+
+    if (!resposta.ok) {
+      throw new Error(data.mensagem || `Erro ${resposta.status}`);
+    }
+
+    alert("Perfil apagado com sucesso.");
+    localStorage.removeItem("usuarioLogadoId");
+    localStorage.removeItem("usuarioLogadoTipo");
+    localStorage.removeItem("usuarioLogadoApelido");
+    localStorage.removeItem("token");
+    atualizarApelidoPerfilHeader("");
+    window.location.href = "/frontend/login.html";
+  } catch (erro) {
+    console.error("[excluirPerfil] Erro ao apagar perfil:", erro);
+    alert("Erro ao apagar perfil: " + (erro.message || erro));
+  }
 }
 
 async function salvarStatusBiblioteca(
@@ -1006,7 +1185,7 @@ function renderBooks(books, bibliotecaStatus) {
   // Filtrar apenas livros com status vÃ¡lido
   const livrosFiltrados = books.filter((book) => {
     const livroId = book.livro_id || book.id;
-    const progresso = statusMap.get(livroId) || book.progresso || "quero_ler";
+    const progresso = statusMap.get(livroId) || book.progresso || "";
     return statusValidos.includes(progresso);
   });
 
@@ -1032,8 +1211,7 @@ function renderBooks(books, bibliotecaStatus) {
           book.image ||
           "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
 
-        const progresso =
-          statusMap.get(livroId) || book.progresso || "quero_ler";
+        const progresso = statusMap.get(livroId) || book.progresso || "";
         const status = getStatusTag(progresso);
 
         let capaUrl = normalizarUrlMidia(
@@ -2156,6 +2334,10 @@ async function carregarFotoPerfilHeader() {
 
     const data = await response.json();
 
+    const apelidoHeader = data.usuario?.apelido || data.usuario?.nome || "";
+    localStorage.setItem("usuarioLogadoApelido", String(apelidoHeader).trim());
+    atualizarApelidoPerfilHeader(apelidoHeader);
+
     // Atualiza a imagem de perfil no header se houver foto
     if (data.usuario && data.usuario.foto_perfil) {
       const imagemHeader = document.querySelector(".info-perfil .perfil img");
@@ -2235,6 +2417,9 @@ function setupImageUpload() {
 
 // Inicializa comportamentos quando a pÃ¡gina estiver pronta
 window.addEventListener("DOMContentLoaded", () => {
+  setupPageTransitions();
+  setupTransitionLinks();
+
   // Identifica qual pÃ¡gina estÃ¡ sendo carregada
   const currentPage = window.location.pathname;
   paginasCarregadas.add(currentPage);
@@ -2264,6 +2449,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initRedefinirSenha();
   initCadastroLivro();
   atualizarAcessoCadastroLivro();
+  atualizarApelidoPerfilHeader(localStorage.getItem("usuarioLogadoApelido"));
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
     carregarPerfil();

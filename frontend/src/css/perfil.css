@@ -297,6 +297,20 @@ button {
   cursor: pointer;
 }
 
+.btn-excluir-perfil {
+  background: #4a1d18;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 10px 25px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .btn-salvar:hover {
   background: #b20710;
+}
+
+.btn-editar:hover,
+.btn-excluir-perfil:hover {
+  filter: brightness(1.08);
 }

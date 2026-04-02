@@ -21,7 +21,6 @@ roteador.get("/login", usuarioControler.formLogin)
 roteador.post("/login", validarLoginUsuario, usuarioControler.loginUsuario)
 //C = Criar novo usuario 
 //Rota para solicitar a página de cadastro
-roteador.get("/cadastrar", usuarioControler.usuarioCadastro)
 roteador.post("/cadastrar", validarCadastroUsuario, usuarioControler.salvarUsuario)
 //Rota para enviar dados da página de cadastro
 //Retorna as informações de todos os usuarios

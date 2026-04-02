@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - Cadastro de Usuário</title>
+    <title>Ler Mais - Cadastro de Usuario</title>
     <link rel="stylesheet" href="/frontend/src/css/cadastroUsuario.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -11,13 +11,12 @@
       integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous"
     />
-  
   </head>
   <body class="">
     <main class="login-page">
-        <img src="" alt="">
+      <img src="" alt="" />
       <div class="login-card">
-        <h1 class="title">CADASTRO DE USUÁRIO</h1>
+        <h1 class="title">CADASTRO DE USUARIO</h1>
 
         <form action="/frontend/src/pages/index.html" method="POST" class="cadastro-form">
           <div class="mb-3">
@@ -31,6 +30,7 @@
               required
             />
           </div>
+
           <div class="mb-3">
             <label for="inputEmail" class="form-label">Email</label>
             <input
@@ -41,26 +41,31 @@
               name="email"
               required
             />
-           
           </div>
 
           <div class="mb-3">
-            <label for="inputTipoUsuario" class="form-label">Tipo de Usuário</label>
+            <label for="inputTipoUsuario" class="form-label">Tipo de Usuario</label>
             <select name="tipo_usuario" id="inputTipoUsuario" class="form-control form-control-lg">
-              <option>Selecione o tipo de usuário</option>
+              <option value="">Selecione o tipo de usuario</option>
               <option value="aluno">Aluno</option>
-             <option value="bibliotecaria">Bibliotecária</option>
+              <option value="bibliotecaria">Bibliotecaria</option>
             </select>
           </div>
 
-          <div class="mb-3">            <label for="inputGeneroFavorito" class="form-label">Gênero Favorito</label>
-            <select name="genero_favorito" id="inputGeneroFavorito" class="form-control form-control-lg" required>
-              <option value="">Selecione seu gênero favorito</option>
+          <div class="mb-3">
+            <label for="inputGeneroFavorito" class="form-label">Genero Favorito</label>
+            <select
+              name="genero_favorito"
+              id="inputGeneroFavorito"
+              class="form-control form-control-lg"
+              required
+            >
+              <option value="">Selecione seu genero favorito</option>
               <option value="Romance">Romance</option>
               <option value="Fantasia">Fantasia</option>
               <option value="Terror">Terror</option>
               <option value="Aventura">Aventura</option>
-              <option value="Ficcao_Cientifica">Ficção Científica</option>
+              <option value="Ficcao_Cientifica">Ficcao Cientifica</option>
               <option value="Drama">Drama</option>
               <option value="Autoajuda">Autoajuda</option>
               <option value="Outro">Outro</option>
@@ -79,7 +84,8 @@
             />
           </div>
 
-          <div class="mb-3">            <label for="inputSenha" class="form-label">Senha</label>
+          <div class="mb-3">
+            <label for="inputSenha" class="form-label">Senha</label>
             <input
               type="password"
               id="inputSenha"
@@ -90,17 +96,16 @@
             />
           </div>
 
-            <button type="submit" class="login-1">
-                CONFIRMAR
-            </button>
-        </form>
+          <button type="submit" class="login-1">CONFIRMAR</button>
 
-       
+            <div class="extras text-center">
+          <p class="mb-2"> Já possui uma conta? <a href="/frontend/login.html">Clique aqui!</a></p>
+
         </div>
+        </form>
       </div>
     </main>
 
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script> -->
-     <script src="../../script.js"></script>
+    <script src="../../script.js"></script>
   </body>
 </html>

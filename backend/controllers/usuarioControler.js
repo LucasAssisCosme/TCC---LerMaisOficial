@@ -43,10 +43,11 @@ module.exports = {
       tipo,
       apelido,
     } = req.body;
+    const tipoUsuario = ['aluno', 'bibliotecaria'].includes(tipo) ? tipo : 'aluno';
 
     //Manda as informações para o model
     usuarioModels.salvar(
-      { nome, email, senha, foto_perfil, bio, genero_favorito, tipo, apelido },
+      { nome, email, senha, foto_perfil, bio, genero_favorito, tipo: tipoUsuario, apelido },
       (erro, novoUsuario) => {
         //se deu erro, renderiza a mensagem de erro mostrando a mensagem
         if (erro) {
@@ -214,8 +215,15 @@ mudarSenhaUsuarioPorEmail(req, res) {
 
     //Acessar model e solicitar a exclusão do usuario
     usuarioModels.deletar(id, (erro, sucesso) => {
-      if (erro || !sucesso) {
-        return res.status(500).json({ mensagem: "Erro ao deletar usuario" });
+      if (erro) {
+        console.error("[deletarUsuario] Erro ao deletar usuario:", erro);
+        return res
+          .status(500)
+          .json({ mensagem: "Erro ao deletar usuario", erro: erro.message });
+      }
+
+      if (!sucesso) {
+        return res.status(404).json({ mensagem: "Usuario nao encontrado" });
       }
 
       const deletado = { usuario: "Selecionado" };

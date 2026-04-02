@@ -92,3 +92,5 @@ ALTER TABLE usuarios MODIFY genero_favorito ENUM('Romance',
 'Drama',
 'Autoajuda',
 'Outro') NULL;
+ALTER TABLE usuarios MODIFY bio  TEXT NULL;
+ALTER TABLE usuarios MODIFY foto_perfil  VARCHAR(255) NULL;

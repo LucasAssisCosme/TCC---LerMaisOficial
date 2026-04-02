@@ -18,7 +18,7 @@ const validarCadastroUsuario = [
     .trim()
     .notEmpty().withMessage('Nome Ã© obrigatÃ³rio')
     .isLength({ min: 2, max: 100 }).withMessage('Nome deve ter entre 2 e 100 caracteres')
-    .matches(/^[\\p{L}\\s]+$/u).withMessage('Nome pode conter apenas letras e espaÃ§os'),
+    .matches(/^[\p{L}\s]+$/u).withMessage('Nome pode conter apenas letras e espaÃ§os'),
   
   body('email')
     .trim()
@@ -193,7 +193,7 @@ const validarAtualizacaoUsuario = [
     .optional()
     .trim()
     .isLength({ min: 2, max: 100 }).withMessage('Nome deve ter entre 2 e 100 caracteres')
-    .matches(/^[\\p{L}\\s]+$/u).withMessage('Nome pode conter apenas letras e espaÃ§os'),
+    .matches(/^[\p{L}\s]+$/u).withMessage('Nome pode conter apenas letras e espaÃ§os'),
   
   body('email')
     .optional()
