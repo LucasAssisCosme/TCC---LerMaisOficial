@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ler Mais - Início</title>
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="/frontend/src/css/Avaliacao.css" />
 
   </head>
@@ -19,24 +19,39 @@
            <a href="/frontend/src/pages/perfil.html">PERFIL</a>
             </div>
       </div>        
+   <nav>
+  <ul class="nav-list">
+    
+    <li class="item-list">
+      <a href="/frontend/src/pages/index.html">
+        <i class="bi bi-house"></i>
+        Início
+      </a>
+    </li>
 
-      <nav>
-        <ul class="nav-list">
-          <li class="item-list">
-            <a href="/frontend/src/pages/index.html">Inicio</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/src/pages/cadastroLivro.html">Cadastrar Livros</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/src/pages/biblioteca.html">Biblioteca</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/login.html">Saida</a>
-          </li>
+    <li class="item-list">
+      <a href="/frontend/src/pages/cadastroLivro.html">
+        <i class="bi bi-plus-circle"></i>
+        Cadastrar
+      </a>
+    </li>
 
-        </ul>
-      </nav>
+    <li class="item-list active">
+      <a href="/frontend/src/pages/biblioteca.html">
+        <i class="bi bi-book"></i>
+        Biblioteca
+      </a>
+    </li>
+
+    <li class="item-list">
+      <a href="/frontend/login.html">
+        <i class="bi bi-box-arrow-right"></i>
+        Sair
+      </a>
+    </li>
+
+  </ul>
+</nav>
     </div>
   </header>
 <main class="avaliacao-container">
@@ -50,7 +65,24 @@
       <img id="capaLivro" src="https://covers.openlibrary.org/b/id/11153254-L.jpg" class="capa" style="cursor: pointer;" onclick="irParaInformacoes()">
 
       <div class="info">
-        <h1 id="tituloLivro">Amor, Teoricamente</h1>
+        <!-- MODO VISUALIZAÇÃO -->
+        <div id="infoVisualizacao">
+          <h1 id="tituloLivro">Amor, Teoricamente</h1>
+          <p class="descricao" id="descricaoLivro">
+            Uma história envolvente que mistura romance, humor e ciência,
+            conquistando do começo ao fim.
+          </p>
+        </div>
+
+        <!-- MODO EDIÇÃO -->
+        <div id="infoEdicao" style="display: none;">
+          <input type="text" id="tituloLivroEdit" placeholder="Título do livro" class="input-edit">
+          <textarea id="descricaoLivroEdit" placeholder="Descrição do livro" class="textarea-edit" rows="4"></textarea>
+          
+          <label for="capaLivroFileEdit" class="label-edit">Imagem da Capa</label>
+          <input type="file" id="capaLivroFileEdit" accept="image/*" class="input-edit">
+        </div>
+
         <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
           <option value="">Adicionar à biblioteca </option>
           <option value="lendo">📖 Lendo</option>
@@ -58,10 +90,6 @@
           <option value="quero_ler">💭 Quero Ler</option>
         </select>
    
-        <div class="acoes-livro" id="acoesLivro" style="display: none;">
-          <button class="btn-editar-livro" onclick="habilitarEdicaoLivro()">✏️ Editar Livro</button>
-          <button class="btn-deletar-livro" onclick="deletarLivro()">🗑️ Deletar Livro</button>
-        </div>
 
         <div class="estrelas" id="avaliacaoEstrelas">
           <span class="star" data-value="1">⭐</span>
@@ -70,12 +98,6 @@
           <span class="star" data-value="4">⭐</span>
           <span class="star" data-value="5">⭐</span>
         </div>
-
-        <p class="descricao" id="descricaoLivro">
-           
-          Uma história envolvente que mistura romance, humor e ciência,
-          conquistando do começo ao fim.
-        </p>
 
       
       </div>

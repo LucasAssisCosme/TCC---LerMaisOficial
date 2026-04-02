@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ler-mais Cadastro de Livro</title>
     <link rel="stylesheet" href="/frontend/src/css/cadastroDelivro.css" />
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   </head>
     <body class="home-page">
@@ -18,24 +19,39 @@
               <a href="/frontend/src/pages/perfil.html">PERFIL</a>
             </div>
       </div>        
+   <nav>
+  <ul class="nav-list">
+    
+    <li class="item-list">
+      <a href="/frontend/src/pages/index.html">
+        <i class="bi bi-house"></i>
+        Início
+      </a>
+    </li>
 
-      <nav>
-        <ul class="nav-list">
-          <li class="item-list">
-            <a href="/frontend/src/pages/index.html">Inicio</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/src/pages/cadastroLivro.html">Cadastrar Livros</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/src/pages/biblioteca.html">Biblioteca</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/login.html">Saida</a>
-          </li>
+    <li class="item-list">
+      <a href="/frontend/src/pages/cadastroLivro.html">
+        <i class="bi bi-plus-circle"></i>
+        Cadastrar
+      </a>
+    </li>
 
-        </ul>
-      </nav>
+    <li class="item-list active">
+      <a href="/frontend/src/pages/biblioteca.html">
+        <i class="bi bi-book"></i>
+        Biblioteca
+      </a>
+    </li>
+
+    <li class="item-list">
+      <a href="/frontend/login.html">
+        <i class="bi bi-box-arrow-right"></i>
+        Sair
+      </a>
+    </li>
+
+  </ul>
+</nav>
     </div>
   </header>
 <main class="cadastro-box">
@@ -94,8 +110,8 @@
 <textarea name="descricao" class="descricao-box"></textarea>
 
   <div class="campo2">
-    <label>Imagem Livro</label>
-    <input type="url" id="inputImagem" name="imagem" placeholder="Cole a URL da imagem">
+    <label>Imagem do Livro</label>
+    <input type="file" id="inputImagemLivro" name="imagemFile" accept="image/*" required>
   </div>
 
   <img 
@@ -109,13 +125,19 @@
   </form>
 
 <script>
-const inputImagem = document.getElementById("inputImagem");
+const inputImagemLivro = document.getElementById("inputImagemLivro");
 const previewImagem = document.getElementById("previewImagem");
 
-const imagemPadrao = "https://static.vecteezy.com/ti/vetor-gratis/p1/26619142-padrao-avatar-perfil-icone-do-social-meios-de-comunicacao-do-utilizador-foto-imagem-vetor.jpg";
-
-inputImagem.addEventListener("input", () => {
-  previewImagem.src = inputImagem.value || imagemPadrao;
+// Preview ao selecionar arquivo
+inputImagemLivro.addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      previewImagem.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 });
 </script>
 </main>

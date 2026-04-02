@@ -1,62 +1,113 @@
-// Função para validar senha conforme requisitos
+﻿const API_BASE_URL = "http://localhost:3000";
+
+// ==================== UPLOAD DE IMAGEM ====================
+async function uploadImagemLivro(arquivo) {
+  try {
+    const formData = new FormData();
+    formData.append("imagemFile", arquivo);
+
+    const response = await fetch("http://localhost:3000/upload-livro-capa", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.sucesso) {
+      throw new Error(data.mensagem || "Erro ao fazer upload");
+    }
+
+    return normalizarUrlMidia(data.url);
+  } catch (erro) {
+    console.error("[uploadImagemLivro] Erro:", erro);
+    throw erro;
+  }
+}
+
+function normalizarUrlMidia(url) {
+  if (!url || typeof url !== "string") {
+    return "";
+  }
+
+  const urlLimpa = url.trim();
+  if (!urlLimpa) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(urlLimpa) || urlLimpa.startsWith("data:")) {
+    return urlLimpa;
+  }
+
+  if (urlLimpa.startsWith("/")) {
+    return `${API_BASE_URL}${urlLimpa}`;
+  }
+
+  return `${API_BASE_URL}/${urlLimpa.replace(/^\.?\//, "")}`;
+}
+
+// ==================== VALIDAR SENHA ====================
 function validarSenha(senha) {
-  // Validações básicas
-  if (!senha || typeof senha !== "string") {
-    return { valida: false, mensagem: "Senha inválida" };
-  }
+// ValidaÃ§Ãµes bÃ¡sicas
+if (!senha || typeof senha !== "string") {
+  return {
+    valida: false,
+    mensagem: "Senha invÃ¡lida",
+  };
+}
 
-  // Verificar comprimento (8 a 32 caracteres)
-  if (senha.length < 8 || senha.length > 32) {
-    return {
-      valida: false,
-      mensagem: "Senha deve ter entre 8 e 32 caracteres",
-    };
-  }
+// Verificar comprimento (8 a 32 caracteres)
+if (senha.length < 8 || senha.length > 32) {
+  return {
+    valida: false,
+    mensagem: "Senha deve ter entre 8 e 32 caracteres",
+  };
+}
 
-  // Verificar espaços
-  if (/\s/.test(senha)) {
-    return { valida: false, mensagem: "Senha não pode conter espaços" };
-  }
+// Verificar espaÃ§os
+if (/\s/.test(senha)) {
+  return { valida: false, mensagem: "Senha nÃ£o pode conter espaÃ§os" };
+}
 
-  // Verificar acentuação
-  const semAcentos = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  if (semAcentos !== senha) {
-    return { valida: false, mensagem: "Senha não pode conter acentuação" };
-  }
+// Verificar acentuaÃ§Ã£o
+const semAcentos = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+if (semAcentos !== senha) {
+  return { valida: false, mensagem: "Senha nÃ£o pode conter acentuaÃ§Ã£o" };
+}
 
-  // Verificar letra maiúscula
-  if (!/[A-Z]/.test(senha)) {
-    return {
-      valida: false,
-      mensagem: "Senha deve conter pelo menos uma letra maiúscula",
-    };
-  }
+// Verificar letra maiÃºscula
+if (!/[A-Z]/.test(senha)) {
+  return {
+    valida: false,
+    mensagem: "Senha deve conter pelo menos uma letra maiÃºscula",
+  };
+}
 
-  // Verificar letra minúscula
-  if (!/[a-z]/.test(senha)) {
-    return {
-      valida: false,
-      mensagem: "Senha deve conter pelo menos uma letra minúscula",
-    };
-  }
+// Verificar letra minÃºscula
+if (!/[a-z]/.test(senha)) {
+  return {
+    valida: false,
+    mensagem: "Senha deve conter pelo menos uma letra minÃºscula",
+  };
+}
 
-  // Verificar número
-  if (!/\d/.test(senha)) {
-    return {
-      valida: false,
-      mensagem: "Senha deve conter pelo menos um número",
-    };
-  }
+// Verificar nÃºmero
+if (!/\d/.test(senha)) {
+  return {
+    valida: false,
+    mensagem: "Senha deve conter pelo menos um nÃºmero",
+  };
+}
 
-  // Verificar símbolo (caracteres especiais permitidos)
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
-    return {
-      valida: false,
-      mensagem: `Senha deve conter pelo menos um símbolo: !@#$%^&*()_+-=[]{};\\':"\\|,.<>/?`,
-    };
-  }
+// Verificar sÃ­mbolo (caracteres especiais permitidos)
+if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
+  return {
+    valida: false,
+    mensagem: `Senha deve conter pelo menos um sÃ­mbolo: !@#$%^&*()_+-=[]{};\\':"\\|,.<>/?`,
+  };
+}
 
-  return { valida: true, mensagem: "Senha válida" };
+return { valida: true, mensagem: "Senha vÃ¡lida" };
+
 }
 
 async function cadastrarUsuario(formData) {
@@ -95,13 +146,13 @@ async function cadastrarUsuario(formData) {
     const data = await resposta.json();
     alert("Cadastro realizado com sucesso!");
 
-    // Auto-login após cadastro bem-sucedido
+    // Auto-login apÃ³s cadastro bem-sucedido
     try {
       const loginFormData = new FormData();
       loginFormData.append("email", formData.get("email"));
       loginFormData.append("senha", senha);
 
-      await loginUsuario(loginFormData, true); // true = auto-login, não mostra alert
+      await loginUsuario(loginFormData, true); // true = auto-login, nÃ£o mostra alert
     } catch (loginError) {
       console.error("Erro no auto-login:", loginError);
       // Se auto-login falhar, redireciona para login manual
@@ -112,8 +163,8 @@ async function cadastrarUsuario(formData) {
 
     return data;
   } catch (error) {
-    console.error("Erro ao cadastrar usuário:", error);
-    alert("Erro ao cadastrar usuário: " + (error.message || error));
+    console.error("Erro ao cadastrar usuÃ¡rio:", error);
+    alert("Erro ao cadastrar usuÃ¡rio: " + (error.message || error));
     throw error;
   }
 }
@@ -122,14 +173,34 @@ async function cadastrarLivro(formData) {
   try {
     const token = getToken();
     if (!token) {
-      alert("Você precisa estar logado para cadastrar livros");
+      alert("VocÃª precisa estar logado para cadastrar livros");
       window.location.href = "/frontend/login.html";
       return;
     }
 
     const usuarioId = getUsuarioLogadoId();
     if (!usuarioId) {
-      alert("Erro: ID do usuário não encontrado");
+      alert("Erro: ID do usuÃ¡rio nÃ£o encontrado");
+      return;
+    }
+
+    // Verificar se hÃ¡ arquivo de imagem (obrigatÃ³rio)
+    const arquivoImagem = document.getElementById("inputImagemLivro")?.files[0];
+    if (!arquivoImagem) {
+      alert("Por favor, selecione uma imagem para o livro");
+      return;
+    }
+
+    let urlImagem;
+
+    // Fazer upload da imagem
+    try {
+      urlImagem = await uploadImagemLivro(arquivoImagem);
+      if (!urlImagem) {
+        throw new Error("URL da imagem nÃ£o foi retornada");
+      }
+    } catch (erro) {
+      alert("Erro ao fazer upload da imagem: " + erro.message);
       return;
     }
 
@@ -140,7 +211,7 @@ async function cadastrarLivro(formData) {
       ano: parseInt(formData.get("ano")),
       numero_paginas: parseInt(formData.get("paginas")),
       descricao: formData.get("descricao"),
-      imagem_capa: formData.get("imagem"),
+      imagem_capa: urlImagem,
       editora: formData.get("editora"),
       tipo_usuario: getUsuarioLogadoTipo(),
     };
@@ -152,7 +223,7 @@ async function cadastrarLivro(formData) {
       payload.ano > new Date().getFullYear()
     ) {
       alert(
-        "Ano inválido. Use um ano entre 1000 e " +
+        "Ano invÃ¡lido. Use um ano entre 1000 e " +
           new Date().getFullYear() +
           ".",
       );
@@ -160,7 +231,7 @@ async function cadastrarLivro(formData) {
     }
 
     if (!payload.numero_paginas || payload.numero_paginas < 1) {
-      alert("Número de páginas inválido.");
+      alert("NÃºmero de pÃ¡ginas invÃ¡lido.");
       return;
     }
 
@@ -181,7 +252,7 @@ async function cadastrarLivro(formData) {
         const detalhes = data.detalhes
           .map((d) => `${d.param}: ${d.msg}`)
           .join(" | ");
-        throw new Error(`Erro 400 - validação: ${detalhes}`);
+        throw new Error(`Erro 400 - validaÃ§Ã£o: ${detalhes}`);
       }
       throw new Error(data.mensagem || `Erro ${resposta.status}`);
     }
@@ -190,7 +261,7 @@ async function cadastrarLivro(formData) {
 
     alert("Livro cadastrado com sucesso!");
 
-    // Redirecionar para a página inicial
+    // Redirecionar para a pÃ¡gina inicial
     window.location.href = "/frontend/src/pages/index.html";
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
@@ -244,7 +315,7 @@ async function loginUsuario(formData, isAutoLogin = false) {
 
     const data = await resposta.json();
 
-    // Salva usuário logado para usar biblioteca/ranking
+    // Salva usuÃ¡rio logado para usar biblioteca/ranking
     if (data.usuario && data.usuario.id) {
       const userId = String(data.usuario.id).trim();
       localStorage.setItem("usuarioLogadoId", userId);
@@ -257,7 +328,7 @@ async function loginUsuario(formData, isAutoLogin = false) {
         usuarioTipo: tipo,
       });
 
-      // Atualiza acesso aos recursos baseado no tipo de usuário
+      // Atualiza acesso aos recursos baseado no tipo de usuÃ¡rio
       atualizarAcessoCadastroLivro();
     }
 
@@ -266,12 +337,12 @@ async function loginUsuario(formData, isAutoLogin = false) {
       localStorage.setItem("token", data.token);
     }
 
-    // Só mostra alert se não for auto-login
+    // SÃ³ mostra alert se nÃ£o for auto-login
     if (!isAutoLogin) {
       alert("Login realizado com sucesso!");
     }
 
-    // Redireciona para a página principal (ajuste conforme sua estrutura)
+    // Redireciona para a pÃ¡gina principal (ajuste conforme sua estrutura)
     setTimeout(() => {
       window.location.href = "/frontend/src/pages/index.html";
     }, 500);
@@ -310,7 +381,7 @@ async function redefinirSenha(formData) {
 
     // Validar se as senhas coincidem
     if (novaSenha !== confirmarSenha) {
-      alert("As senhas não coincidem");
+      alert("As senhas nÃ£o coincidem");
       return;
     }
 
@@ -400,7 +471,7 @@ function logout() {
   localStorage.removeItem("usuarioLogadoTipo");
   localStorage.removeItem("token");
 
-  // Limpa o intervalo de atualização se estiver ativo
+  // Limpa o intervalo de atualizaÃ§Ã£o se estiver ativo
   if (bibliotecaAutoRefreshId !== null) {
     clearInterval(bibliotecaAutoRefreshId);
     bibliotecaAutoRefreshId = null;
@@ -432,16 +503,16 @@ function atualizarAcessoCadastroLivro() {
   links.forEach((link) => {
     if (podeCadastrar) {
       link.style.display = "";
-      link.parentElement.style.display = ""; // Mostra também o elemento pai (li)
+      link.parentElement.style.display = ""; // Mostra tambÃ©m o elemento pai (li)
     } else {
       link.style.display = "none";
-      link.parentElement.style.display = "none"; // Esconde também o elemento pai (li)
+      link.parentElement.style.display = "none"; // Esconde tambÃ©m o elemento pai (li)
     }
   });
 
-  // Verifica se usuário não autorizado está na página de cadastro
+  // Verifica se usuÃ¡rio nÃ£o autorizado estÃ¡ na pÃ¡gina de cadastro
   if (!podeCadastrar && window.location.href.includes("cadastroLivro.html")) {
-    alert("Acesso negado: apenas bibliotecárias podem cadastrar livros.");
+    alert("Acesso negado: apenas bibliotecÃ¡rias podem cadastrar livros.");
     window.location.href = "/frontend/src/pages/index.html";
   }
 }
@@ -452,24 +523,26 @@ let bibliotecaCachedStatus = [];
 let paginasCarregadas = new Set();
 
 async function atualizarBibliotecaELista() {
-  // Verifica se os elementos necessários existem
+  // Verifica se os elementos necessÃ¡rios existem
   const inputSearch = document.querySelector(
     '.books-grid input[type="search"]',
   );
   const row = document.querySelector(".books-grid .row");
   if (!inputSearch || !row) {
-    console.warn("[Biblioteca] Elementos da grid não encontrados!");
+    console.warn("[Biblioteca] Elementos da grid nÃ£o encontrados!");
     return;
   }
 
   console.log("[atualizarBibliotecaELista] Buscando livros...");
 
-  // Tenta buscar biblioteca do usuário primeiro
+  // Tenta buscar biblioteca do usuÃ¡rio primeiro
   let livrosDaBiblioteca = await fetchBiblioteca();
-  
-  // Se não houver livros na biblioteca, tenta buscar todos os livros
+
+  // Se nÃ£o houver livros na biblioteca, tenta buscar todos os livros
   if (livrosDaBiblioteca.length === 0) {
-    console.log("[atualizarBibliotecaELista] Nenhum livro na biblioteca, buscando todos os livros...");
+    console.log(
+      "[atualizarBibliotecaELista] Nenhum livro na biblioteca, buscando todos os livros...",
+    );
     const todosOsLivros = await fetchLivrosPublicos();
     livrosDaBiblioteca = todosOsLivros;
   }
@@ -513,25 +586,25 @@ async function fetchBiblioteca() {
   try {
     const usuarioId = getUsuarioLogadoId();
     const token = getToken();
-    
+
     console.log("[fetchBiblioteca] Iniciando busca com ", {
       usuarioId,
       temToken: !!token,
     });
 
     if (!token) {
-      console.error("Token não encontrado! Redirecionando para login.");
+      console.error("Token nÃ£o encontrado! Redirecionando para login.");
       logout();
       return [];
     }
 
     if (!usuarioId) {
-      console.error("ID do usuário não encontrado!");
+      console.error("ID do usuÃ¡rio nÃ£o encontrado!");
       return [];
     }
 
     const url = `http://localhost:3000/biblioteca/usuario/${usuarioId}`;
-    console.log("[fetchBiblioteca] Fazendo requisição para:", url);
+    console.log("[fetchBiblioteca] Fazendo requisiÃ§Ã£o para:", url);
 
     const resposta = await fetch(url, {
       headers: {
@@ -542,7 +615,7 @@ async function fetchBiblioteca() {
     console.log("[fetchBiblioteca] Status HTTP:", resposta.status);
 
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("Sessão expirada. Faça login novamente.");
+      alert("SessÃ£o expirada. FaÃ§a login novamente.");
       logout();
       return [];
     }
@@ -558,7 +631,7 @@ async function fetchBiblioteca() {
 
     // A resposta pode vir como { status: [...] } ou { biblioteca: [...] } ou direto [...]
     const livros = data.status || data.biblioteca || data.livros || data || [];
-    console.log("[fetchBiblioteca] Livros extraídos:", livros);
+    console.log("[fetchBiblioteca] Livros extraÃ­dos:", livros);
 
     return livros;
   } catch (error) {
@@ -569,10 +642,10 @@ async function fetchBiblioteca() {
 
 async function fetchLivrosPublicos() {
   try {
-    console.log("[fetchLivrosPublicos] Buscando livros públicos...");
-    
+    console.log("[fetchLivrosPublicos] Buscando livros pÃºblicos...");
+
     const resposta = await fetch("http://localhost:3000/livros/");
-    
+
     console.log("[fetchLivrosPublicos] Status HTTP:", resposta.status);
 
     if (!resposta.ok) {
@@ -585,9 +658,9 @@ async function fetchLivrosPublicos() {
     console.log("[fetchLivrosPublicos] Dados recebidos:", data);
 
     // A resposta pode vir em diferentes formatos
-    // Tenta extrair os livros de várias estruturas possíveis
+    // Tenta extrair os livros de vÃ¡rias estruturas possÃ­veis
     let livros = [];
-    
+
     if (Array.isArray(data)) {
       livros = data;
     } else if (data.livros && Array.isArray(data.livros)) {
@@ -600,14 +673,17 @@ async function fetchLivrosPublicos() {
       livros = data.data;
     }
 
-    console.log("[fetchLivrosPublicos] Livros extraídos:", {
+    console.log("[fetchLivrosPublicos] Livros extraÃ­dos:", {
       quantidade: livros.length,
       livros,
     });
 
     return livros;
   } catch (error) {
-    console.error("[fetchLivrosPublicos] Erro ao buscar livros públicos:", error);
+    console.error(
+      "[fetchLivrosPublicos] Erro ao buscar livros pÃºblicos:",
+      error,
+    );
     return [];
   }
 }
@@ -629,10 +705,10 @@ async function carregarPerfil() {
     const id = getUsuarioLogadoId();
     const token = getToken();
 
-    // Se não estiver logado, redirecionar para login
+    // Se nÃ£o estiver logado, redirecionar para login
     if (!id || !token) {
-      alert('Você precisa estar logado para acessar o perfil!');
-      window.location.href = '/frontend/login.html';
+      alert("VocÃª precisa estar logado para acessar o perfil!");
+      window.location.href = "/frontend/login.html";
       return;
     }
 
@@ -650,13 +726,14 @@ async function carregarPerfil() {
 
     const data = await response.json();
 
-    console.log('Perfil carregado:', data.usuario);
+    console.log("Perfil carregado:", data.usuario);
 
     document.getElementById("nome").value = data.usuario.nome || "";
     document.getElementById("bio").value = data.usuario.bio || "";
     document.getElementById("email").value = data.usuario.email || "";
     document.getElementById("apelido").value = data.usuario.apelido || "";
-    document.getElementById("genero").value = data.usuario.genero_favorito || "";
+    document.getElementById("genero").value =
+      data.usuario.genero_favorito || "";
 
     // Se houver foto de perfil, carregar em todos os elementos
     if (data.usuario.foto_perfil) {
@@ -665,8 +742,8 @@ async function carregarPerfil() {
       if (fotoHeader) {
         fotoHeader.src = data.usuario.foto_perfil;
       }
-      
-      // Atualizar foto no formulário principal
+
+      // Atualizar foto no formulÃ¡rio principal
       const fotoMain = document.getElementById("fotoPerfilMain");
       if (fotoMain) {
         fotoMain.src = data.usuario.foto_perfil;
@@ -674,11 +751,10 @@ async function carregarPerfil() {
     }
 
   } catch (erro) {
-    console.error('Erro ao carregar perfil:', erro);
-    alert('Erro ao carregar perfil: ' + erro.message);
+    console.error("Erro ao carregar perfil:", erro);
+    alert("Erro ao carregar perfil: " + erro.message);
   }
 }
-
 
 function desabilitarCampos() {
   document.getElementById("nome").disabled = true;
@@ -699,32 +775,36 @@ function habilitarEdicao() {
 
   // Adicionar preview de imagem ao selecionar arquivo
   const inputFoto = document.getElementById("inputFoto");
-  inputFoto.addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        // Atualizar a foto principal
-        const fotoMain = document.getElementById("fotoPerfilMain");
-        if (fotoMain) {
-          fotoMain.src = e.target.result;
-        }
-        
-        // Atualizar a foto do header
-        const fotoHeader = document.querySelector(".info-perfil .perfil img");
-        if (fotoHeader) {
-          fotoHeader.src = e.target.result;
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  }, { once: true }); // Usar { once: true } para evitar listeners duplicados
+  inputFoto.addEventListener(
+    "change",
+    function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          // Atualizar a foto principal
+          const fotoMain = document.getElementById("fotoPerfilMain");
+          if (fotoMain) {
+            fotoMain.src = e.target.result;
+          }
 
-  // mostrar botões
+          // Atualizar a foto do header
+          const fotoHeader = document.querySelector(".info-perfil .perfil img");
+          if (fotoHeader) {
+            fotoHeader.src = e.target.result;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    { once: true },
+  ); // Usar { once: true } para evitar listeners duplicados
+
+  // mostrar botÃµes
   document.querySelector(".btn-salvar").style.display = "inline-block";
   document.querySelector(".btn-cancelar").style.display = "inline-block";
 
-  // esconder botão editar
+  // esconder botÃ£o editar
   const btnEditar = document.querySelector(".btn-editar");
   if (btnEditar) btnEditar.style.display = "none";
 }
@@ -740,7 +820,7 @@ async function salvarPerfil() {
     formData.append("email", document.getElementById("email").value);
     formData.append("apelido", document.getElementById("apelido").value);
     formData.append("genero_favorito", document.getElementById("genero").value);
-    
+
     // Se houver arquivo, adicionar
     const file = document.getElementById("inputFoto").files[0];
     if (file) {
@@ -750,9 +830,9 @@ async function salvarPerfil() {
     const response = await fetch(`http://localhost:3000/usuario/${id}`, {
       method: "PATCH",
       headers: {
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
@@ -761,22 +841,22 @@ async function salvarPerfil() {
     }
 
     const resultado = await response.json();
-    alert("Perfil atualizado com sucesso! 😏");
-    
+    alert("Perfil atualizado com sucesso! ðŸ˜");
+
     console.log("[salvarPerfil] Resultado:", resultado);
 
     // Atualizar foto no header se foi enviada
     if (resultado.foto_url || resultado.usuario?.foto_perfil) {
       const novaFoto = resultado.foto_url || resultado.usuario?.foto_perfil;
-      
+
       // Atualizar foto no header
       const fotoHeader = document.querySelector(".info-perfil .perfil img");
       if (fotoHeader) {
         fotoHeader.src = novaFoto;
         console.log("[salvarPerfil] Foto do header atualizada");
       }
-      
-      // Atualizar foto no formulário principal
+
+      // Atualizar foto no formulÃ¡rio principal
       const fotoMain = document.getElementById("fotoPerfilMain");
       if (fotoMain) {
         fotoMain.src = novaFoto;
@@ -784,7 +864,7 @@ async function salvarPerfil() {
       }
     }
 
-    // volta pra página de perfil
+    // volta pra pÃ¡gina de perfil
     desabilitarCampos();
 
     document.querySelector(".btn-salvar").style.display = "none";
@@ -793,11 +873,10 @@ async function salvarPerfil() {
     const btnEditar = document.querySelector(".btn-editar");
     if (btnEditar) btnEditar.style.display = "inline-block";
 
-    // Recarregar dados para garantir sincronização
+    // Recarregar dados para garantir sincronizaÃ§Ã£o
     setTimeout(() => {
       carregarPerfil();
     }, 500);
-
   } catch (erro) {
     console.error(erro);
     alert("Erro ao salvar perfil: " + erro.message);
@@ -821,24 +900,24 @@ async function salvarStatusBiblioteca(
   progresso = "quero_ler",
 ) {
   try {
-    // Validações no frontend
+    // ValidaÃ§Ãµes no frontend
     const uId = parseInt(usuarioId);
     const lId = parseInt(livroId);
 
     if (!uId || !lId) {
-      console.error("Dados inválidos:", { usuarioId, livroId });
-      alert("Erro: IDs inválidos. Abra o console para detalhes.");
+      console.error("Dados invÃ¡lidos:", { usuarioId, livroId });
+      alert("Erro: IDs invÃ¡lidos. Abra o console para detalhes.");
       return null;
     }
 
     if (!["lido", "lendo", "quero_ler"].includes(progresso)) {
-      alert("Erro: Progresso inválido. Use: lido, lendo ou quero_ler");
+      alert("Erro: Progresso invÃ¡lido. Use: lido, lendo ou quero_ler");
       return null;
     }
 
     const token = getToken();
     if (!token) {
-      alert("Você precisa estar logado");
+      alert("VocÃª precisa estar logado");
       logout();
       return null;
     }
@@ -863,7 +942,7 @@ async function salvarStatusBiblioteca(
     console.log("[Frontend] Status HTTP:", resposta.status);
 
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("Sessão expirada. Faça login novamente.");
+      alert("SessÃ£o expirada. FaÃ§a login novamente.");
       logout();
       return null;
     }
@@ -879,7 +958,7 @@ async function salvarStatusBiblioteca(
     }
 
     console.log("[Frontend] Status salvo com sucesso:", data);
-    alert("Livro adicionado à biblioteca!");
+    alert("Livro adicionado Ã  biblioteca!");
 
     // Dispara evento para atualizar biblioteca com pequeno delay
     setTimeout(() => {
@@ -898,7 +977,7 @@ async function salvarStatusBiblioteca(
 function renderBooks(books, bibliotecaStatus) {
   const row = document.querySelector(".books-grid .row");
   const countEl = document.querySelector(".books-header h3");
-  
+
   console.log("[renderBooks] Renderizando livros:", {
     quantidade: books.length,
     temRow: !!row,
@@ -907,7 +986,7 @@ function renderBooks(books, bibliotecaStatus) {
   });
 
   if (!row) {
-    console.error("[renderBooks] .books-grid .row não encontrado!");
+    console.error("[renderBooks] .books-grid .row nÃ£o encontrado!");
     return;
   }
 
@@ -924,31 +1003,50 @@ function renderBooks(books, bibliotecaStatus) {
 
   row.innerHTML = "";
 
-  // Filtrar apenas livros com status válido
+  // Filtrar apenas livros com status vÃ¡lido
   const livrosFiltrados = books.filter((book) => {
     const livroId = book.livro_id || book.id;
     const progresso = statusMap.get(livroId) || book.progresso || "quero_ler";
     return statusValidos.includes(progresso);
   });
 
-  console.log("[renderBooks] Livros filtrados com status válido:", livrosFiltrados.length);
+  console.log(
+    "[renderBooks] Livros filtrados com status vÃ¡lido:",
+    livrosFiltrados.length,
+  );
 
   if (livrosFiltrados.length === 0) {
     console.warn("[renderBooks] Nenhum livro para renderizar!");
-    row.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na página de avaliação!</p>';
+    row.innerHTML =
+      '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na pÃ¡gina de avaliaÃ§Ã£o!</p>';
   } else {
     livrosFiltrados.forEach((book) => {
       try {
         // Trata diferentes estruturas de IDs
         const livroId = book.livro_id || book.id;
-        const titulo = book.titulo || book.nome || "Sem título";
+        const titulo = book.titulo || book.nome || "Sem tÃ­tulo";
         const autor = book.autor || book.author || "Desconhecido";
-        const capa = book.imagem_capa || book.capa || book.image || "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
-        
-        const progresso = statusMap.get(livroId) || book.progresso || "quero_ler";
+        const capa =
+          book.imagem_capa ||
+          book.capa ||
+          book.image ||
+          "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+
+        const progresso =
+          statusMap.get(livroId) || book.progresso || "quero_ler";
         const status = getStatusTag(progresso);
-        
-        const capaUrl = capa && capa.trim() ? capa : "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+
+        let capaUrl = normalizarUrlMidia(
+          capa && capa.trim()
+            ? capa
+            : "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png",
+        );
+
+        // Remover qualquer versÃ£o anterior (com ?v=) e adicionar cache-buster novo
+        capaUrl = capaUrl.split("?")[0];
+        if (!capaUrl.includes("?")) {
+          capaUrl += "?v=" + Date.now();
+        }
 
         const card = `
           <div class="col-6 col-md-4 col-lg-3 col-xl-2" data-livro-id="${livroId}">
@@ -982,7 +1080,7 @@ async function fetchRanking(usuarioId = 1) {
   try {
     const token = getToken();
     if (!token) {
-      console.error("Token não encontrado! Redirecionando para login.");
+      console.error("Token nÃ£o encontrado! Redirecionando para login.");
       logout();
       return null;
     }
@@ -995,7 +1093,7 @@ async function fetchRanking(usuarioId = 1) {
       },
     );
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("Sessão expirada. Faça login novamente.");
+      alert("SessÃ£o expirada. FaÃ§a login novamente.");
       logout();
       return null;
     }
@@ -1010,14 +1108,14 @@ async function fetchRanking(usuarioId = 1) {
 function renderRank(posicao, totalPaginas) {
   const rankElem = document.querySelector(".ranking-text.mb-2");
   if (rankElem) {
-    rankElem.innerHTML = `Você está em <strong>${posicao}º lugar</strong> no ranking de mais páginas lidas da sua universidade!`;
+    rankElem.innerHTML = `VocÃª estÃ¡ em <strong>${posicao}Âº lugar</strong> no ranking de mais pÃ¡ginas lidas da sua universidade!`;
   }
 
   const pageMeterElem = document.querySelector(
     ".overview-card .badge.bg-light.text-dark",
   );
   if (pageMeterElem) {
-    pageMeterElem.textContent = `Paginômetro ${totalPaginas}`;
+    pageMeterElem.textContent = `PaginÃ´metro ${totalPaginas}`;
   }
 }
 
@@ -1034,7 +1132,9 @@ async function initBibliotecaGrid() {
   });
 
   if (!inputSearch || !row) {
-    console.error("[initBibliotecaGrid] Elementos da biblioteca não encontrados!");
+    console.error(
+      "[initBibliotecaGrid] Elementos da biblioteca nÃ£o encontrados!",
+    );
     return;
   }
 
@@ -1054,43 +1154,48 @@ async function initBibliotecaGrid() {
   console.log("[initBibliotecaGrid] Chamando atualizarBibliotecaELista...");
   await atualizarBibliotecaELista();
 
-  // Listener para atualizar biblioteca quando um livro é adicionado
+  // Listener para atualizar biblioteca quando um livro Ã© adicionado
   document.addEventListener("LivroAdicionado", async () => {
     console.log("[initBibliotecaGrid] Evento LivroAdicionado disparado");
     await atualizarBibliotecaELista();
   });
 
-  // Listener para atualizar biblioteca quando o status de um livro é alterado
+  // Listener para atualizar biblioteca quando o status de um livro Ã© alterado
   document.addEventListener("StatusLivroAlterado", async () => {
-    console.log("[initBibliotecaGrid] Evento StatusLivroAlterado disparado - recarregando biblioteca...");
+    console.log(
+      "[initBibliotecaGrid] Evento StatusLivroAlterado disparado - recarregando biblioteca...",
+    );
     await atualizarBibliotecaELista();
   });
 
-  // Listener global para atualizar biblioteca em qualquer página
+  // Listener global para atualizar biblioteca em qualquer pÃ¡gina
   document.addEventListener("StatusLivroAlterado", async () => {
-    console.log("[Global] Evento StatusLivroAlterado - tentando atualizar elementos da biblioteca se visíveis");
-    
-    // Se estiver na página de biblioteca
+    console.log(
+      "[Global] Evento StatusLivroAlterado - tentando atualizar elementos da biblioteca se visÃ­veis",
+    );
+
+    // Se estiver na pÃ¡gina de biblioteca
     const row = document.querySelector(".books-grid .row");
     if (row) {
       console.log("[Global] Atualizando biblioteca.html em tempo real...");
       await atualizarBibliotecaELista();
     }
-    
-    // Se estiver na página de Avaliação, recarregar dados
+
+    // Se estiver na pÃ¡gina de AvaliaÃ§Ã£o, recarregar dados
     if (window.location.href.includes("Avaliacao.html")) {
-      console.log("[Global] Recarregando dados da Avaliação...");
+      console.log("[Global] Recarregando dados da AvaliaÃ§Ã£o...");
       await carregarDadosLivroAvaliacao();
     }
   });
 }
 
-// ======================== FUNÇÕES DE AVALIAÇÃO E LIVROS ========================
+// ======================== FUNÃ‡Ã•ES DE AVALIAÃ‡ÃƒO E LIVROS ========================
 
 let livroAtualId = null;
+let livroAtualDados = null;
 let avaliacaoAtual = 0;
 
-// Redireciona para página de avaliação
+// Redireciona para pÃ¡gina de avaliaÃ§Ã£o
 function irParaAvaliacao(livroId) {
   if (livroId) {
     localStorage.setItem("livroAtualId", livroId);
@@ -1098,7 +1203,7 @@ function irParaAvaliacao(livroId) {
   window.location.href = "/frontend/src/pages/Avaliacao.html";
 }
 
-// Redireciona para página de informações
+// Redireciona para pÃ¡gina de informaÃ§Ãµes
 function irParaInformacoes() {
   const livroId = localStorage.getItem("livroAtualId");
   if (livroId) {
@@ -1106,36 +1211,60 @@ function irParaInformacoes() {
   }
 }
 
-// Carrega dados do livro na página de avaliação
+// Carrega dados do livro na pÃ¡gina de avaliaÃ§Ã£o
 async function carregarDadosLivroAvaliacao() {
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
-      alert("Livro não especificado");
+      alert("Livro nÃ£o especificado");
       return;
     }
+
+    console.log("[carregarDadosLivroAvaliacao] Carregando livro ID:", livroId);
 
     const token = getToken();
     const usuarioId = getUsuarioLogadoId();
 
     // Buscar dados do livro
-    const respostaLivro = await fetch(`http://localhost:3000/livros/${livroId}`);
+    const respostaLivro = await fetch(
+      `http://localhost:3000/livros/${livroId}`,
+    );
     if (!respostaLivro.ok) throw new Error("Erro ao buscar livro");
-    
+
     const dataLivro = await respostaLivro.json();
-    const livro = dataLivro.livro;
+    const livro = normalizarDadosLivro(dataLivro.livro);
+    livroAtualDados = livro;
+    preencherFormularioEdicaoLivro(livro);
+    configurarPreviewCapaLivro();
+
+    console.log("[carregarDadosLivroAvaliacao] Livro carregado:", {
+      titulo: livro.titulo,
+      imagem_capa_original: livro.imagem_capa,
+    });
 
     // Atualizar UI
     document.getElementById("tituloLivro").textContent = livro.titulo || "";
-    document.getElementById("descricaoLivro").textContent = livro.descricao || "";
-    
+    document.getElementById("descricaoLivro").textContent =
+      livro.descricao || "";
+
     if (livro.imagem_capa && livro.imagem_capa.trim()) {
-      document.getElementById("capaLivro").src = livro.imagem_capa;
+      // Remover qualquer versÃ£o anterior (com ?v=)
+      let capa = normalizarUrlMidia(livro.imagem_capa).split("?")[0];
+
+      // Adicionar cache-buster novo
+      capa += "?v=" + Date.now();
+
+      console.log(
+        "[carregarDadosLivroAvaliacao] URL final com cache-buster:",
+        capa,
+      );
+
+      document.getElementById("capaLivro").src = capa;
     }
 
     livroAtualId = livroId;
 
-    // Mostra botões apenas para bibliotecárias
+    // Mostra botÃµes apenas para bibliotecÃ¡rias
     if (isBibliotecariaLogada()) {
       const acoesDiv = document.getElementById("acoesLivro");
       if (acoesDiv) {
@@ -1143,41 +1272,56 @@ async function carregarDadosLivroAvaliacao() {
       }
     }
 
-    // Se usuário logado, buscar dados
+    // Se usuÃ¡rio logado, buscar dados
     if (token && usuarioId) {
       // Carregar status current da biblioteca
       try {
-        const resposta = await fetch(`http://localhost:3000/biblioteca/usuario/${usuarioId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const resposta = await fetch(
+          `http://localhost:3000/biblioteca/usuario/${usuarioId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
         if (resposta.ok) {
           const data = await resposta.json();
           const biblioteca = data.status || [];
-          const livroStatus = biblioteca.find(l => l.livro_id === parseInt(livroId));
-          
+          const livroStatus = biblioteca.find(
+            (l) => l.livro_id === parseInt(livroId),
+          );
+
           if (livroStatus) {
             const select = document.getElementById("statusLivro");
             if (select) {
               select.value = livroStatus.progresso;
-              console.log("[carregarDadosLivroAvaliacao] Status carregado:", livroStatus.progresso);
+              console.log(
+                "[carregarDadosLivroAvaliacao] Status carregado:",
+                livroStatus.progresso,
+              );
             }
           }
         }
       } catch (e) {
-        console.log("[carregarDadosLivroAvaliacao] Livro ainda não está na biblioteca");
+        console.log(
+          "[carregarDadosLivroAvaliacao] Livro ainda nÃ£o estÃ¡ na biblioteca",
+        );
       }
 
       try {
-        const respostaResenha = await fetch(`http://localhost:3000/resenha/usuario/${usuarioId}/livro/${livroId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
+        const respostaResenha = await fetch(
+          `http://localhost:3000/resenha/usuario/${usuarioId}/livro/${livroId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
         if (respostaResenha.ok) {
           const dataResenha = await respostaResenha.json();
           if (dataResenha.resenha) {
-            document.getElementById("resenhaTexto").textContent = dataResenha.resenha.texto || "";
-            document.getElementById("resenhaInput").value = dataResenha.resenha.texto || "";
+            document.getElementById("resenhaTexto").textContent =
+              dataResenha.resenha.texto || "";
+            document.getElementById("resenhaInput").value =
+              dataResenha.resenha.texto || "";
           }
         }
       } catch (e) {
@@ -1185,15 +1329,20 @@ async function carregarDadosLivroAvaliacao() {
       }
 
       try {
-        const respostaFavorita = await fetch(`http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
+        const respostaFavorita = await fetch(
+          `http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
         if (respostaFavorita.ok) {
           const dataFavorita = await respostaFavorita.json();
           if (dataFavorita.favorita) {
-            document.getElementById("favoritaTexto").textContent = dataFavorita.favorita.parte_favorita || "";
-            document.getElementById("favoritaInput").value = dataFavorita.favorita.parte_favorita || "";
+            document.getElementById("favoritaTexto").textContent =
+              dataFavorita.favorita.parte_favorita || "";
+            document.getElementById("favoritaInput").value =
+              dataFavorita.favorita.parte_favorita || "";
           }
         }
       } catch (e) {
@@ -1201,10 +1350,13 @@ async function carregarDadosLivroAvaliacao() {
       }
 
       try {
-        const respostaAvaliacao = await fetch(`http://localhost:3000/avaliacoes/usuario/${usuarioId}/livro/${livroId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
+        const respostaAvaliacao = await fetch(
+          `http://localhost:3000/avaliacoes/usuario/${usuarioId}/livro/${livroId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
         if (respostaAvaliacao.ok) {
           const dataAvaliacao = await respostaAvaliacao.json();
           if (dataAvaliacao.avaliacao) {
@@ -1213,12 +1365,11 @@ async function carregarDadosLivroAvaliacao() {
           }
         }
       } catch (e) {
-        console.log("Sem avaliação salva");
+        console.log("Sem avaliaÃ§Ã£o salva");
       }
     }
 
     setupEstrelasListeners();
-
   } catch (erro) {
     console.error("Erro ao carregar livro:", erro);
     alert("Erro ao carregar livro");
@@ -1228,23 +1379,25 @@ async function carregarDadosLivroAvaliacao() {
 // Setup de listeners das estrelas
 function setupEstrelasListeners() {
   const estrelas = document.querySelectorAll("#avaliacaoEstrelas .star");
-  
-  estrelas.forEach(star => {
+
+  estrelas.forEach((star) => {
     star.style.cursor = "pointer";
-    star.addEventListener("click", function() {
+    star.addEventListener("click", function () {
       const valor = parseInt(this.dataset.value);
       salvarAvaliacao(valor);
     });
-    
-    star.addEventListener("mouseover", function() {
+
+    star.addEventListener("mouseover", function () {
       const valor = parseInt(this.dataset.value);
       atualizarEstrelas(valor);
     });
   });
 
-  document.getElementById("avaliacaoEstrelas").addEventListener("mouseleave", function() {
-    atualizarEstrelas(avaliacaoAtual);
-  });
+  document
+    .getElementById("avaliacaoEstrelas")
+    .addEventListener("mouseleave", function () {
+      atualizarEstrelas(avaliacaoAtual);
+    });
 }
 
 // Atualiza visualmente as estrelas
@@ -1259,39 +1412,39 @@ function atualizarEstrelas(valor) {
   });
 }
 
-// Salva avaliação no servidor
+// Salva avaliaÃ§Ã£o no servidor
 async function salvarAvaliacao(estrelas) {
   try {
     const token = getToken();
     const usuarioId = getUsuarioLogadoId();
 
     if (!token || !usuarioId || !livroAtualId) {
-      alert("Você precisa estar logado");
+      alert("VocÃª precisa estar logado");
       return;
     }
 
     const payload = {
       usuario_id: parseInt(usuarioId),
       livro_id: parseInt(livroAtualId),
-      estrelas: estrelas
+      estrelas: estrelas,
     };
 
     const response = await fetch("http://localhost:3000/avaliacoes/cadastrar", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     if (response.ok) {
       avaliacaoAtual = estrelas;
       atualizarEstrelas(estrelas);
-      console.log("Avaliação salva!");
+      console.log("AvaliaÃ§Ã£o salva!");
     }
   } catch (erro) {
-    console.error("Erro ao salvar avaliação:", erro);
+    console.error("Erro ao salvar avaliaÃ§Ã£o:", erro);
   }
 }
 
@@ -1301,7 +1454,9 @@ async function atualizarStatusBibliotecaOuSalvar() {
   const progresso = select.value;
 
   if (!progresso) {
-    console.log("[atualizarStatusBibliotecaOuSalvar] Nenhum status selecionado");
+    console.log(
+      "[atualizarStatusBibliotecaOuSalvar] Nenhum status selecionado",
+    );
     return;
   }
 
@@ -1309,64 +1464,80 @@ async function atualizarStatusBibliotecaOuSalvar() {
   const livroId = localStorage.getItem("livroAtualId");
 
   if (!usuarioId || !livroId) {
-    alert("Usuário ou livro não encontrado");
+    alert("UsuÃ¡rio ou livro nÃ£o encontrado");
     return;
   }
 
   console.log("[atualizarStatusBibliotecaOuSalvar] Atualizando status:", {
     usuarioId,
     livroId,
-    progresso
+    progresso,
   });
 
   const resultado = await salvarStatusBiblioteca(usuarioId, livroId, progresso);
 
   if (resultado) {
     console.log("[atualizarStatusBibliotecaOuSalvar] Status salvo com sucesso");
-    // Manter a seleção no select
+    // Manter a seleÃ§Ã£o no select
     select.value = progresso;
-    
-    // Atualizar paginômetro se o livro foi marcado como "lido"
+
+    // Atualizar paginÃ´metro se o livro foi marcado como "lido"
     if (progresso === "lido") {
       await atualizarPaginometro(usuarioId);
     }
   } else {
-    // Resetar a seleção se falhar
+    // Resetar a seleÃ§Ã£o se falhar
     select.value = "";
   }
 }
 
-// Atualiza o paginômetro após marcar livro como lido
+// Atualiza o paginÃ´metro apÃ³s marcar livro como lido
 async function atualizarPaginometro(usuarioId) {
   try {
-    console.log("[atualizarPaginometro] Atualizando paginômetro para usuário:", usuarioId);
-    
+    console.log(
+      "[atualizarPaginometro] Atualizando paginÃ´metro para usuÃ¡rio:",
+      usuarioId,
+    );
+
     const ranking = await fetchRanking(usuarioId);
     if (ranking) {
       console.log("[atualizarPaginometro] Ranking obtido:", ranking);
-      
+
       // Atualizar elemento na biblioteca.html (se estiver aberto)
-      const pageMeterElem = document.querySelector(".overview-card .badge.bg-light.text-dark");
+      const pageMeterElem = document.querySelector(
+        ".overview-card .badge.bg-light.text-dark",
+      );
       if (pageMeterElem) {
-        pageMeterElem.textContent = `Paginômetro ${ranking.total_paginas || 0}`;
-        console.log("[atualizarPaginometro] Paginômetro atualizado para:", ranking.total_paginas);
+        pageMeterElem.textContent = `PaginÃ´metro ${ranking.total_paginas || 0}`;
+        console.log(
+          "[atualizarPaginometro] PaginÃ´metro atualizado para:",
+          ranking.total_paginas,
+        );
       } else {
-        console.log("[atualizarPaginometro] Elemento do paginômetro não encontrado (pode estar em outra página)");
+        console.log(
+          "[atualizarPaginometro] Elemento do paginÃ´metro nÃ£o encontrado (pode estar em outra pÃ¡gina)",
+        );
       }
-      
-      // Atualizar ranking também
+
+      // Atualizar ranking tambÃ©m
       const rankElem = document.querySelector(".ranking-text.mb-2");
       if (rankElem) {
-        rankElem.innerHTML = `Você está em <strong>${ranking.posicao_ranking || 1}º lugar</strong> no ranking de mais páginas lidas da sua universidade!`;
-        console.log("[atualizarPaginometro] Ranking atualizado para posição:", ranking.posicao_ranking);
+        rankElem.innerHTML = `VocÃª estÃ¡ em <strong>${ranking.posicao_ranking || 1}Âº lugar</strong> no ranking de mais pÃ¡ginas lidas da sua universidade!`;
+        console.log(
+          "[atualizarPaginometro] Ranking atualizado para posiÃ§Ã£o:",
+          ranking.posicao_ranking,
+        );
       }
     }
   } catch (error) {
-    console.error("[atualizarPaginometro] Erro ao atualizar paginômetro:", error);
+    console.error(
+      "[atualizarPaginometro] Erro ao atualizar paginÃ´metro:",
+      error,
+    );
   }
 }
 
-// Edição de Resenha
+// EdiÃ§Ã£o de Resenha
 function habilitarEdicaoResenha() {
   const p = document.getElementById("resenhaTexto");
   const textarea = document.getElementById("resenhaInput");
@@ -1376,8 +1547,9 @@ function habilitarEdicaoResenha() {
   p.style.display = "none";
   textarea.style.display = "block";
   botoes.style.display = "block";
-  
-  document.querySelector(".secao:nth-child(1) .btn-editar").style.display = "none";
+
+  document.querySelector(".secao:nth-child(1) .btn-editar").style.display =
+    "none";
 }
 
 function cancelarResenha() {
@@ -1388,8 +1560,9 @@ function cancelarResenha() {
   p.style.display = "block";
   textarea.style.display = "none";
   botoes.style.display = "none";
-  
-  document.querySelector(".secao:nth-child(1) .btn-editar").style.display = "block";
+
+  document.querySelector(".secao:nth-child(1) .btn-editar").style.display =
+    "block";
 }
 
 async function salvarResenha() {
@@ -1406,16 +1579,16 @@ async function salvarResenha() {
     const payload = {
       usuario_id: parseInt(usuarioId),
       livro_id: parseInt(livroAtualId),
-      texto: texto
+      texto: texto,
     };
 
     const response = await fetch("http://localhost:3000/resenha/cadastrar", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     if (response.ok) {
@@ -1428,7 +1601,7 @@ async function salvarResenha() {
   }
 }
 
-// Edição de Favorita
+// EdiÃ§Ã£o de Favorita
 function habilitarEdicaoFavorita() {
   const p = document.getElementById("favoritaTexto");
   const textarea = document.getElementById("favoritaInput");
@@ -1438,8 +1611,9 @@ function habilitarEdicaoFavorita() {
   p.style.display = "none";
   textarea.style.display = "block";
   botoes.style.display = "block";
-  
-  document.querySelector(".secao:nth-child(2) .btn-editar").style.display = "none";
+
+  document.querySelector(".secao:nth-child(2) .btn-editar").style.display =
+    "none";
 }
 
 function cancelarFavorita() {
@@ -1450,8 +1624,9 @@ function cancelarFavorita() {
   p.style.display = "block";
   textarea.style.display = "none";
   botoes.style.display = "none";
-  
-  document.querySelector(".secao:nth-child(2) .btn-editar").style.display = "block";
+
+  document.querySelector(".secao:nth-child(2) .btn-editar").style.display =
+    "block";
 }
 
 async function salvarFavorita() {
@@ -1468,17 +1643,20 @@ async function salvarFavorita() {
     const payload = {
       usuario_id: parseInt(usuarioId),
       livro_id: parseInt(livroAtualId),
-      parte_favorita: texto
+      parte_favorita: texto,
     };
 
-    const response = await fetch("http://localhost:3000/livros/favorita/cadastrar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+    const response = await fetch(
+      "http://localhost:3000/livros/favorita/cadastrar",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(payload)
-    });
+    );
 
     if (response.ok) {
       document.getElementById("favoritaTexto").textContent = texto;
@@ -1491,32 +1669,395 @@ async function salvarFavorita() {
 }
 
 // ==================== EDITAR LIVRO ====================
-async function habilitarEdicaoLivro() {
-  if (!isBibliotecariaLogada()) {
-    alert("Acesso negado. Apenas bibliotecárias podem editar livros.");
+function obterElementoLivro(...ids) {
+  for (const id of ids) {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+      return elemento;
+    }
+  }
+
+  return null;
+}
+
+function obterTextoLivro(...ids) {
+  const elemento = obterElementoLivro(...ids);
+  if (!elemento) return "";
+  return (elemento.textContent || elemento.innerText || "").trim();
+}
+
+function normalizarDadosLivro(livro) {
+  return {
+    titulo: livro?.titulo || "",
+    autor: livro?.autor || "",
+    genero: livro?.genero || "",
+    ano: livro?.ano || "",
+    numero_paginas: livro?.numero_paginas || "",
+    editora: livro?.editora || "",
+    descricao: livro?.descricao || "",
+    imagem_capa: livro?.imagem_capa || "",
+  };
+}
+
+function obterDadosLivroDaTela() {
+  return normalizarDadosLivro({
+    titulo: obterTextoLivro("tituloLivro", "tituloInfo"),
+    autor: obterTextoLivro("autorInfo").replace(/^Autor:\s*/i, ""),
+    genero: obterTextoLivro("generoInfo").replace(/^GÃªnero:\s*/i, ""),
+    ano: obterTextoLivro("anoInfo").replace(/^Ano:\s*/i, ""),
+    numero_paginas: obterTextoLivro("paginasInfo").replace(/^PÃ¡ginas:\s*/i, ""),
+    editora: obterTextoLivro("editoraInfo").replace(/^Editora:\s*/i, ""),
+    descricao: obterTextoLivro("descricaoLivro", "descricaoInfo"),
+    imagem_capa:
+      obterElementoLivro("capaLivro", "capaCapa")?.getAttribute("src") || "",
+  });
+}
+
+function preencherFormularioEdicaoLivro(livro) {
+  const dados = normalizarDadosLivro(livro);
+
+  const tituloInput = document.getElementById("tituloLivroEdit");
+  if (tituloInput) tituloInput.value = dados.titulo;
+
+  const descricaoInput = document.getElementById("descricaoLivroEdit");
+  if (descricaoInput) descricaoInput.value = dados.descricao;
+
+  const autorInput = document.getElementById("autorLivroEdit");
+  if (autorInput) autorInput.value = dados.autor;
+
+  const generoInput = document.getElementById("generoLivroEdit");
+  if (generoInput) generoInput.value = dados.genero;
+
+  const anoInput = document.getElementById("anoLivroEdit");
+  if (anoInput) anoInput.value = dados.ano;
+
+  const paginasInput = document.getElementById("paginasLivroEdit");
+  if (paginasInput) paginasInput.value = dados.numero_paginas;
+
+  const editoraInput = document.getElementById("editoraLivroEdit");
+  if (editoraInput) editoraInput.value = dados.editora;
+
+  const capaInput = document.getElementById("capaLivroFileEdit");
+  if (capaInput) capaInput.value = "";
+}
+
+function preencherVisualizacaoLivro(livro) {
+  const dados = normalizarDadosLivro(livro);
+
+  const tituloEl = obterElementoLivro("tituloLivro", "tituloInfo");
+  if (tituloEl) {
+    tituloEl.textContent = dados.titulo || "";
+  }
+
+  const descricaoEl = obterElementoLivro("descricaoLivro", "descricaoInfo");
+  if (descricaoEl) {
+    descricaoEl.textContent = dados.descricao || "";
+  }
+
+  const autorInfo = document.getElementById("autorInfo");
+  if (autorInfo) {
+    autorInfo.textContent = dados.autor ? `Autor: ${dados.autor}` : "Autor: N/A";
+  }
+
+  const generoInfo = document.getElementById("generoInfo");
+  if (generoInfo) {
+    generoInfo.textContent = dados.genero
+      ? `GÃªnero: ${dados.genero}`
+      : "GÃªnero: N/A";
+  }
+
+  const anoInfo = document.getElementById("anoInfo");
+  if (anoInfo) {
+    anoInfo.textContent = dados.ano ? `Ano: ${dados.ano}` : "Ano: N/A";
+  }
+
+  const paginasInfo = document.getElementById("paginasInfo");
+  if (paginasInfo) {
+    paginasInfo.textContent = dados.numero_paginas
+      ? `PÃ¡ginas: ${dados.numero_paginas}`
+      : "PÃ¡ginas: N/A";
+  }
+
+  const editoraInfo = document.getElementById("editoraInfo");
+  if (editoraInfo) {
+    editoraInfo.textContent = dados.editora
+      ? `Editora: ${dados.editora}`
+      : "Editora: N/A";
+  }
+
+  const capaEl = obterElementoLivro("capaLivro", "capaCapa");
+  if (capaEl && dados.imagem_capa) {
+    let capa = normalizarUrlMidia(dados.imagem_capa).split("?")[0];
+    capa += `?v=${Date.now()}`;
+    capaEl.src = capa;
+  }
+}
+
+function alternarModoEdicaoLivro(ativo) {
+  const infoVisualizacao = document.getElementById("infoVisualizacao");
+  const infoEdicao = document.getElementById("infoEdicao");
+  const acoesLivro = document.getElementById("acoesLivro");
+  const acoesEdicao = document.getElementById("acoesEdicao");
+  const acoesLivroLeitor = document.getElementById("acoesLivroLeitor");
+  const capaEdicaoInfo = document.getElementById("capaEdicaoInfo");
+
+  if (infoVisualizacao) {
+    infoVisualizacao.style.display = ativo ? "none" : "block";
+  }
+
+  if (infoEdicao) {
+    infoEdicao.style.display = ativo ? "block" : "none";
+  }
+
+  if (capaEdicaoInfo) {
+    capaEdicaoInfo.style.display = ativo ? "flex" : "none";
+  }
+
+  if (acoesEdicao) {
+    acoesEdicao.style.display = ativo ? "flex" : "none";
+  }
+
+  if (ativo) {
+    if (acoesLivro) acoesLivro.style.display = "none";
+    if (acoesLivroLeitor) acoesLivroLeitor.style.display = "none";
     return;
   }
 
-  // Redireciona para página de edição ou abre modal
-  // Por enquanto, vamos abrir um modal de edição (você pode adaptar depois)
-  alert("Funcionalidade de edição em desenvolvimento. Em breve você poderá editar livros aqui!");
+  if (isBibliotecariaLogada()) {
+    if (acoesLivro) acoesLivro.style.display = "flex";
+    if (acoesLivroLeitor) acoesLivroLeitor.style.display = "none";
+  } else {
+    if (acoesLivro) acoesLivro.style.display = "none";
+    if (acoesLivroLeitor) acoesLivroLeitor.style.display = "flex";
+  }
+}
+
+function configurarPreviewCapaLivro() {
+  const inputCapaFile = document.getElementById("capaLivroFileEdit");
+  const imagemCapa = obterElementoLivro("capaLivro", "capaCapa");
+
+  if (!inputCapaFile || !imagemCapa) {
+    return;
+  }
+
+  if (inputCapaFile.dataset.previewConfigurado === "true") {
+    return;
+  }
+
+  inputCapaFile.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      imagemCapa.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  inputCapaFile.dataset.previewConfigurado = "true";
+}
+
+async function habilitarEdicaoLivro() {
+  if (!isBibliotecariaLogada()) {
+    alert("Acesso negado. Apenas bibliotecarias podem editar livros.");
+    return;
+  }
+
+  const dadosBase = livroAtualDados || obterDadosLivroDaTela();
+  preencherFormularioEdicaoLivro(dadosBase);
+  configurarPreviewCapaLivro();
+  alternarModoEdicaoLivro(true);
+
+  console.log("[habilitarEdicaoLivro] Modo de edicao ativado");
+}
+
+async function salvarAlteracoesLivro() {
+  const livroId = localStorage.getItem("livroAtualId");
+  if (!livroId) {
+    alert("Livro nao encontrado");
+    return;
+  }
+
+  const tituloInput = document.getElementById("tituloLivroEdit");
+  const descricaoInput = document.getElementById("descricaoLivroEdit");
+  const autorInput = document.getElementById("autorLivroEdit");
+  const generoInput = document.getElementById("generoLivroEdit");
+  const anoInput = document.getElementById("anoLivroEdit");
+  const paginasInput = document.getElementById("paginasLivroEdit");
+  const editoraInput = document.getElementById("editoraLivroEdit");
+  const capaInput = document.getElementById("capaLivroFileEdit");
+  const capaFile = capaInput ? capaInput.files[0] : null;
+
+  const titulo = tituloInput ? tituloInput.value.trim() : "";
+  const descricao = descricaoInput ? descricaoInput.value.trim() : "";
+  const autor = autorInput ? autorInput.value.trim() : null;
+  const genero = generoInput ? generoInput.value.trim() : null;
+  const anoTexto = anoInput ? anoInput.value.trim() : null;
+  const paginasTexto = paginasInput ? paginasInput.value.trim() : null;
+  const editora = editoraInput ? editoraInput.value.trim() : null;
+
+  if (!titulo) {
+    alert("Titulo e obrigatorio!");
+    return;
+  }
+
+  if (!descricao) {
+    alert("Descricao e obrigatoria!");
+    return;
+  }
+
+  const payload = {
+    titulo,
+    descricao,
+  };
+
+  if (autorInput) {
+    if (!autor) {
+      alert("Autor e obrigatorio!");
+      return;
+    }
+    payload.autor = autor;
+  }
+
+  if (generoInput) {
+    if (!genero) {
+      alert("Genero e obrigatorio!");
+      return;
+    }
+    payload.genero = genero;
+  }
+
+  if (anoInput) {
+    const ano = Number(anoTexto);
+    const anoAtual = new Date().getFullYear();
+    if (!Number.isInteger(ano) || ano < 1000 || ano > anoAtual) {
+      alert(`Ano invalido. Use um ano entre 1000 e ${anoAtual}.`);
+      return;
+    }
+    payload.ano = ano;
+  }
+
+  if (paginasInput) {
+    const paginas = Number(paginasTexto);
+    if (!Number.isInteger(paginas) || paginas < 1) {
+      alert("Numero de paginas invalido.");
+      return;
+    }
+    payload.numero_paginas = paginas;
+  }
+
+  if (editoraInput && editora) {
+    payload.editora = editora;
+  }
+
+  try {
+    const token = getToken();
+    if (!token) {
+      alert("Voce precisa estar logado");
+      return;
+    }
+
+    let imagemUrl = null;
+
+    if (capaFile) {
+      try {
+        imagemUrl = await uploadImagemLivro(capaFile);
+        if (!imagemUrl) {
+          throw new Error("URL da imagem nao foi retornada");
+        }
+        console.log("[salvarAlteracoesLivro] Upload realizado:", imagemUrl);
+      } catch (erro) {
+        alert("Erro ao fazer upload da imagem: " + erro.message);
+        return;
+      }
+    }
+
+    if (imagemUrl) {
+      payload.imagem_capa = normalizarUrlMidia(imagemUrl);
+    }
+
+    console.log("[salvarAlteracoesLivro] Enviando dados:", payload);
+
+    const response = await fetch(`http://localhost:3000/livros/${livroId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("[salvarAlteracoesLivro] Status HTTP:", response.status);
+
+    const resultData = await response.json().catch(() => ({}));
+    console.log("[salvarAlteracoesLivro] Resposta do servidor:", resultData);
+
+    if (!response.ok) {
+      const detalhesValidacao = Array.isArray(resultData.detalhes)
+        ? resultData.detalhes
+            .map((detalhe) => `${detalhe.path || detalhe.param}: ${detalhe.msg}`)
+            .join(" | ")
+        : "";
+      const erro =
+        detalhesValidacao ||
+        resultData.mensagem ||
+        resultData.erro ||
+        `Erro ${response.status}`;
+      console.error("[salvarAlteracoesLivro] Erro na resposta:", erro);
+      throw new Error(erro);
+    }
+
+    livroAtualDados = normalizarDadosLivro({
+      ...livroAtualDados,
+      ...payload,
+      imagem_capa: payload.imagem_capa || livroAtualDados?.imagem_capa || "",
+    });
+
+    preencherVisualizacaoLivro(livroAtualDados);
+    preencherFormularioEdicaoLivro(livroAtualDados);
+    cancelarEdicaoLivro();
+
+    alert("Livro atualizado com sucesso!");
+
+    console.log("[salvarAlteracoesLivro] Recarregando biblioteca...");
+    setTimeout(() => {
+      atualizarBibliotecaELista();
+    }, 500);
+  } catch (erro) {
+    console.error("[salvarAlteracoesLivro] Erro completo:", erro);
+    alert("Erro ao salvar alteracoes: " + erro.message);
+  }
+}
+
+function cancelarEdicaoLivro() {
+  const dadosBase = livroAtualDados || obterDadosLivroDaTela();
+  preencherVisualizacaoLivro(dadosBase);
+  preencherFormularioEdicaoLivro(dadosBase);
+  alternarModoEdicaoLivro(false);
+
+  console.log("[cancelarEdicaoLivro] Modo de edicao cancelado");
 }
 
 // ==================== DELETAR LIVRO ====================
 async function deletarLivro() {
   if (!isBibliotecariaLogada()) {
-    alert("Acesso negado. Apenas bibliotecárias podem deletar livros.");
+    alert("Acesso negado. Apenas bibliotecÃ¡rias podem deletar livros.");
     return;
   }
 
   const livroId = localStorage.getItem("livroAtualId");
   if (!livroId) {
-    alert("Livro não encontrado");
+    alert("Livro nÃ£o encontrado");
     return;
   }
 
-  // Confirmar deleção
-  const confirmar = confirm("Tem certeza que deseja deletar este livro? Esta ação não pode ser desfeita.");
+  // Confirmar deleÃ§Ã£o
+  const confirmar = confirm(
+    "Tem certeza que deseja deletar este livro? Esta aÃ§Ã£o nÃ£o pode ser desfeita.",
+  );
   if (!confirmar) {
     return;
   }
@@ -1524,7 +2065,7 @@ async function deletarLivro() {
   try {
     const token = getToken();
     if (!token) {
-      alert("Você precisa estar logado");
+      alert("VocÃª precisa estar logado");
       return;
     }
 
@@ -1534,8 +2075,8 @@ async function deletarLivro() {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     console.log("[deletarLivro] Status HTTP:", response.status);
@@ -1549,56 +2090,54 @@ async function deletarLivro() {
     console.log("[deletarLivro] Livro deletado com sucesso:", resultado);
 
     alert("Livro deletado com sucesso!");
-    
-    // Redireciona para biblioteca após deletar
+
+    // Redireciona para biblioteca apÃ³s deletar
     setTimeout(() => {
       window.location.href = "/frontend/src/pages/biblioteca.html";
     }, 500);
-
   } catch (erro) {
     console.error("[deletarLivro] Erro ao deletar livro:", erro);
     alert("Erro ao deletar livro: " + erro.message);
   }
 }
 
-// Carrega dados na página de informações
+// Carrega dados na pÃ¡gina de informaÃ§Ãµes
 async function carregarDadosLivroInformacoes() {
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
-      alert("Livro não especificado");
+      alert("Livro nao especificado");
       return;
     }
 
+    console.log(
+      "[carregarDadosLivroInformacoes] Carregando livro ID:",
+      livroId,
+    );
+
     const response = await fetch(`http://localhost:3000/livros/${livroId}`);
     if (!response.ok) throw new Error("Erro ao buscar livro");
-    
+
     const data = await response.json();
-    const livro = data.livro;
+    const livro = normalizarDadosLivro(data.livro);
 
-    document.getElementById("tituloInfo").textContent = livro.titulo || "";
-    document.getElementById("autorInfo").textContent = livro.autor || "";
-    document.getElementById("generoInfo").textContent = `Gênero: ${livro.genero || "N/A"}`;
-    document.getElementById("anoInfo").textContent = `Ano: ${livro.ano || "N/A"}`;
-    document.getElementById("paginasInfo").textContent = `Páginas: ${livro.numero_paginas || "N/A"}`;
-    document.getElementById("descricaoInfo").textContent = livro.descricao || "";
-    
-    if (livro.imagem_capa && livro.imagem_capa.trim()) {
-      document.getElementById("capaCapa").src = livro.imagem_capa;
-    }
-
+    livroAtualDados = livro;
+    preencherVisualizacaoLivro(livro);
+    preencherFormularioEdicaoLivro(livro);
+    configurarPreviewCapaLivro();
+    alternarModoEdicaoLivro(false);
   } catch (erro) {
     console.error("Erro ao carregar livro:", erro);
   }
 }
 
-// Carrega foto de perfil do usuário no header em todas as páginas
+// Carrega foto de perfil do usuÃ¡rio no header em todas as pÃ¡ginas
 async function carregarFotoPerfilHeader() {
   try {
     const id = getUsuarioLogadoId();
     const token = getToken();
-    
-    // Se não estiver logado, não tenta carregar
+
+    // Se nÃ£o estiver logado, nÃ£o tenta carregar
     if (!id || !token) {
       return;
     }
@@ -1622,17 +2161,20 @@ async function carregarFotoPerfilHeader() {
       const imagemHeader = document.querySelector(".info-perfil .perfil img");
       if (imagemHeader) {
         imagemHeader.src = data.usuario.foto_perfil;
-        console.log("[carregarFotoPerfilHeader] Foto carregada:", data.usuario.foto_perfil);
+        console.log(
+          "[carregarFotoPerfilHeader] Foto carregada:",
+          data.usuario.foto_perfil,
+        );
       }
-      
-      // Se estiver na página de perfil, atualizar também a foto principal
+
+      // Se estiver na pÃ¡gina de perfil, atualizar tambÃ©m a foto principal
       const fotoMain = document.getElementById("fotoPerfilMain");
       if (fotoMain) {
         fotoMain.src = data.usuario.foto_perfil;
       }
     }
   } catch (erro) {
-    console.error('Erro ao carregar foto de perfil:', erro);
+    console.error("Erro ao carregar foto de perfil:", erro);
   }
 }
 
@@ -1641,17 +2183,17 @@ function setupImageUpload() {
   // Listener para input do header (inputFotoPerfil)
   const inputFotoPerfil = document.getElementById("inputFotoPerfil");
   if (inputFotoPerfil && !inputFotoPerfil.hasAttribute("data-listener-added")) {
-    inputFotoPerfil.addEventListener("change", function(e) {
+    inputFotoPerfil.addEventListener("change", function (e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
           // Atualiza foto do header
           const fotoHeader = document.querySelector(".info-perfil .perfil img");
           if (fotoHeader) {
             fotoHeader.src = event.target.result;
           }
-          
+
           // Atualiza foto principal
           const fotoMain = document.getElementById("fotoPerfilMain");
           if (fotoMain) {
@@ -1664,20 +2206,20 @@ function setupImageUpload() {
     inputFotoPerfil.setAttribute("data-listener-added", "true");
   }
 
-  // Listener para input da página de perfil (inputFoto)
+  // Listener para input da pÃ¡gina de perfil (inputFoto)
   const inputFoto = document.getElementById("inputFoto");
   if (inputFoto && !inputFoto.hasAttribute("data-listener-added")) {
-    inputFoto.addEventListener("change", function(e) {
+    inputFoto.addEventListener("change", function (e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
           // Atualiza foto do header
           const fotoHeader = document.querySelector(".info-perfil .perfil img");
           if (fotoHeader) {
             fotoHeader.src = event.target.result;
           }
-          
+
           // Atualiza foto principal
           const fotoMain = document.getElementById("fotoPerfilMain");
           if (fotoMain) {
@@ -1691,19 +2233,19 @@ function setupImageUpload() {
   }
 }
 
-// Inicializa comportamentos quando a página estiver pronta
+// Inicializa comportamentos quando a pÃ¡gina estiver pronta
 window.addEventListener("DOMContentLoaded", () => {
-  // Identifica qual página está sendo carregada
+  // Identifica qual pÃ¡gina estÃ¡ sendo carregada
   const currentPage = window.location.pathname;
   paginasCarregadas.add(currentPage);
 
-  console.log("[DOMContentLoaded] Página carregada:", currentPage);
+  console.log("[DOMContentLoaded] PÃ¡gina carregada:", currentPage);
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
     carregarPerfil();
     desabilitarCampos();
 
-    // esconder botões no início
+    // esconder botÃµes no inÃ­cio
     const btnSalvar = document.querySelector(".btn-salvar");
     const btnCancelar = document.querySelector(".btn-cancelar");
 
@@ -1711,9 +2253,9 @@ window.addEventListener("DOMContentLoaded", () => {
     if (btnCancelar) btnCancelar.style.display = "none";
   }
 
-  // Evita carregar mais de uma vez na mesma página
+  // Evita carregar mais de uma vez na mesma pÃ¡gina
   if (paginasCarregadas.size > 1) {
-    console.log("[DOMContentLoaded] Página já carregada, ignorando...");
+    console.log("[DOMContentLoaded] PÃ¡gina jÃ¡ carregada, ignorando...");
     return;
   }
 
@@ -1728,10 +2270,10 @@ window.addEventListener("DOMContentLoaded", () => {
     desabilitarCampos();
   }
 
-  // Apenas inicializa biblioteca se o usuário estiver logado (tem token)
+  // Apenas inicializa biblioteca se o usuÃ¡rio estiver logado (tem token)
   const token = getToken();
   const usuarioId = getUsuarioLogadoId();
-  
+
   console.log("[DOMContentLoaded] Verificando biblioteca com:", {
     temToken: !!token,
     usuarioId,
@@ -1741,15 +2283,15 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("[DOMContentLoaded] Inicializando biblioteca grid...");
     initBibliotecaGrid();
   } else {
-    console.warn("[DOMContentLoaded] Usuário não logado ou token ausente!");
+    console.warn("[DOMContentLoaded] UsuÃ¡rio nÃ£o logado ou token ausente!");
   }
 
-  // Carrega dados da página de avaliação
+  // Carrega dados da pÃ¡gina de avaliaÃ§Ã£o
   if (currentPage.includes("/frontend/src/pages/Avaliacao.html")) {
     carregarDadosLivroAvaliacao();
   }
 
-  // Carrega dados da página de informações
+  // Carrega dados da pÃ¡gina de informaÃ§Ãµes
   if (currentPage.includes("/frontend/src/pages/informacoes.html")) {
     carregarDadosLivroInformacoes();
   }
@@ -1760,5 +2302,4 @@ window.addEventListener("DOMContentLoaded", () => {
   // Setup de uploads de imagem
   setupImageUpload();
 });
-
 

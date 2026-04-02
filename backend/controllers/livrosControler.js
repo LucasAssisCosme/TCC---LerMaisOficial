@@ -1,4 +1,5 @@
 const livrosModels = require("../models/livrosModels")
+const multerConfig = require("../config/multer")
 
 module.exports = {
     livroCadastro(req, res) {
@@ -85,16 +86,22 @@ module.exports = {
         const id = req.params.id;
         const { titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora } = req.body;
 
-        livrosModels.Renovar(id, { titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora }, (erro,) => {
+        console.log("[atualizarLivro] ID:", id);
+        console.log("[atualizarLivro] Dados recebidos:", { titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora });
+
+        livrosModels.Renovar(id, { titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora }, (erro, resultado) => {
 
             if (erro) {
-                return res.status(500).json({ mensagem: "Erro ao atualizar livro" });
+                console.error("[atualizarLivro] Erro ao atualizar:", erro);
+                return res.status(500).json({ mensagem: "Erro ao atualizar livro", erro: erro.message });
             }
 
+            console.log("[atualizarLivro] Livro atualizado com sucesso:", resultado);
              
             res.json({
                 tipo: "edicao",
                 titulo: "Edição confirmada",
+                livroAtualizado: resultado
             });
 
         });

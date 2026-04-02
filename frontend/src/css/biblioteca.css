@@ -57,29 +57,85 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  padding: 6px 14px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
+
+
+.perfil img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  transition: 0.3s;
+}
+
 
 .perfil a {
   color: white;
   text-decoration: none;
+  font-weight: 500;
+
+  transition: 0.3s;
+}
+
+/* 🔥 HOVER SUAVE */
+.perfil:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.perfil:hover img {
+  transform: scale(1.1);
+}
+
+.perfil:hover a {
+  color: #ffe3d9;
 }
 
 .nav-list {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   list-style: none;
 }
 
-.item-list {
+.item-list a {
   display: flex;
-  gap: 24px;
   align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+
+  transition: all 0.3s ease;
 }
 
-.item-list a {
-  color: aliceblue;
-  text-decoration: none;
+
+.item-list a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
+
+
+.item-list.active a {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+
+.item-list i {
+  font-size: 18px;
+}
+
 
 /* FOOTER */
 .app-footer {
@@ -141,7 +197,7 @@ header {
   padding: 16px 18px;
   border-radius: 30px;
   border: none;
-  background: #9c4637e7;
+  background: #b85240;
   color: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   outline: none;
@@ -280,14 +336,20 @@ header {
 /* CARD QUADRADO (SIDEBAR) */
 .card-quadrado {
   flex: 1;
-  background: #9c4637e7;
+  background: #b85240;
   color: white;
-  padding: 55px;
-  border-radius: 25px;
+  padding: 45px;
+  border-radius: 28px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.card-quadrado:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 }
 
 .card-quadrado h2,
@@ -296,8 +358,31 @@ header {
   line-height: 1.4;
   padding: 20px;
   border-radius: 20px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.062);
   margin: 0;
+}
+
+.ranking-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.trophy-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trophy-icon svg {
+  width: 70px;
+  height: 80px;
+  color: rgb(250, 183, 0);
+  stroke-width: 2;
 }
 
 .mb-2 {
@@ -327,25 +412,58 @@ header {
 .item {
   display: flex;
   align-items: center;
-  gap: 15px;
-  font-size: 18px;
-  padding: 10px;
+  gap: 20px;
+  font-size: 30px;
+  padding: 12px;
   border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+.item:has(.flag.verde):hover {
+  background: rgba(0, 255, 136, 0.2);
+  transform: translateX(8px);
+  padding-left: 20px;
+}
+
+
+.item:has(.flag.azul):hover {
+  background: rgba(33, 150, 243, 0.2);
+  transform: translateX(8px);
+  padding-left: 20px;
+}
+
+
+.item:has(.flag.amarelo):hover {
+  background: rgba(255, 193, 7, 0.2);
+  transform: translateX(8px);
+  padding-left: 20px;
 }
 
 .flag {
-  width: 78px;
-  height: 80px;
-  clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+  width: 65px;
+  height: 65px;
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.item:hover .flag {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .overview-card .badge {
   display: inline-block;
-  font-size: 18px;
-  padding: 10px 20px;
-  background: white !important;
-  color: #333 !important;
+  font-size: 20px;
+  padding: 20px 30px;
+  background: rgb(184, 82, 64) !important;
+  color: #ffffff !important;
   border-radius: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  font-weight: 700;
 }
 
 .bg-light {

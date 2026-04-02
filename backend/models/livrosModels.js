@@ -52,7 +52,7 @@ module.exports = {
 
 Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
   // Lista de colunas permitidas para atualização
-  const colunasPermitidas = ['titulo', 'autor', 'genero', 'ano', 'numero_paginas', 'descricao', 'editora'];
+  const colunasPermitidas = ['titulo', 'autor', 'genero', 'ano', 'numero_paginas', 'descricao', 'imagem_capa', 'editora'];
   
   // Filtrar apenas campos com valores válidos e permitidos
   const camposValidos = {};
@@ -62,6 +62,10 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
       camposValidos[key] = dados[key];
     }
   });
+
+  console.log("[Renovar] Livro ID:", id);
+  console.log("[Renovar] Dados recebidos:", dados);
+  console.log("[Renovar] Campos válidos após filtro:", camposValidos);
 
   if (Object.keys(camposValidos).length === 0) {
     return callback(new Error('Nenhum campo válido para atualizar'), null);
@@ -74,10 +78,15 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
 
   const sql = `UPDATE livros SET ${setClause} WHERE id = ?`;
 
+  console.log("[Renovar] SQL gerado:", sql);
+  console.log("[Renovar] Valores:", valores);
+
   conn.query(sql, valores, (erro, resultado) => {
     if (erro) {
+      console.error("[Renovar] Erro ao atualizar:", erro);
       return callback(erro, null);
     }
+    console.log("[Renovar] Atualização concluída. Registros afetados:", resultado.affectedRows);
     callback(null, { id, ...camposValidos });
   });
 },      atualizarImagemCapaPadrao: (ids, capaPadrao, callback) => {

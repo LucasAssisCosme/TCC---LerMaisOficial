@@ -1,62 +1,62 @@
-const { body, param, validationResult } = require('express-validator');
+﻿const { body, param, validationResult } = require('express-validator');
 
-// Middleware para tratar erros de validação
+// Middleware para tratar erros de validaÃ§Ã£o
 const tratarErrosValidacao = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ 
-      erro: 'Erro de validação', 
+      erro: 'Erro de validaÃ§Ã£o', 
       detalhes: errors.array() 
     });
   }
   next();
 };
 
-// Validações para Usuário
+// ValidaÃ§Ãµes para UsuÃ¡rio
 const validarCadastroUsuario = [
   body('nome')
     .trim()
-    .notEmpty().withMessage('Nome é obrigatório')
+    .notEmpty().withMessage('Nome Ã© obrigatÃ³rio')
     .isLength({ min: 2, max: 100 }).withMessage('Nome deve ter entre 2 e 100 caracteres')
-    .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('Nome pode conter apenas letras e espaços'),
+    .matches(/^[\\p{L}\\s]+$/u).withMessage('Nome pode conter apenas letras e espaÃ§os'),
   
   body('email')
     .trim()
-    .notEmpty().withMessage('Email é obrigatório')
-    .isEmail().withMessage('Email inválido')
+    .notEmpty().withMessage('Email Ã© obrigatÃ³rio')
+    .isEmail().withMessage('Email invÃ¡lido')
     .normalizeEmail(),
   
   body('senha')
-    .notEmpty().withMessage('Senha é obrigatória')
+    .notEmpty().withMessage('Senha Ã© obrigatÃ³ria')
     .isLength({ min: 8, max: 32 }).withMessage('Senha deve ter entre 8 e 32 caracteres'),
   
   body('tipo')
     .optional()
     .trim()
     .isIn(['aluno', 'bibliotecaria'])
-    .withMessage('Tipo de usuário inválido. Use: aluno ou bibliotecaria'),
+    .withMessage('Tipo de usuÃ¡rio invÃ¡lido. Use: aluno ou bibliotecaria'),
   
   body('genero_favorito')
-    .notEmpty().withMessage('Gênero favorito é obrigatório')
+    .notEmpty().withMessage('GÃªnero favorito Ã© obrigatÃ³rio')
     .isIn(['Romance', 'Fantasia', 'Terror', 'Aventura', 'Ficcao_Cientifica', 'Drama', 'Autoajuda', 'Outro'])
-    .withMessage('Gênero favorito inválido'),
+    .withMessage('GÃªnero favorito invÃ¡lido'),
   
   body('apelido')
-    .notEmpty().withMessage('Apelido é obrigatório')
+    .notEmpty().withMessage('Apelido Ã© obrigatÃ³rio')
     .isLength({ min: 2, max: 50 }).withMessage('Apelido deve ter entre 2 e 50 caracteres'),
-  
+
   tratarErrosValidacao
 ];
 
 const validarLoginUsuario = [
   body('email')
     .trim()
-    .notEmpty().withMessage('Email é obrigatório')
-    .isEmail().withMessage('Email inválido')
+    .notEmpty().withMessage('Email Ã© obrigatÃ³rio')
+    .isEmail().withMessage('Email invÃ¡lido')
     .normalizeEmail(),
   
   body('senha')
-    .notEmpty().withMessage('Senha é obrigatória'),
+    .notEmpty().withMessage('Senha Ã© obrigatÃ³ria'),
   
   tratarErrosValidacao
 ];
@@ -64,80 +64,80 @@ const validarLoginUsuario = [
 const validarRedefinirSenha = [
   body('email')
     .trim()
-    .notEmpty().withMessage('Email é obrigatório')
-    .isEmail().withMessage('Email inválido')
+    .notEmpty().withMessage('Email Ã© obrigatÃ³rio')
+    .isEmail().withMessage('Email invÃ¡lido')
     .normalizeEmail(),
   
   body('novaSenha')
-    .notEmpty().withMessage('Nova senha é obrigatória')
+    .notEmpty().withMessage('Nova senha Ã© obrigatÃ³ria')
     .isLength({ min: 8, max: 32 }).withMessage('Senha deve ter entre 8 e 32 caracteres'),
   
   body('confirmarSenha')
-    .notEmpty().withMessage('Confirmar senha é obrigatório')
+    .notEmpty().withMessage('Confirmar senha Ã© obrigatÃ³rio')
     .custom((value, { req }) => value === req.body.novaSenha)
-    .withMessage('As senhas não coincidem'),
+    .withMessage('As senhas nÃ£o coincidem'),
   
   tratarErrosValidacao
 ];
 
 const validarIdUsuario = [
   param('id')
-    .isInt({ min: 1 }).withMessage('ID de usuário inválido'),
+    .isInt({ min: 1 }).withMessage('ID de usuÃ¡rio invÃ¡lido'),
   
   tratarErrosValidacao
 ];
 
-// Validações para Livros
+// ValidaÃ§Ãµes para Livros
 const validarCadastroLivro = [
   body('titulo')
     .trim()
-    .notEmpty().withMessage('Título é obrigatório')
-    .isLength({ min: 2, max: 200 }).withMessage('Título deve ter entre 2 e 200 caracteres'),
+    .notEmpty().withMessage('TÃ­tulo Ã© obrigatÃ³rio')
+    .isLength({ min: 2, max: 200 }).withMessage('TÃ­tulo deve ter entre 2 e 200 caracteres'),
   
   body('autor')
     .trim()
-    .notEmpty().withMessage('Autor é obrigatório')
+    .notEmpty().withMessage('Autor Ã© obrigatÃ³rio')
     .isLength({ min: 2, max: 100 }).withMessage('Autor deve ter entre 2 e 100 caracteres'),
   
   body('genero')
     .trim()
-    .notEmpty().withMessage('Gênero é obrigatório')
-    .isLength({ min: 2, max: 50 }).withMessage('Gênero deve ter entre 2 e 50 caracteres'),
+    .notEmpty().withMessage('GÃªnero Ã© obrigatÃ³rio')
+    .isLength({ min: 2, max: 50 }).withMessage('GÃªnero deve ter entre 2 e 50 caracteres'),
   
   body('ano')
     .isInt({ min: 1000, max: new Date().getFullYear() })
-    .withMessage('Ano inválido'),
+    .withMessage('Ano invÃ¡lido'),
   
   body('numero_paginas')
     .isInt({ min: 1, max: 10000 })
-    .withMessage('Número de páginas inválido'),
+    .withMessage('NÃºmero de pÃ¡ginas invÃ¡lido'),
   
   body('descricao')
     .optional()
     .trim()
-    .isLength({ max: 1000 }).withMessage('Descrição não pode exceder 1000 caracteres'),
-  
+    .isLength({ max: 1000 }).withMessage('DescriÃ§Ã£o nÃ£o pode exceder 1000 caracteres'),
+
   body('imagem_capa')
     .optional()
     .trim()
-    .isURL().withMessage('URL da imagem inválida'),
-  
+    .isURL({ require_tld: false }).withMessage('URL da imagem invÃ¡lida'),
+
   body('editora')
     .optional()
     .trim()
-    .isLength({ max: 100 }).withMessage('Editora não pode exceder 100 caracteres'),
+    .isLength({ max: 100 }).withMessage('Editora nÃ£o pode exceder 100 caracteres'),
   
   tratarErrosValidacao
 ];
 
 const validarAtualizacaoLivro = [
   param('id')
-    .isInt({ min: 1 }).withMessage('ID de livro inválido'),
+    .isInt({ min: 1 }).withMessage('ID de livro invÃ¡lido'),
   
   body('titulo')
     .optional()
     .trim()
-    .isLength({ min: 2, max: 200 }).withMessage('Título deve ter entre 2 e 200 caracteres'),
+    .isLength({ min: 2, max: 200 }).withMessage('TÃ­tulo deve ter entre 2 e 200 caracteres'),
   
   body('autor')
     .optional()
@@ -147,48 +147,58 @@ const validarAtualizacaoLivro = [
   body('genero')
     .optional()
     .trim()
-    .isLength({ min: 2, max: 50 }).withMessage('Gênero deve ter entre 2 e 50 caracteres'),
+    .isLength({ min: 2, max: 50 }).withMessage('GÃªnero deve ter entre 2 e 50 caracteres'),
   
   body('ano')
     .optional()
     .isInt({ min: 1000, max: new Date().getFullYear() })
-    .withMessage('Ano inválido'),
+    .withMessage('Ano invÃ¡lido'),
   
   body('numero_paginas')
     .optional()
     .isInt({ min: 1, max: 10000 })
-    .withMessage('Número de páginas inválido'),
+    .withMessage('NÃºmero de pÃ¡ginas invÃ¡lido'),
   
   body('descricao')
     .optional()
     .trim()
-    .isLength({ max: 1000 }).withMessage('Descrição não pode exceder 1000 caracteres'),
+    .isLength({ max: 1000 }).withMessage('DescriÃ§Ã£o nÃ£o pode exceder 1000 caracteres'),
+
+  body('imagem_capa')
+    .optional()
+    .trim()
+    .isURL({ require_tld: false }).withMessage('URL da imagem invÃ¡lida'),
+
+  body('editora')
+    .optional()
+    .trim()
+    .isLength({ max: 100 }).withMessage('Editora nÃ£o pode exceder 100 caracteres'),
   
   tratarErrosValidacao
 ];
 
 const validarIdLivro = [
   param('id')
-    .isInt({ min: 1 }).withMessage('ID de livro inválido'),
+    .isInt({ min: 1 }).withMessage('ID de livro invÃ¡lido'),
   
   tratarErrosValidacao
 ];
 
-// ✅ Validações para Atualização de Usuário
+// âœ… ValidaÃ§Ãµes para AtualizaÃ§Ã£o de UsuÃ¡rio
 const validarAtualizacaoUsuario = [
   param('id')
-    .isInt({ min: 1 }).withMessage('ID de usuário inválido'),
+    .isInt({ min: 1 }).withMessage('ID de usuÃ¡rio invÃ¡lido'),
   
   body('nome')
     .optional()
     .trim()
     .isLength({ min: 2, max: 100 }).withMessage('Nome deve ter entre 2 e 100 caracteres')
-    .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('Nome pode conter apenas letras e espaços'),
+    .matches(/^[\\p{L}\\s]+$/u).withMessage('Nome pode conter apenas letras e espaÃ§os'),
   
   body('email')
     .optional()
     .trim()
-    .isEmail().withMessage('Email inválido')
+    .isEmail().withMessage('Email invÃ¡lido')
     .normalizeEmail(),
   
   body('senha')
@@ -198,7 +208,7 @@ const validarAtualizacaoUsuario = [
   body('bio')
     .optional()
     .trim()
-    .isLength({ max: 500 }).withMessage('Bio não pode exceder 500 caracteres'),
+    .isLength({ max: 500 }).withMessage('Bio nÃ£o pode exceder 500 caracteres'),
   
   body('apelido')
     .optional()
@@ -208,7 +218,7 @@ const validarAtualizacaoUsuario = [
   body('genero_favorito')
     .optional()
     .trim()
-    .isLength({ max: 50 }).withMessage('Gênero favorito não pode exceder 50 caracteres'),
+    .isLength({ max: 50 }).withMessage('GÃªnero favorito nÃ£o pode exceder 50 caracteres'),
   
   body('foto_perfil')
     .optional()
@@ -217,26 +227,26 @@ const validarAtualizacaoUsuario = [
   tratarErrosValidacao
 ];
 
-// ✅ Validações para Cadastro de Partes Favoritas
+// âœ… ValidaÃ§Ãµes para Cadastro de Partes Favoritas
 const validarCadastroPF = [
   body('usuario_id')
-    .isInt({ min: 1 }).withMessage('ID do usuário inválido'),
+    .isInt({ min: 1 }).withMessage('ID do usuÃ¡rio invÃ¡lido'),
   
   body('livro_id')
-    .isInt({ min: 1 }).withMessage('ID do livro inválido'),
+    .isInt({ min: 1 }).withMessage('ID do livro invÃ¡lido'),
   
   body('trecho')
     .trim()
-    .notEmpty().withMessage('Trecho é obrigatório')
+    .notEmpty().withMessage('Trecho Ã© obrigatÃ³rio')
     .isLength({ min: 5, max: 1000 }).withMessage('Trecho deve ter entre 5 e 1000 caracteres'),
   
   tratarErrosValidacao
 ];
 
-// ✅ Validações para Atualização de Partes Favoritas
+// âœ… ValidaÃ§Ãµes para AtualizaÃ§Ã£o de Partes Favoritas
 const validarAtualizacaoPF = [
   param('id')
-    .isInt({ min: 1 }).withMessage('ID de parte favorita inválido'),
+    .isInt({ min: 1 }).withMessage('ID de parte favorita invÃ¡lido'),
   
   body('trecho')
     .optional()
@@ -246,33 +256,33 @@ const validarAtualizacaoPF = [
   tratarErrosValidacao
 ];
 
-// Validações para Biblioteca
+// ValidaÃ§Ãµes para Biblioteca
 const validarStatusBiblioteca = [
   body('usuario_id')
-    .isInt({ min: 1 }).withMessage('ID do usuário inválido'),
+    .isInt({ min: 1 }).withMessage('ID do usuÃ¡rio invÃ¡lido'),
   
   body('livro_id')
-    .isInt({ min: 1 }).withMessage('ID do livro inválido'),
+    .isInt({ min: 1 }).withMessage('ID do livro invÃ¡lido'),
   
   body('progresso')
     .trim()
     .isIn(['lido', 'lendo', 'quero_ler'])
-    .withMessage('Progresso inválido. Use: lido, lendo ou quero_ler'),
+    .withMessage('Progresso invÃ¡lido. Use: lido, lendo ou quero_ler'),
   
   tratarErrosValidacao
 ];
 
-// Validações para Avaliações
+// ValidaÃ§Ãµes para AvaliaÃ§Ãµes
 const validarAvaliacao = [
   body('usuario_id')
-    .isInt({ min: 1 }).withMessage('ID do usuário inválido'),
+    .isInt({ min: 1 }).withMessage('ID do usuÃ¡rio invÃ¡lido'),
   
   body('livro_id')
-    .isInt({ min: 1 }).withMessage('ID do livro inválido'),
+    .isInt({ min: 1 }).withMessage('ID do livro invÃ¡lido'),
   
   body('estrelas')
     .isInt({ min: 1, max: 5 })
-    .withMessage('Avaliação deve ser entre 1 e 5 estrelas'),
+    .withMessage('AvaliaÃ§Ã£o deve ser entre 1 e 5 estrelas'),
   
   tratarErrosValidacao
 ];
@@ -292,3 +302,5 @@ module.exports = {
   validarAvaliacao,
   tratarErrosValidacao
 };
+
+

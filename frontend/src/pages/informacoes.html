@@ -3,84 +3,206 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - Informações</title>
-
+    <title>Ler Mais - Informacoes</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/frontend/src/css/informacoes.css" />
   </head>
 
   <body class="home-page">
-  <header>
-    <div class="header container"> 
-      <div class="info-perfil">
-            <img src="../../logo.png" alt="">    
-            <div class="perfil">
-              <img src="../../User.png" alt="">
-               <a href="/frontend/src/pages/perfil.html">PERFIL</a>
+    <header>
+      <div class="header container">
+        <div class="info-perfil">
+          <img src="../../logo.png" alt="" />
+          <div class="perfil">
+            <img src="../../User.png" alt="" />
+            <a href="/frontend/src/pages/perfil.html">PERFIL</a>
+          </div>
+        </div>
+
+        <nav>
+          <ul class="nav-list">
+            <li class="item-list">
+              <a href="/frontend/src/pages/index.html">
+                <i class="bi bi-house"></i>
+                Inicio
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="/frontend/src/pages/cadastroLivro.html">
+                <i class="bi bi-plus-circle"></i>
+                Cadastrar
+              </a>
+            </li>
+
+            <li class="item-list active">
+              <a href="/frontend/src/pages/biblioteca.html">
+                <i class="bi bi-book"></i>
+                Biblioteca
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="/frontend/login.html">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="informacoes-container">
+      <div class="livro-info">
+        <div class="livro-capa">
+          <img id="capaCapa" src="" alt="Capa do livro" />
+          <div class="capa-edicao" id="capaEdicaoInfo" style="display: none">
+            <label for="capaLivroFileEdit" class="label-edit">Imagem da Capa</label>
+            <input
+              type="file"
+              id="capaLivroFileEdit"
+              accept="image/*"
+              class="input-edit"
+            />
+          </div>
+        </div>
+
+        <div class="livro-detalhes">
+          <div id="infoVisualizacao">
+            <h1 id="tituloInfo"></h1>
+            <p class="autor" id="autorInfo"></p>
+
+            <div class="meta-livro">
+              <p class="genero" id="generoInfo"></p>
+              <p class="ano" id="anoInfo"></p>
+              <p class="paginas" id="paginasInfo"></p>
+              <p class="editora" id="editoraInfo"></p>
             </div>
-      </div>        
 
-      <nav>
-        <ul class="nav-list">
-          <li class="item-list">
-            <a href="/frontend/src/pages/index.html">Inicio</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/src/pages/cadastroLivro.html">Cadastrar Livros</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/src/pages/biblioteca.html">Biblioteca</a>
-          </li>
-          <li class="item-list">
-            <a href="/frontend/login.html">Saida</a>
-          </li>
+            <div class="descricao-completa">
+              <h2>Descricao</h2>
+              <p id="descricaoInfo"></p>
+            </div>
+          </div>
 
-        </ul>
-      </nav>
-    </div>
-  </header>
+          <div id="infoEdicao" class="edicao-livro" style="display: none">
+            <label for="tituloLivroEdit" class="label-edit">Titulo</label>
+            <input
+              type="text"
+              id="tituloLivroEdit"
+              class="input-edit"
+              placeholder="Titulo do livro"
+            />
 
-  <main class="informacoes-container">
-    <div class="livro-info">
-      <div class="livro-capa">
-        <img id="capaCapa" src="" alt="Capa do livro">
-      </div>
-      
-      <div class="livro-detalhes">
-        <h1 id="tituloInfo"></h1>
-        <p class="autor" id="autorInfo"></p>
-        <p class="genero" id="generoInfo"></p>
-        <p class="ano" id="anoInfo"></p>
-        <p class="paginas" id="paginasInfo"></p>
-        
-        <div class="descricao-completa">
-          <h2>Descrição</h2>
-          <p id="descricaoInfo"></p>
+            <label for="autorLivroEdit" class="label-edit">Autor</label>
+            <input
+              type="text"
+              id="autorLivroEdit"
+              class="input-edit"
+              placeholder="Autor do livro"
+            />
+
+            <div class="linha-edicao">
+              <div>
+                <label for="generoLivroEdit" class="label-edit">Genero</label>
+                <input
+                  type="text"
+                  id="generoLivroEdit"
+                  class="input-edit"
+                  placeholder="Genero"
+                />
+              </div>
+
+              <div>
+                <label for="anoLivroEdit" class="label-edit">Ano</label>
+                <input
+                  type="number"
+                  id="anoLivroEdit"
+                  class="input-edit"
+                  placeholder="Ano"
+                />
+              </div>
+            </div>
+
+            <div class="linha-edicao">
+              <div>
+                <label for="paginasLivroEdit" class="label-edit">Paginas</label>
+                <input
+                  type="number"
+                  id="paginasLivroEdit"
+                  class="input-edit"
+                  placeholder="Numero de paginas"
+                />
+              </div>
+
+              <div>
+                <label for="editoraLivroEdit" class="label-edit">Editora</label>
+                <input
+                  type="text"
+                  id="editoraLivroEdit"
+                  class="input-edit"
+                  placeholder="Editora"
+                />
+              </div>
+            </div>
+
+            <label for="descricaoLivroEdit" class="label-edit">Descricao</label>
+            <textarea
+              id="descricaoLivroEdit"
+              class="textarea-edit"
+              rows="6"
+              placeholder="Descricao do livro"
+            ></textarea>
+          </div>
+
+          <div class="acoes" id="acoesLivro" style="display: none">
+            <button class="btn-primario" onclick="irParaAvaliacao()">
+              Voltar para Avaliacao
+            </button>
+            <button class="btn-secundario" onclick="habilitarEdicaoLivro()">
+              Editar Livro
+            </button>
+            <button class="btn-perigo" onclick="deletarLivro()">
+              Deletar Livro
+            </button>
+          </div>
+
+          <div class="acoes" id="acoesEdicao" style="display: none">
+            <button class="btn-primario" onclick="salvarAlteracoesLivro()">
+              Salvar Alteracoes
+            </button>
+            <button class="btn-secundario" onclick="cancelarEdicaoLivro()">
+              Cancelar Edicao
+            </button>
+          </div>
+
+          <div class="acoes" id="acoesLivroLeitor">
+            <button class="btn-primario" onclick="irParaAvaliacao()">
+              Voltar para Avaliacao
+            </button>
+          </div>
         </div>
-
-        <div class="acoes">
-          <button class="btn-primario" onclick="irParaAvaliacao()">Voltar para Avaliação</button>
-        </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <footer class="app-footer">
+    <footer class="app-footer">
+      <div class="footer-left">
+        <a href="/frontend/src/pages/index.html">Home</a>
+        <a href="/frontend/src/pages/perfil.html">Perfil</a>
+      </div>
 
-  <div class="footer-left">
-    <a href="/frontend/src/pages/index.html">Home</a>
-    <a href="/frontend/src/pages/perfil.html">Perfil</a>
-  </div>
+      <div class="footer-center">
+        <img src="/frontend/logo.png" alt="Logo" class="footer-logo" />
+      </div>
 
-  <div class="footer-center">
-    <img src="/frontend/logo.png" alt="Logo" class="footer-logo">
-  </div>
-
-  <div class="footer-right">
-    <small>Todos os direitos reservados</small>
-  </div>
-
-</footer>
-
-</body>
-<script src="/frontend/script.js"></script>
+      <div class="footer-right">
+        <small>Todos os direitos reservados</small>
+      </div>
+    </footer>
+  </body>
+  <script src="/frontend/script.js"></script>
 </html>

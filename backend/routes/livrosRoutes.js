@@ -13,6 +13,7 @@ const {
 } = require("../middleware/validacao")
 
 
+
 //Crud
 
 //C = Criar novo usuario 
@@ -20,8 +21,6 @@ const {
 roteador.get("/cadastrar", livrosControler.livroCadastro)
 //Rota para enviar dados da página de cadastro
 roteador.post("/cadastrar", autenticacao.verificarToken, validarCadastroLivro, livrosControler.salvarLivro)
-
-
 
 //R = Obter informações de usuarios
 //Retorna as informações de todos os usuarios

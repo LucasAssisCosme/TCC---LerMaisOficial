@@ -37,33 +37,90 @@ justify-content: space-between;
   border-radius: 50px;
 
 }
-.perfil{
+
+.perfil {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  padding: 6px 14px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-.perfil a{
-color: white;
+
+
+.perfil img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  transition: 0.3s;
+}
+
+
+.perfil a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+
+  transition: 0.3s;
+}
+
+/* 🔥 HOVER SUAVE */
+.perfil:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.perfil:hover img {
+  transform: scale(1.1);
+}
+
+.perfil:hover a {
+  color: #ffe3d9;
 }
 
 .nav-list {
-    display: flex;
-  gap: 20px;
-  list-style: none;
-
-}
-.item-list{
   display: flex;
-  gap: 24px;
-  align-items: center;
-
-
+  gap: 15px;
+  list-style: none;
 }
+
 .item-list a {
-    color: aliceblue;
-    text-decoration: none;
-   
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+
+  transition: all 0.3s ease;
 }
+
+
+.item-list a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+
+.item-list.active a {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+
+.item-list i {
+  font-size: 18px;
+}
+
 
 html, body {
   height: 100%;
