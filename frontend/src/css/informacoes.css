@@ -295,6 +295,16 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 
+#generoLivroEdit {
+  background: #f3e5dc;
+  color: #111;
+}
+
+#generoLivroEdit option {
+  background: white;
+  color: #111;
+}
+
 .textarea-edit {
   min-height: 150px;
   resize: vertical;

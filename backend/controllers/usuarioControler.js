@@ -40,10 +40,9 @@ module.exports = {
       foto_perfil,
       bio,
       genero_favorito,
-      tipo,
       apelido,
     } = req.body;
-    const tipoUsuario = ['aluno', 'bibliotecaria'].includes(tipo) ? tipo : 'aluno';
+    const tipoUsuario = 'aluno';
 
     //Manda as informações para o model
     usuarioModels.salvar(

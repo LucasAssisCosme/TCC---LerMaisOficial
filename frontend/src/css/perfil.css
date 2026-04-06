@@ -239,6 +239,7 @@ font-size:13px;
 }
 
 .campo input,
+.campo select,
 .campo textarea {
   background: #f3e5dc;
   border: none;
@@ -250,6 +251,7 @@ font-size:13px;
 
 
 .campo input:focus,
+.campo select:focus,
 .campo textarea:focus {
   box-shadow: 0 0 0 2px #ff8c5a;
 }

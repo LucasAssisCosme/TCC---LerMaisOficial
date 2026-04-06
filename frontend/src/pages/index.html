@@ -105,6 +105,44 @@
     let livrosCached = [];
     let generosFiltrados = {};
 
+    function normalizarGeneroCategoria(genero) {
+      const valor = String(genero || "").trim();
+
+      const mapa = {
+        Romance: "Romance",
+        Fantasia: "Fantasia",
+        Terror: "Terror",
+        Aventura: "Aventura",
+        Ficcao_Cientifica: "Ficcao_Cientifica",
+        "Ficcao Cientifica": "Ficcao_Cientifica",
+        "Ficcao CientÃ­fica": "Ficcao_Cientifica",
+        "Ficção Científica": "Ficcao_Cientifica",
+        Drama: "Drama",
+        Autoajuda: "Autoajuda",
+        Outro: "Outro",
+        Outros: "Outro",
+      };
+
+      return mapa[valor] || "Outro";
+    }
+
+    function obterTituloGenero(genero) {
+      const generoNormalizado = normalizarGeneroCategoria(genero);
+
+      const titulos = {
+        Romance: "Romance",
+        Fantasia: "Fantasia",
+        Terror: "Terror",
+        Aventura: "Aventura",
+        Ficcao_Cientifica: "Ficcao Cientifica",
+        Drama: "Drama",
+        Autoajuda: "Autoajuda",
+        Outro: "Outros",
+      };
+
+      return titulos[generoNormalizado] || "Outros";
+    }
+
     async function carregarCategoriasLivros() {
       try {
         const resposta = await fetch('http://localhost:3000/livros/');
@@ -115,7 +153,7 @@
 
         const livrosPorGenero = {};
         livrosCached.forEach(livro => {
-          const genero = livro.genero || 'Outros';
+          const genero = normalizarGeneroCategoria(livro.genero);
           if (!livrosPorGenero[genero]) {
             livrosPorGenero[genero] = [];
           }
@@ -142,7 +180,7 @@
         const categoriaDiv = document.createElement('div');
         categoriaDiv.className = 'categoria';
         const h3 = document.createElement('h3');
-        h3.textContent = genero.toUpperCase();
+        h3.textContent = obterTituloGenero(genero).toUpperCase();
 
         const livrosDiv = document.createElement('div');
         livrosDiv.className = 'livros';
@@ -199,7 +237,7 @@
 
       const livrosPorGenero = {};
       livrosFiltrados.forEach(livro => {
-        const genero = livro.genero || 'Outros';
+        const genero = normalizarGeneroCategoria(livro.genero);
         if (!livrosPorGenero[genero]) {
           livrosPorGenero[genero] = [];
         }

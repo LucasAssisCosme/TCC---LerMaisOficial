@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   font-family: sans-serif;
   list-style: none;
   text-decoration: none;
@@ -37,12 +38,15 @@ header{
 display: flex;
 align-items: center;
 justify-content: space-between;
+gap: 20px;
+flex-wrap: wrap;
 }
 
 .info-perfil{
   display: flex;
   gap: 24px;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .info-perfil img {
@@ -54,7 +58,8 @@ justify-content: space-between;
 
 .perfil {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 8px;
 
   padding: 6px 14px;
@@ -85,7 +90,6 @@ justify-content: space-between;
   transition: 0.3s;
 }
 
-/* 🔥 HOVER SUAVE */
 .perfil:hover {
   background: rgba(255, 255, 255, 0.25);
 }
@@ -102,6 +106,7 @@ justify-content: space-between;
     display: flex;
   gap: 20px;
   list-style: none;
+  flex-wrap: wrap;
 
 }
 .item-list{
@@ -170,12 +175,12 @@ font-size:13px;
 
 .avaliacao-container {
   margin: 50px auto;
-  width: 70%;
+  width: min(1100px, calc(100% - 32px));
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(22px);
   border-radius: 30px;
  box-shadow: 0 25px 70px rgba(0,0,0,0.8);
-
+  overflow: hidden;
 }
 .hero-livro {
   margin-bottom: 60px;
@@ -192,17 +197,20 @@ font-size:13px;
 
   display: flex;
   gap: 30px;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
 
+}
+
+.info {
+  flex: 1;
+  min-width: 280px;
 }
 
 .conteudo {
   max-width: 1200px;
   margin: 0 auto;
   padding: 50px 35px;
-
-
- 
 
   display: flex;
   flex-direction: column;
@@ -213,6 +221,7 @@ font-size:13px;
   width: 220px;
   height: 350px;
   object-fit: cover;
+  flex-shrink: 0;
 
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
@@ -220,31 +229,36 @@ font-size:13px;
 
 
 .info h1 {
-  width: 30px;
+  width: 100%;
   font-size: 45px;
   font-weight: 600;
   color: #fff;
   line-height: 1.1;
-  margin: 0 ; 
+  margin: 0;
 }
-/* linha fina */
 
 .estrelas {
   font-size: 40px;
   letter-spacing: 4px;
   color: #FFD700;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 .descricao {
   width: 100%;
   margin-top: 10px;
   font-size: 24px;
   color: #cfcfcf;
+  word-break: break-word;
 
 }
 .secao {
   display: flex;
   justify-content: space-between;
 align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
   background: rgba(255,255,255,0.06);
   padding: 25px 25px;
   border-radius: 18px;
@@ -264,8 +278,10 @@ align-items: flex-start;
 .secao p {
   font-size: 14px;
   color: #d6d6d6;
-  max-width: 520px;
+  max-width: 100%;
+  flex: 1 1 320px;
   line-height: 1.5;
+  word-break: break-word;
 }
 .btn-editar {
   background: #9C5343;
@@ -287,7 +303,6 @@ align-items: flex-start;
   transform: scale(1.05);
 }
 
-/* BOTÕES DE EDITAR E DELETAR LIVRO (apenas para bibliotecárias) */
 .acoes-livro {
   display: flex;
   gap: 12px;
@@ -347,7 +362,8 @@ align-items: flex-start;
   font-weight: 600;
   cursor: pointer;
   margin: 15px 0;
-  min-width: 200px;
+  min-width: min(260px, 100%);
+  max-width: 100%;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   appearance: none;
@@ -454,4 +470,101 @@ align-items: flex-start;
   background: #da190b;
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+}
+
+@media (max-width: 900px) {
+  .avaliacao-container {
+    width: calc(100% - 24px);
+    margin: 24px auto;
+    border-radius: 24px;
+  }
+
+  .hero-content {
+    padding: 28px 20px 0;
+  }
+
+  .conteudo {
+    padding: 30px 20px 32px;
+  }
+
+  .info h1 {
+    font-size: 36px;
+  }
+
+  .descricao {
+    font-size: 20px;
+  }
+
+  .capa {
+    width: 190px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header,
+  .nav-list,
+  .item-list {
+    gap: 12px;
+  }
+
+  .hero-content {
+    padding: 24px 16px 0;
+    justify-content: center;
+  }
+
+  .info {
+    min-width: 100%;
+  }
+
+  .info h1 {
+    font-size: 30px;
+    text-align: center;
+  }
+
+  .descricao {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .capa {
+    width: min(220px, 100%);
+    height: auto;
+    aspect-ratio: 11 / 17;
+    margin: 0 auto;
+  }
+
+  #statusLivro {
+    width: 100%;
+  }
+
+  .estrelas {
+    justify-content: center;
+    font-size: 34px;
+  }
+
+  .conteudo {
+    padding: 24px 16px 28px;
+    gap: 20px;
+  }
+
+  .secao {
+    padding: 18px 16px;
+  }
+
+  .btn-editar,
+  .btn-salvar,
+  .btn-cancelar {
+    width: 100%;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    gap: 14px;
+    text-align: center;
+  }
+
+  .footer-center {
+    transform: none;
+  }
 }

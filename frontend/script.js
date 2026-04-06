@@ -217,10 +217,6 @@ return { valida: true, mensagem: "Senha vÃ¡lida" };
 async function cadastrarUsuario(formData) {
   try {
     const senha = formData.get("senha");
-    const tipoSelecionado = String(formData.get("tipo_usuario") || "").trim();
-    const tipoUsuario = ["aluno", "bibliotecaria"].includes(tipoSelecionado)
-      ? tipoSelecionado
-      : "aluno";
 
     // Validar senha
     const validacaoSenha = validarSenha(senha);
@@ -233,7 +229,7 @@ async function cadastrarUsuario(formData) {
       nome: formData.get("nome"),
       email: formData.get("email"),
       senha: senha,
-      tipo: tipoUsuario,
+      tipo: "aluno",
       genero_favorito: formData.get("genero_favorito"),
       apelido: formData.get("apelido"),
     };
@@ -323,7 +319,7 @@ async function cadastrarLivro(formData) {
     const payload = {
       titulo: formData.get("nome"),
       autor: formData.get("autor"),
-      genero: formData.get("assunto"),
+      genero: normalizarGeneroLivro(formData.get("assunto")),
       ano: parseInt(formData.get("ano")),
       numero_paginas: parseInt(formData.get("paginas")),
       descricao: formData.get("descricao"),
@@ -1868,13 +1864,34 @@ function normalizarDadosLivro(livro) {
   return {
     titulo: livro?.titulo || "",
     autor: livro?.autor || "",
-    genero: livro?.genero || "",
+    genero: normalizarGeneroLivro(livro?.genero || ""),
     ano: livro?.ano || "",
     numero_paginas: livro?.numero_paginas || "",
     editora: livro?.editora || "",
     descricao: livro?.descricao || "",
     imagem_capa: livro?.imagem_capa || "",
   };
+}
+
+function normalizarGeneroLivro(genero) {
+  const valor = String(genero || "").trim();
+
+  const mapaGeneros = {
+    Romance: "Romance",
+    Fantasia: "Fantasia",
+    Terror: "Terror",
+    Aventura: "Aventura",
+    Ficcao_Cientifica: "Ficcao_Cientifica",
+    "Ficcao Cientifica": "Ficcao_Cientifica",
+    "Ficcao CientÃ­fica": "Ficcao_Cientifica",
+    "Ficção Científica": "Ficcao_Cientifica",
+    Drama: "Drama",
+    Autoajuda: "Autoajuda",
+    Outro: "Outro",
+    Outros: "Outro",
+  };
+
+  return mapaGeneros[valor] || valor;
 }
 
 function obterDadosLivroDaTela() {
@@ -2072,7 +2089,7 @@ async function salvarAlteracoesLivro() {
   const titulo = tituloInput ? tituloInput.value.trim() : "";
   const descricao = descricaoInput ? descricaoInput.value.trim() : "";
   const autor = autorInput ? autorInput.value.trim() : null;
-  const genero = generoInput ? generoInput.value.trim() : null;
+  const genero = generoInput ? normalizarGeneroLivro(generoInput.value) : null;
   const anoTexto = anoInput ? anoInput.value.trim() : null;
   const paginasTexto = paginasInput ? paginasInput.value.trim() : null;
   const editora = editoraInput ? editoraInput.value.trim() : null;
