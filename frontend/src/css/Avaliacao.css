@@ -174,7 +174,7 @@ font-size:13px;
 }
 
 .avaliacao-container {
-  margin: 50px auto;
+  margin: 26px auto;
   width: min(1100px, calc(100% - 32px));
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(22px);
@@ -183,7 +183,7 @@ font-size:13px;
   overflow: hidden;
 }
 .hero-livro {
-  margin-bottom: 60px;
+  margin-bottom: 8px;
 }
 
 .overlay {
@@ -193,10 +193,10 @@ font-size:13px;
 .hero-content {
   max-width: 1270px; /* 🔥 diminui (antes tava muito grande) */
   margin: 0 auto;
-  padding: 40px 20px 0;
+  padding: 24px 20px 0;
 
   display: flex;
-  gap: 30px;
+  gap: 22px;
   align-items: flex-start;
   flex-wrap: wrap;
 
@@ -210,11 +210,11 @@ font-size:13px;
 .conteudo {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 50px 35px;
+  padding: 12px 35px 26px;
 
   display: flex;
   flex-direction: column;
-  gap: 35px;
+  gap: 14px;
 }
 
 .capa {
@@ -234,7 +234,7 @@ font-size:13px;
   font-weight: 600;
   color: #fff;
   line-height: 1.1;
-  margin: 0;
+  margin: 0 0 6px;
 }
 
 .estrelas {
@@ -244,6 +244,7 @@ font-size:13px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin-top: 6px;
 }
 .descricao {
   width: 100%;
@@ -255,13 +256,15 @@ font-size:13px;
 }
 .secao {
   display: flex;
-  justify-content: space-between;
-align-items: flex-start;
-  gap: 20px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
   flex-wrap: wrap;
+  position: relative;
   background: rgba(255,255,255,0.06);
-  padding: 25px 25px;
+  padding: 18px 22px 72px;
   border-radius: 18px;
+  min-height: 128px;
 
   transition: 0.2s;
 }
@@ -279,9 +282,29 @@ align-items: flex-start;
   font-size: 14px;
   color: #d6d6d6;
   max-width: 100%;
-  flex: 1 1 320px;
   line-height: 1.5;
   word-break: break-word;
+  white-space: pre-wrap;
+  margin-bottom: 0;
+}
+
+#favoritaTexto,
+#resenhaTexto {
+  display: block;
+  min-height: 24px;
+  width: 100%;
+  visibility: visible;
+  opacity: 1;
+}
+
+#favoritaTexto:empty::before {
+  content: "Nenhuma parte favorita salva ainda.";
+  color: #d6d6d6;
+}
+
+#resenhaTexto:empty::before {
+  content: "Nenhuma resenha salva ainda.";
+  color: #d6d6d6;
 }
 .btn-editar {
   background: #9C5343;
@@ -296,6 +319,9 @@ align-items: flex-start;
 
   cursor: pointer;
   transition: 0.2s;
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
 }
 
 .btn-editar:hover {
@@ -472,6 +498,34 @@ align-items: flex-start;
   box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
 }
 
+#botoesResenha,
+#botoesFavorita {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  align-self: flex-start;
+}
+
+.texto-edicao {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #111;
+  font-size: 15px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.texto-edicao:focus {
+  outline: none;
+  border-color: #FFD700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.18);
+}
+
 @media (max-width: 900px) {
   .avaliacao-container {
     width: calc(100% - 24px);
@@ -556,6 +610,11 @@ align-items: flex-start;
   .btn-salvar,
   .btn-cancelar {
     width: 100%;
+  }
+
+  #botoesResenha,
+  #botoesFavorita {
+    flex-direction: column;
   }
 
   .app-footer {

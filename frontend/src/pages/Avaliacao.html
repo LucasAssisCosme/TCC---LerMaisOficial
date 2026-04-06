@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ler Mais - Início</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="/frontend/src/css/Avaliacao.css" />
+    <link rel="stylesheet" href="/frontend/src/css/Avaliacao.css?v=20260406a" />
 
   </head>
 
@@ -116,11 +116,11 @@
         e o jeito como a história mistura romance, humor
         e ciência é simplesmente encantador.
       </p>
-      <button class="btn-editar" onclick="habilitarEdicaoResenha()">Editar</button>
-      <textarea id="resenhaInput" style="display: none; width: 100%; min-height: 100px; padding: 10px;"></textarea>
+      <button id="btnEditarResenha" class="btn-editar" onclick="habilitarEdicaoResenha()">Editar</button>
+      <textarea id="resenhaInput" class="texto-edicao" style="display: none;"></textarea>
       <div id="botoesResenha" style="display: none; margin-top: 10px;">
-        <button onclick="salvarResenha()">Salvar</button>
-        <button onclick="cancelarResenha()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarResenha()">Salvar</button>
+        <button class="btn-cancelar" onclick="cancelarResenha()">Cancelar</button>
       </div>
     </div>
 
@@ -130,11 +130,11 @@
         Quando Elsie e Jack deixam a rivalidade de lado
         e mostram uma conexão real e sincera.
       </p>
-      <button class="btn-editar" onclick="habilitarEdicaoFavorita()">Editar</button>
-      <textarea id="favoritaInput" style="display: none; width: 100%; min-height: 100px; padding: 10px;"></textarea>
+      <button id="btnEditarFavorita" class="btn-editar" onclick="habilitarEdicaoFavorita()">Editar</button>
+      <textarea id="favoritaInput" class="texto-edicao" style="display: none;"></textarea>
       <div id="botoesFavorita" style="display: none; margin-top: 10px;">
-        <button onclick="salvarFavorita()">Salvar</button>
-        <button onclick="cancelarFavorita()">Cancelar</button>
+        <button class="btn-salvar" onclick="salvarFavorita()">Salvar</button>
+        <button class="btn-cancelar" onclick="cancelarFavorita()">Cancelar</button>
       </div>
     </div>
 
@@ -158,6 +158,6 @@
 
 </footer>
 
-<script src="/frontend/script.js"></script>
+<script src="/frontend/script.js?v=20260406a"></script>
 </body>
 </html>

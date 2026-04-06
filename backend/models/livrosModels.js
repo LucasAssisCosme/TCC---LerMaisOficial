@@ -148,6 +148,9 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
             const sqlDelete = `DELETE FROM partes_favoritas WHERE usuario_id = ? AND livro_id = ?`
             
             conn.query(sqlDelete, [usuario_id, livro_id], (erroDelete) => {
+                  if(erroDelete){
+                        return callback(erroDelete, null)
+                  }
 
                   // Depois insere a nova
                   const sqlInsert = `INSERT INTO partes_favoritas (usuario_id, livro_id, trecho) VALUES (?, ?, ?)`
@@ -169,7 +172,13 @@ Renovar: (id, dados, callback) => {  // Ou renomeie para atualizar
             })
       },
       buscarFavorita: (usuarioId, livroId, callback) => {
-            const sql = `SELECT id, usuario_id, livro_id, trecho as parte_favorita FROM partes_favoritas WHERE usuario_id = ? AND livro_id = ?`
+            const sql = `
+                  SELECT id, usuario_id, livro_id, trecho as parte_favorita
+                  FROM partes_favoritas
+                  WHERE usuario_id = ? AND livro_id = ?
+                  ORDER BY id DESC
+                  LIMIT 1
+            `
 
             conn.query(sql, [usuarioId, livroId], (erro, resultado) => {
                   if(erro){

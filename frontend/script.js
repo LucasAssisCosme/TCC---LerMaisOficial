@@ -1368,6 +1368,146 @@ async function initBibliotecaGrid() {
 let livroAtualId = null;
 let livroAtualDados = null;
 let avaliacaoAtual = 0;
+const TEXTO_PADRAO_RESENHA = "Nenhuma resenha salva ainda.";
+const TEXTO_PADRAO_FAVORITA = "Nenhuma parte favorita salva ainda.";
+
+function obterTextoSecao(texto) {
+  return String(texto || "").trim();
+}
+
+function aplicarTextoOuPadrao(elemento, texto, textoPadrao) {
+  if (!elemento) {
+    return;
+  }
+
+  const valor = obterTextoSecao(texto);
+  elemento.textContent = valor || textoPadrao;
+  elemento.innerText = valor || textoPadrao;
+  elemento.style.display = "block";
+  elemento.style.visibility = "visible";
+  elemento.style.opacity = "1";
+}
+
+function ehPlaceholderResenha(texto) {
+  const valor = obterTextoSecao(texto);
+  return (
+    !valor ||
+    valor === TEXTO_PADRAO_RESENHA ||
+    valor.includes("Amor, Teoricamente me conquistou")
+  );
+}
+
+function ehPlaceholderFavorita(texto) {
+  const valor = obterTextoSecao(texto);
+  return (
+    !valor ||
+    valor === TEXTO_PADRAO_FAVORITA ||
+    valor.includes("Quando Elsie e Jack deixam a rivalidade de lado")
+  );
+}
+
+function resetarSecoesAvaliacao() {
+  const resenhaTexto = document.getElementById("resenhaTexto");
+  const resenhaInput = document.getElementById("resenhaInput");
+  const botoesResenha = document.getElementById("botoesResenha");
+  const btnEditarResenha = document.getElementById("btnEditarResenha");
+
+  if (resenhaTexto) {
+    resenhaTexto.style.display = "block";
+    if (ehPlaceholderResenha(resenhaTexto.textContent)) {
+      resenhaTexto.textContent = TEXTO_PADRAO_RESENHA;
+    }
+  }
+  if (resenhaInput) {
+    resenhaInput.style.display = "none";
+    resenhaInput.value = "";
+  }
+  if (botoesResenha) {
+    botoesResenha.style.display = "none";
+    botoesResenha.style.visibility = "visible";
+    botoesResenha.style.opacity = "1";
+  }
+  if (btnEditarResenha) {
+    btnEditarResenha.style.display = "inline-block";
+  }
+
+  const favoritaTexto = document.getElementById("favoritaTexto");
+  const favoritaInput = document.getElementById("favoritaInput");
+  const botoesFavorita = document.getElementById("botoesFavorita");
+  const btnEditarFavorita = document.getElementById("btnEditarFavorita");
+
+  if (favoritaTexto) {
+    favoritaTexto.style.display = "block";
+    if (ehPlaceholderFavorita(favoritaTexto.textContent)) {
+      favoritaTexto.textContent = TEXTO_PADRAO_FAVORITA;
+    }
+  }
+  if (favoritaInput) {
+    favoritaInput.style.display = "none";
+    favoritaInput.value = "";
+  }
+  if (botoesFavorita) {
+    botoesFavorita.style.display = "none";
+    botoesFavorita.style.visibility = "visible";
+    botoesFavorita.style.opacity = "1";
+  }
+  if (btnEditarFavorita) {
+    btnEditarFavorita.style.display = "inline-block";
+  }
+}
+
+function aplicarFavoritaPadrao() {
+  const favoritaTexto = document.getElementById("favoritaTexto");
+  const favoritaInput = document.getElementById("favoritaInput");
+
+  if (favoritaTexto) {
+    favoritaTexto.textContent = TEXTO_PADRAO_FAVORITA;
+    favoritaTexto.innerText = TEXTO_PADRAO_FAVORITA;
+    favoritaTexto.style.display = "block";
+    favoritaTexto.style.visibility = "visible";
+    favoritaTexto.style.opacity = "1";
+  }
+
+  if (favoritaInput) {
+    favoritaInput.value = "";
+  }
+}
+
+async function carregarFavoritaLivro(usuarioId, livroId, token) {
+  try {
+    const respostaFavorita = await fetch(
+      `http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    if (!respostaFavorita.ok) {
+      aplicarFavoritaPadrao();
+      return null;
+    }
+
+    const dataFavorita = await respostaFavorita.json();
+    const textoFavorita = obterTextoSecao(dataFavorita?.favorita?.parte_favorita);
+
+    if (!textoFavorita) {
+      aplicarFavoritaPadrao();
+      return null;
+    }
+
+    aplicarTextoOuPadrao(
+      document.getElementById("favoritaTexto"),
+      textoFavorita,
+      TEXTO_PADRAO_FAVORITA,
+    );
+    document.getElementById("favoritaInput").value = textoFavorita;
+    return dataFavorita.favorita;
+  } catch (erro) {
+    console.log("Sem favorita salva");
+    aplicarFavoritaPadrao();
+    return null;
+  }
+}
 
 // Redireciona para pÃ¡gina de avaliaÃ§Ã£o
 function irParaAvaliacao(livroId) {
@@ -1398,6 +1538,7 @@ async function carregarDadosLivroAvaliacao() {
 
     const token = getToken();
     const usuarioId = getUsuarioLogadoId();
+    resetarSecoesAvaliacao();
 
     // Buscar dados do livro
     const respostaLivro = await fetch(
@@ -1492,36 +1633,25 @@ async function carregarDadosLivroAvaliacao() {
         if (respostaResenha.ok) {
           const dataResenha = await respostaResenha.json();
           if (dataResenha.resenha) {
+            const textoResenha = obterTextoSecao(dataResenha.resenha.texto);
+            aplicarTextoOuPadrao(
+              document.getElementById("resenhaTexto"),
+              textoResenha,
+              TEXTO_PADRAO_RESENHA,
+            );
+            document.getElementById("resenhaInput").value = textoResenha;
+          } else {
             document.getElementById("resenhaTexto").textContent =
-              dataResenha.resenha.texto || "";
-            document.getElementById("resenhaInput").value =
-              dataResenha.resenha.texto || "";
+              TEXTO_PADRAO_RESENHA;
           }
         }
       } catch (e) {
         console.log("Sem resenha salva");
+        document.getElementById("resenhaTexto").textContent =
+          TEXTO_PADRAO_RESENHA;
       }
 
-      try {
-        const respostaFavorita = await fetch(
-          `http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-
-        if (respostaFavorita.ok) {
-          const dataFavorita = await respostaFavorita.json();
-          if (dataFavorita.favorita) {
-            document.getElementById("favoritaTexto").textContent =
-              dataFavorita.favorita.parte_favorita || "";
-            document.getElementById("favoritaInput").value =
-              dataFavorita.favorita.parte_favorita || "";
-          }
-        }
-      } catch (e) {
-        console.log("Sem favorita salva");
-      }
+      await carregarFavoritaLivro(usuarioId, livroId, token);
 
       try {
         const respostaAvaliacao = await fetch(
@@ -1716,37 +1846,44 @@ function habilitarEdicaoResenha() {
   const p = document.getElementById("resenhaTexto");
   const textarea = document.getElementById("resenhaInput");
   const botoes = document.getElementById("botoesResenha");
+  const botaoEditar = document.getElementById("btnEditarResenha");
 
-  textarea.value = p.textContent;
+  textarea.value = ehPlaceholderResenha(p.textContent) ? "" : p.textContent;
   p.style.display = "none";
   textarea.style.display = "block";
-  botoes.style.display = "block";
-
-  document.querySelector(".secao:nth-child(1) .btn-editar").style.display =
-    "none";
+  botoes.style.display = "inline-flex";
+  botoes.style.visibility = "visible";
+  botoes.style.opacity = "1";
+  if (botaoEditar) botaoEditar.style.display = "none";
+  textarea.focus();
+  botoes.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 function cancelarResenha() {
   const p = document.getElementById("resenhaTexto");
   const textarea = document.getElementById("resenhaInput");
   const botoes = document.getElementById("botoesResenha");
+  const botaoEditar = document.getElementById("btnEditarResenha");
 
   p.style.display = "block";
   textarea.style.display = "none";
   botoes.style.display = "none";
-
-  document.querySelector(".secao:nth-child(1) .btn-editar").style.display =
-    "block";
+  if (botaoEditar) botaoEditar.style.display = "inline-block";
 }
 
 async function salvarResenha() {
   try {
     const token = getToken();
     const usuarioId = getUsuarioLogadoId();
-    const texto = document.getElementById("resenhaInput").value;
+    const texto = obterTextoSecao(document.getElementById("resenhaInput").value);
 
     if (!token || !usuarioId || !livroAtualId) {
       alert("Erro ao salvar");
+      return;
+    }
+
+    if (!texto) {
+      alert("Digite uma resenha antes de salvar.");
       return;
     }
 
@@ -1766,7 +1903,11 @@ async function salvarResenha() {
     });
 
     if (response.ok) {
-      document.getElementById("resenhaTexto").textContent = texto;
+      aplicarTextoOuPadrao(
+        document.getElementById("resenhaTexto"),
+        texto,
+        TEXTO_PADRAO_RESENHA,
+      );
       cancelarResenha();
       alert("Resenha salva!");
     }
@@ -1780,37 +1921,46 @@ function habilitarEdicaoFavorita() {
   const p = document.getElementById("favoritaTexto");
   const textarea = document.getElementById("favoritaInput");
   const botoes = document.getElementById("botoesFavorita");
+  const botaoEditar = document.getElementById("btnEditarFavorita");
 
-  textarea.value = p.textContent;
+  textarea.value = ehPlaceholderFavorita(p.textContent) ? "" : p.textContent;
   p.style.display = "none";
   textarea.style.display = "block";
-  botoes.style.display = "block";
-
-  document.querySelector(".secao:nth-child(2) .btn-editar").style.display =
-    "none";
+  botoes.style.display = "inline-flex";
+  botoes.style.visibility = "visible";
+  botoes.style.opacity = "1";
+  if (botaoEditar) botaoEditar.style.display = "none";
+  textarea.focus();
+  botoes.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 function cancelarFavorita() {
   const p = document.getElementById("favoritaTexto");
   const textarea = document.getElementById("favoritaInput");
   const botoes = document.getElementById("botoesFavorita");
+  const botaoEditar = document.getElementById("btnEditarFavorita");
 
   p.style.display = "block";
   textarea.style.display = "none";
   botoes.style.display = "none";
-
-  document.querySelector(".secao:nth-child(2) .btn-editar").style.display =
-    "block";
+  if (botaoEditar) botaoEditar.style.display = "inline-block";
 }
 
 async function salvarFavorita() {
   try {
     const token = getToken();
     const usuarioId = getUsuarioLogadoId();
-    const texto = document.getElementById("favoritaInput").value;
+    const texto = obterTextoSecao(document.getElementById("favoritaInput").value);
 
     if (!token || !usuarioId || !livroAtualId) {
       alert("Erro ao salvar");
+      return;
+    }
+
+    if (!texto) {
+      document.getElementById("favoritaTexto").textContent =
+        TEXTO_PADRAO_FAVORITA;
+      cancelarFavorita();
       return;
     }
 
@@ -1832,13 +1982,18 @@ async function salvarFavorita() {
       },
     );
 
-    if (response.ok) {
-      document.getElementById("favoritaTexto").textContent = texto;
-      cancelarFavorita();
-      alert("Favorita salva!");
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.mensagem || data.erro || `Erro ${response.status}`);
     }
+
+    await carregarFavoritaLivro(usuarioId, livroAtualId, token);
+    cancelarFavorita();
+    alert("Favorita salva!");
   } catch (erro) {
     console.error("Erro ao salvar favorita:", erro);
+    alert("Erro ao salvar favorita: " + (erro.message || erro));
   }
 }
 

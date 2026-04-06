@@ -3,23 +3,58 @@ const conn = require("../config/banco")
 module.exports = {
      criarResenha: ({usuario_id, livro_id, texto}, callback) => {
 
-  const sql = `INSERT INTO resenha (usuario_id, livro_id, texto) VALUES (?, ?, ?)`
-  const valores = [usuario_id, livro_id, texto]
+  const sqlBuscarExistente = `
+    SELECT id
+    FROM resenha
+    WHERE usuario_id = ? AND livro_id = ?
+    ORDER BY id DESC
+    LIMIT 1
+  `
 
-  conn.query(sql, valores, (erro, resultado) => {
+  conn.query(sqlBuscarExistente, [usuario_id, livro_id], (erroBusca, resultadoBusca) => {
 
-    if (erro) {
-      return callback(erro, null)
+    if (erroBusca) {
+      return callback(erroBusca, null)
     }
 
-    const novaResenha = {
-      id: resultado.insertId,
-      usuario_id,
-      livro_id,
-      texto
+    if (resultadoBusca.length > 0) {
+      const idExistente = resultadoBusca[0].id
+      const sqlAtualizar = `UPDATE resenha SET texto = ? WHERE id = ?`
+
+      conn.query(sqlAtualizar, [texto, idExistente], (erroAtualizar) => {
+        if (erroAtualizar) {
+          return callback(erroAtualizar, null)
+        }
+
+        callback(null, {
+          id: idExistente,
+          usuario_id,
+          livro_id,
+          texto
+        })
+      })
+
+      return
     }
 
-    callback(null, novaResenha)
+    const sql = `INSERT INTO resenha (usuario_id, livro_id, texto) VALUES (?, ?, ?)`
+    const valores = [usuario_id, livro_id, texto]
+
+    conn.query(sql, valores, (erro, resultado) => {
+
+      if (erro) {
+        return callback(erro, null)
+      }
+
+      const novaResenha = {
+        id: resultado.insertId,
+        usuario_id,
+        livro_id,
+        texto
+      }
+
+      callback(null, novaResenha)
+    })
   })
 },
      //Busca todos os produtos pelo banco
@@ -75,7 +110,13 @@ module.exports = {
 },
 buscarResenhaPorUsuarioLivro: (usuarioId, livroId, callback) => {
 
-  const sql = `SELECT * FROM resenha WHERE usuario_id = ? AND livro_id = ?`
+  const sql = `
+    SELECT *
+    FROM resenha
+    WHERE usuario_id = ? AND livro_id = ?
+    ORDER BY id DESC
+    LIMIT 1
+  `
 
   conn.query(sql, [usuarioId, livroId], (erro, resultado) => {
 
