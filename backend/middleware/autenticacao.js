@@ -1,26 +1,27 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const env = require("../config/env");
 
-const SECRET_KEY = 'sua_chave_secreta_super_segura_123456'; // ⚠️ Mude isso em produção!
+const SECRET_KEY = env.jwtSecret;
+const TOKEN_EXPIRES_IN = env.jwtExpiresIn;
 
 module.exports = {
   gerarToken(usuario) {
     return jwt.sign(
       { id: usuario.id, email: usuario.email, tipo: usuario.tipo },
       SECRET_KEY,
-      { expiresIn: '24h' }
+      { expiresIn: TOKEN_EXPIRES_IN },
     );
   },
 
   verificarToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    
+    const authHeader = req.headers.authorization;
+
     if (!authHeader) {
-      return res.status(401).json({ erro: 'Token não fornecido' });
+      return res.status(401).json({ erro: "Token não fornecido" });
     }
 
-    // Remove "Bearer " do header
-    const token = authHeader.startsWith('Bearer ') 
-      ? authHeader.slice(7) 
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
       : authHeader;
 
     try {
@@ -29,10 +30,11 @@ module.exports = {
       req.usuarioTipo = decoded.tipo;
       next();
     } catch (erro) {
-      if (erro.name === 'TokenExpiredError') {
-        return res.status(401).json({ erro: 'Token expirado' });
+      if (erro.name === "TokenExpiredError") {
+        return res.status(401).json({ erro: "Token expirado" });
       }
-      return res.status(403).json({ erro: 'Token inválido' });
+
+      return res.status(403).json({ erro: "Token inválido" });
     }
-  }
+  },
 };

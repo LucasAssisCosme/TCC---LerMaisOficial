@@ -1,6 +1,7 @@
 const usuarioModels = require("../models/usuarioModels");
 const autenticacao = require("../middleware/autenticacao");
 const multerConfig = require("../config/multer");
+const env = require("../config/env");
 const path = require('path');
 const fs = require('fs');
 
@@ -183,7 +184,7 @@ mudarSenhaUsuarioPorEmail(req, res) {
         const nomeArquivoFinal = multerConfig.verificarImagemDuplicada(caminhoTemporario);
         
         if (nomeArquivoFinal) {
-          dados.foto_perfil = `/backend/uploads/perfis/${nomeArquivoFinal}`;
+          dados.foto_perfil = env.buildPublicPath(env.profileUploadSubdir, nomeArquivoFinal);
           console.log("[ATUALIZAR] Arquivo (verificado de duplicatas):", dados.foto_perfil);
         } else {
           console.error("[ATUALIZAR] Erro ao verificar duplicatas");
@@ -205,7 +206,7 @@ mudarSenhaUsuarioPorEmail(req, res) {
       res.json({
         tipo: "edicao",
         titulo: "Edição confirmada",
-        foto_url: dados.foto_perfil ? `${req.protocol}://${req.get('host')}${dados.foto_perfil}` : null
+        foto_url: dados.foto_perfil ? env.buildPublicUrl(dados.foto_perfil) : null
       });
     });
   },

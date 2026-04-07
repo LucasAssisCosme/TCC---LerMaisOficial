@@ -1,4 +1,32 @@
-﻿const API_BASE_URL = "http://localhost:3000";
+﻿const API_BASE_URL = window.location.origin || "";
+
+const RUNTIME_API_BASE_URL = String(
+  window.APP_CONFIG?.API_BASE_URL ||
+    (/127\.0\.0\.1:550\d|localhost:550\d/i.test(API_BASE_URL)
+      ? "http://localhost:3000"
+      : API_BASE_URL) ||
+    "http://localhost:3000",
+).replace(/\/$/, "");
+const DEFAULT_BOOK_COVER_URL =
+  window.APP_CONFIG?.DEFAULT_BOOK_COVER_URL ||
+  "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+
+function apiUrl(path = "") {
+  if (!path) {
+    return RUNTIME_API_BASE_URL;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${RUNTIME_API_BASE_URL}${normalized}`;
+}
+
+window.API_BASE_URL = RUNTIME_API_BASE_URL;
+window.DEFAULT_BOOK_COVER_URL = DEFAULT_BOOK_COVER_URL;
+window.apiUrl = apiUrl;
 
 // ==================== UPLOAD DE IMAGEM ====================
 async function uploadImagemLivro(arquivo) {
@@ -6,7 +34,7 @@ async function uploadImagemLivro(arquivo) {
     const formData = new FormData();
     formData.append("imagemFile", arquivo);
 
-    const response = await fetch("http://localhost:3000/upload-livro-capa", {
+    const response = await fetch(apiUrl("/upload-livro-capa"), {
       method: "POST",
       body: formData,
     });
@@ -39,10 +67,10 @@ function normalizarUrlMidia(url) {
   }
 
   if (urlLimpa.startsWith("/")) {
-    return `${API_BASE_URL}${urlLimpa}`;
+    return `${RUNTIME_API_BASE_URL}${urlLimpa}`;
   }
 
-  return `${API_BASE_URL}/${urlLimpa.replace(/^\.?\//, "")}`;
+  return `${RUNTIME_API_BASE_URL}/${urlLimpa.replace(/^\.?\//, "")}`;
 }
 
 const PAGE_TRANSITION_DURATION = 280;
@@ -479,8 +507,7 @@ function tratarErroCapaLivro(img) {
     return;
   }
 
-  const fallback =
-    "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+  const fallback = DEFAULT_BOOK_COVER_URL;
 
   if (img.dataset.fallbackApplied === "true") {
     marcarCapaLivroCarregada(img);
@@ -730,7 +757,7 @@ async function cadastrarUsuario(formData) {
       apelido: formData.get("apelido"),
     };
 
-    const resposta = await fetch("http://localhost:3000/usuario/cadastrar", {
+    const resposta = await fetch(apiUrl("/usuario/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -845,7 +872,7 @@ async function cadastrarLivro(formData) {
 
     console.log("Enviando dados do livro:", payload);
 
-    const resposta = await fetch("http://localhost:3000/livros/cadastrar", {
+    const resposta = await fetch(apiUrl("/livros/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -908,7 +935,7 @@ async function loginUsuario(formData, isAutoLogin = false) {
       senha: formData.get("senha"),
     };
 
-    const resposta = await fetch("http://localhost:3000/usuario/login", {
+    const resposta = await fetch(apiUrl("/usuario/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1004,7 +1031,7 @@ async function redefinirSenha(formData) {
     };
 
     const resposta = await fetch(
-      "http://localhost:3000/usuario/esqueceuSenha",
+      apiUrl("/usuario/esqueceuSenha"),
       {
         method: "POST",
         headers: {
@@ -1328,7 +1355,7 @@ async function fetchBiblioteca() {
       return [];
     }
 
-    const url = `http://localhost:3000/biblioteca/usuario/${usuarioId}`;
+    const url = apiUrl(`/biblioteca/usuario/${usuarioId}`);
     console.log("[fetchBiblioteca] Fazendo requisiÃ§Ã£o para:", url);
 
     const resposta = await fetch(url, {
@@ -1369,7 +1396,7 @@ async function fetchLivrosPublicos() {
   try {
     console.log("[fetchLivrosPublicos] Buscando livros pÃºblicos...");
 
-    const resposta = await fetch("http://localhost:3000/livros/");
+    const resposta = await fetch(apiUrl("/livros/"));
 
     console.log("[fetchLivrosPublicos] Status HTTP:", resposta.status);
 
@@ -1415,7 +1442,7 @@ async function fetchLivrosPublicos() {
 
 async function fetchLivros() {
   try {
-    const resposta = await fetch("http://localhost:3000/livros/");
+    const resposta = await fetch(apiUrl("/livros/"));
     if (!resposta.ok) throw new Error(`Erro ${resposta.status}`);
     const data = await resposta.json();
     return data.livros || [];
@@ -1439,7 +1466,7 @@ async function carregarPerfil() {
       return;
     }
 
-    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+    const response = await fetch(apiUrl(`/usuario/${id}`), {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -1559,7 +1586,7 @@ async function salvarPerfil() {
       formData.append("foto_perfil", file);
     }
 
-    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+    const response = await fetch(apiUrl(`/usuario/${id}`), {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -1654,7 +1681,7 @@ async function excluirPerfil() {
       return;
     }
 
-    const resposta = await fetch(`http://localhost:3000/usuario/deletar/${id}`, {
+    const resposta = await fetch(apiUrl(`/usuario/deletar/${id}`), {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -1716,7 +1743,7 @@ async function salvarStatusBiblioteca(
 
     console.log("[Frontend] Enviando status:", payload);
 
-    const resposta = await fetch("http://localhost:3000/biblioteca/cadastrar", {
+    const resposta = await fetch(apiUrl("/biblioteca/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1807,7 +1834,7 @@ function renderBooks(books, bibliotecaStatus) {
           book.imagem_capa ||
           book.capa ||
           book.image ||
-          "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+          DEFAULT_BOOK_COVER_URL;
 
         const progresso = statusMap.get(livroId) || book.progresso || "";
         const status = getStatusTag(progresso);
@@ -1815,7 +1842,7 @@ function renderBooks(books, bibliotecaStatus) {
         let capaUrl = normalizarUrlMidia(
           capa && capa.trim()
             ? capa
-            : "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png",
+            : DEFAULT_BOOK_COVER_URL,
         );
 
         // Remover qualquer versÃ£o anterior (com ?v=) e adicionar cache-buster novo
@@ -1869,7 +1896,7 @@ async function fetchRanking(usuarioId = 1) {
       return null;
     }
     const resposta = await fetch(
-      `http://localhost:3000/ranking/paginometro/${usuarioId}`,
+      apiUrl(`/ranking/paginometro/${usuarioId}`),
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -2085,7 +2112,7 @@ function aplicarFavoritaPadrao() {
 async function carregarFavoritaLivro(usuarioId, livroId, token) {
   try {
     const respostaFavorita = await fetch(
-      `http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`,
+      apiUrl(`/livros/${livroId}/favorita/${usuarioId}`),
       {
         headers: { Authorization: `Bearer ${token}` },
       },
@@ -2153,7 +2180,7 @@ async function carregarDadosLivroAvaliacao() {
 
     // Buscar dados do livro
     const respostaLivro = await fetch(
-      `http://localhost:3000/livros/${livroId}`,
+      apiUrl(`/livros/${livroId}`),
     );
     if (!respostaLivro.ok) throw new Error("Erro ao buscar livro");
 
@@ -2203,7 +2230,7 @@ async function carregarDadosLivroAvaliacao() {
       // Carregar status current da biblioteca
       try {
         const resposta = await fetch(
-          `http://localhost:3000/biblioteca/usuario/${usuarioId}`,
+          apiUrl(`/biblioteca/usuario/${usuarioId}`),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -2235,7 +2262,7 @@ async function carregarDadosLivroAvaliacao() {
 
       try {
         const respostaResenha = await fetch(
-          `http://localhost:3000/resenha/usuario/${usuarioId}/livro/${livroId}`,
+          apiUrl(`/resenha/usuario/${usuarioId}/livro/${livroId}`),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -2266,7 +2293,7 @@ async function carregarDadosLivroAvaliacao() {
 
       try {
         const respostaAvaliacao = await fetch(
-          `http://localhost:3000/avaliacoes/usuario/${usuarioId}/livro/${livroId}`,
+          apiUrl(`/avaliacoes/usuario/${usuarioId}/livro/${livroId}`),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -2346,7 +2373,7 @@ async function salvarAvaliacao(estrelas) {
       estrelas: estrelas,
     };
 
-    const response = await fetch("http://localhost:3000/avaliacoes/cadastrar", {
+    const response = await fetch(apiUrl("/avaliacoes/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -2506,7 +2533,7 @@ async function salvarResenha() {
       texto: texto,
     };
 
-    const response = await fetch("http://localhost:3000/resenha/cadastrar", {
+    const response = await fetch(apiUrl("/resenha/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -2584,7 +2611,7 @@ async function salvarFavorita() {
     };
 
     const response = await fetch(
-      "http://localhost:3000/livros/favorita/cadastrar",
+      apiUrl("/livros/favorita/cadastrar"),
       {
         method: "POST",
         headers: {
@@ -2944,7 +2971,7 @@ async function salvarAlteracoesLivro() {
 
     console.log("[salvarAlteracoesLivro] Enviando dados:", payload);
 
-    const response = await fetch(`http://localhost:3000/livros/${livroId}`, {
+    const response = await fetch(apiUrl(`/livros/${livroId}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -3034,7 +3061,7 @@ async function deletarLivro() {
 
     console.log("[deletarLivro] Deletando livro ID:", livroId);
 
-    const response = await fetch(`http://localhost:3000/livros/${livroId}`, {
+    const response = await fetch(apiUrl(`/livros/${livroId}`), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -3080,7 +3107,7 @@ async function carregarDadosLivroInformacoes() {
       livroId,
     );
 
-    const response = await fetch(`http://localhost:3000/livros/${livroId}`);
+    const response = await fetch(apiUrl(`/livros/${livroId}`));
     if (!response.ok) throw new Error("Erro ao buscar livro");
 
     const data = await response.json();
@@ -3109,7 +3136,7 @@ async function carregarFotoPerfilHeader() {
       return;
     }
 
-    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+    const response = await fetch(apiUrl(`/usuario/${id}`), {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -3277,4 +3304,5 @@ window.addEventListener("DOMContentLoaded", () => {
   // Setup de uploads de imagem
   setupImageUpload();
 });
+
 

@@ -1,9 +1,10 @@
 const conn = require("../config/banco")
+const env = require("../config/env")
 
 module.exports = {
      guardar: ({titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora}, callback) => {
            //Tem fallback de capa também no backend
-         const capaPadrao = 'https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png';
+         const capaPadrao = env.defaultBookCoverUrl;
          const capaFinal = imagem_capa && imagem_capa.toString().trim() ? imagem_capa : capaPadrao;
 
          //Variavel que guarda consulta sql
