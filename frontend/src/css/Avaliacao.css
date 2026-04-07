@@ -58,35 +58,27 @@ flex-wrap: wrap;
 
 .perfil {
   display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
-
   padding: 6px 14px;
   border-radius: 20px;
-
   background: rgba(255, 255, 255, 0.15);
-
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
 
 .perfil img {
   width: 38px;
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-
   transition: 0.3s;
 }
-
 
 .perfil a {
   color: white;
   text-decoration: none;
   font-weight: 500;
-
   transition: 0.3s;
 }
 
@@ -101,7 +93,6 @@ flex-wrap: wrap;
 .perfil:hover a {
   color: #ffe3d9;
 }
-
 .nav-list {
     display: flex;
   gap: 20px;
@@ -175,7 +166,7 @@ font-size:13px;
 
 .avaliacao-container {
   margin: 26px auto;
-  width: min(1100px, calc(100% - 32px));
+  width: min(1200px, calc(100% - 32px));
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(22px);
   border-radius: 30px;
@@ -191,12 +182,12 @@ font-size:13px;
 }
 
 .hero-content {
-  max-width: 1270px; /* 🔥 diminui (antes tava muito grande) */
+  max-width: 1270px; 
   margin: 0 auto;
-  padding: 24px 20px 0;
+  padding: 31px 31px 0;
 
   display: flex;
-  gap: 22px;
+  gap: 28px;
   align-items: flex-start;
   flex-wrap: wrap;
 
@@ -265,6 +256,7 @@ font-size:13px;
   padding: 18px 22px 72px;
   border-radius: 18px;
   min-height: 128px;
+
 
   transition: 0.2s;
 }
@@ -510,6 +502,7 @@ font-size:13px;
 .texto-edicao {
   width: 100%;
   min-height: 120px;
+
   padding: 14px 16px;
   border: 2px solid rgba(255, 255, 255, 0.22);
   border-radius: 14px;
@@ -518,6 +511,7 @@ font-size:13px;
   font-size: 15px;
   line-height: 1.6;
   resize: vertical;
+
 }
 
 .texto-edicao:focus {

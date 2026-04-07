@@ -1133,7 +1133,7 @@ async function salvarStatusBiblioteca(
     }
 
     console.log("[Frontend] Status salvo com sucesso:", data);
-    alert("Livro adicionado Ã  biblioteca!");
+    alert("Livro adicionado a biblioteca!");
 
     // Dispara evento para atualizar biblioteca com pequeno delay
     setTimeout(() => {
@@ -1161,7 +1161,7 @@ function renderBooks(books, bibliotecaStatus) {
   });
 
   if (!row) {
-    console.error("[renderBooks] .books-grid .row nÃ£o encontrado!");
+    console.error("[renderBooks] .books-grid .row não encontrado!");
     return;
   }
 
@@ -1186,14 +1186,14 @@ function renderBooks(books, bibliotecaStatus) {
   });
 
   console.log(
-    "[renderBooks] Livros filtrados com status vÃ¡lido:",
+    "[renderBooks] Livros filtrados com status Inválidos:",
     livrosFiltrados.length,
   );
 
   if (livrosFiltrados.length === 0) {
     console.warn("[renderBooks] Nenhum livro para renderizar!");
     row.innerHTML =
-      '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na pÃ¡gina de avaliaÃ§Ã£o!</p>';
+      '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na pagina de avaliação!</p>';
   } else {
     livrosFiltrados.forEach((book) => {
       try {
@@ -1930,8 +1930,8 @@ function habilitarEdicaoFavorita() {
   botoes.style.visibility = "visible";
   botoes.style.opacity = "1";
   if (botaoEditar) botaoEditar.style.display = "none";
-  textarea.focus();
-  botoes.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  textarea.scrollIntoView({ block: "center", behavior: "smooth" });
+  window.setTimeout(() => textarea.focus({ preventScroll: true }), 150);
 }
 
 function cancelarFavorita() {
@@ -2053,9 +2053,9 @@ function obterDadosLivroDaTela() {
   return normalizarDadosLivro({
     titulo: obterTextoLivro("tituloLivro", "tituloInfo"),
     autor: obterTextoLivro("autorInfo").replace(/^Autor:\s*/i, ""),
-    genero: obterTextoLivro("generoInfo").replace(/^GÃªnero:\s*/i, ""),
+    genero: obterTextoLivro("generoInfo").replace(/^G\u00eanero:\s*/i, ""),
     ano: obterTextoLivro("anoInfo").replace(/^Ano:\s*/i, ""),
-    numero_paginas: obterTextoLivro("paginasInfo").replace(/^PÃ¡ginas:\s*/i, ""),
+    numero_paginas: obterTextoLivro("paginasInfo").replace(/^P\u00e1ginas:\s*/i, ""),
     editora: obterTextoLivro("editoraInfo").replace(/^Editora:\s*/i, ""),
     descricao: obterTextoLivro("descricaoLivro", "descricaoInfo"),
     imagem_capa:
@@ -2112,8 +2112,8 @@ function preencherVisualizacaoLivro(livro) {
   const generoInfo = document.getElementById("generoInfo");
   if (generoInfo) {
     generoInfo.textContent = dados.genero
-      ? `GÃªnero: ${dados.genero}`
-      : "GÃªnero: N/A";
+      ? `G\u00eanero: ${dados.genero}`
+      : "G\u00eanero: N/A";
   }
 
   const anoInfo = document.getElementById("anoInfo");
@@ -2124,8 +2124,8 @@ function preencherVisualizacaoLivro(livro) {
   const paginasInfo = document.getElementById("paginasInfo");
   if (paginasInfo) {
     paginasInfo.textContent = dados.numero_paginas
-      ? `PÃ¡ginas: ${dados.numero_paginas}`
-      : "PÃ¡ginas: N/A";
+      ? `P\u00e1ginas: ${dados.numero_paginas}`
+      : "P\u00e1ginas: N/A";
   }
 
   const editoraInfo = document.getElementById("editoraInfo");
