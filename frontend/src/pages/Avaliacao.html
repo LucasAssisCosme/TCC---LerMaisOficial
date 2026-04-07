@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - Início</title>
+    <title>Ler Mais - InÃ­cio</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="/frontend/src/css/Avaliacao.css?v=20260406a" />
+    <link rel="stylesheet" href="../css/Avaliacao.css?v=20260406a" />
 
   </head>
 
@@ -16,35 +16,35 @@
             <img src="../../logo.png" alt="">    
             <div class="perfil">
               <img src="../../User.png" alt="">
-           <a href="/frontend/src/pages/perfil.html">PERFIL</a>
+           <a href="perfil.html">PERFIL</a>
             </div>
       </div>        
    <nav>
   <ul class="nav-list">
     
     <li class="item-list">
-      <a href="/frontend/src/pages/index.html">
+      <a href="index.html">
         <i class="bi bi-house"></i>
-        Início
+        InÃ­cio
       </a>
     </li>
 
     <li class="item-list">
-      <a href="/frontend/src/pages/cadastroLivro.html">
+      <a href="cadastroLivro.html">
         <i class="bi bi-plus-circle"></i>
         Cadastrar
       </a>
     </li>
 
     <li class="item-list active">
-      <a href="/frontend/src/pages/biblioteca.html">
+      <a href="biblioteca.html">
         <i class="bi bi-book"></i>
         Biblioteca
       </a>
     </li>
 
     <li class="item-list">
-      <a href="/frontend/login.html">
+      <a href="../../login.html">
         <i class="bi bi-box-arrow-right"></i>
         Sair
       </a>
@@ -65,38 +65,38 @@
       <img id="capaLivro" src="https://covers.openlibrary.org/b/id/11153254-L.jpg" class="capa" style="cursor: pointer;" onclick="irParaInformacoes()">
 
       <div class="info">
-        <!-- MODO VISUALIZAÇÃO -->
+        <!-- MODO VISUALIZAÃ‡ÃƒO -->
         <div id="infoVisualizacao">
           <h1 id="tituloLivro">Amor, Teoricamente</h1>
           <p class="descricao" id="descricaoLivro">
-            Uma história envolvente que mistura romance, humor e ciência,
-            conquistando do começo ao fim.
+            Uma histÃ³ria envolvente que mistura romance, humor e ciÃªncia,
+            conquistando do comeÃ§o ao fim.
           </p>
         </div>
 
-        <!-- MODO EDIÇÃO -->
+        <!-- MODO EDIÃ‡ÃƒO -->
         <div id="infoEdicao" style="display: none;">
-          <input type="text" id="tituloLivroEdit" placeholder="Título do livro" class="input-edit">
-          <textarea id="descricaoLivroEdit" placeholder="Descrição do livro" class="textarea-edit" rows="4"></textarea>
+          <input type="text" id="tituloLivroEdit" placeholder="TÃ­tulo do livro" class="input-edit">
+          <textarea id="descricaoLivroEdit" placeholder="DescriÃ§Ã£o do livro" class="textarea-edit" rows="4"></textarea>
           
           <label for="capaLivroFileEdit" class="label-edit">Imagem da Capa</label>
           <input type="file" id="capaLivroFileEdit" accept="image/*" class="input-edit">
         </div>
 
         <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
-          <option value="">Adicionar à biblioteca </option>
-          <option value="lendo">📖 Lendo</option>
-          <option value="lido">✅ Lido</option>
-          <option value="quero_ler">💭 Quero Ler</option>
+          <option value="">Adicionar Ã  biblioteca </option>
+          <option value="lendo">ðŸ“– Lendo</option>
+          <option value="lido">âœ… Lido</option>
+          <option value="quero_ler">ðŸ’­ Quero Ler</option>
         </select>
    
 
         <div class="estrelas" id="avaliacaoEstrelas">
-          <span class="star" data-value="1">⭐</span>
-          <span class="star" data-value="2">⭐</span>
-          <span class="star" data-value="3">⭐</span>
-          <span class="star" data-value="4">⭐</span>
-          <span class="star" data-value="5">⭐</span>
+          <span class="star" data-value="1">â­</span>
+          <span class="star" data-value="2">â­</span>
+          <span class="star" data-value="3">â­</span>
+          <span class="star" data-value="4">â­</span>
+          <span class="star" data-value="5">â­</span>
         </div>
 
       
@@ -105,16 +105,16 @@
 
   </section>
 
-  <!-- CONTEÚDO -->
+  <!-- CONTEÃšDO -->
   <section class="conteudo">
 
     <div class="secao">
       <h2>Sua resenha</h2>
       <p id="resenhaTexto">
-        Amor, Teoricamente me conquistou do começo ao fim!
-        A Elsie é divertida, inteligente e muito humana,
-        e o jeito como a história mistura romance, humor
-        e ciência é simplesmente encantador.
+        Amor, Teoricamente me conquistou do comeÃ§o ao fim!
+        A Elsie Ã© divertida, inteligente e muito humana,
+        e o jeito como a histÃ³ria mistura romance, humor
+        e ciÃªncia Ã© simplesmente encantador.
       </p>
       <button id="btnEditarResenha" class="btn-editar" onclick="habilitarEdicaoResenha()">Editar</button>
       <textarea id="resenhaInput" class="texto-edicao" style="display: none;"></textarea>
@@ -128,7 +128,7 @@
       <h2>Parte favorita</h2>
       <p id="favoritaTexto">
         Quando Elsie e Jack deixam a rivalidade de lado
-        e mostram uma conexão real e sincera.
+        e mostram uma conexÃ£o real e sincera.
       </p>
       <button id="btnEditarFavorita" class="btn-editar" onclick="habilitarEdicaoFavorita()">Editar</button>
       <textarea id="favoritaInput" class="texto-edicao" style="display: none;"></textarea>
@@ -144,12 +144,12 @@
 <footer class="app-footer">
 
   <div class="footer-left">
-    <a href="/frontend/src/pages/index.html">Home</a>
-    <a href="/frontend/src/pages/perfil.html">Perfil</a>
+    <a href="index.html">Home</a>
+    <a href="perfil.html">Perfil</a>
   </div>
 
   <div class="footer-center">
-    <img src="/frontend/logo.png" alt="Logo" class="footer-logo">
+    <img src="../../logo.png" alt="Logo" class="footer-logo">
   </div>
 
   <div class="footer-right">
@@ -159,6 +159,6 @@
 </footer>
 
 <script src="/frontend-config.js"></script>
-<script src="/frontend/script.js?v=20260406a"></script>
+<script src="../../script.js?v=20260406a"></script>
 </body>
 </html>

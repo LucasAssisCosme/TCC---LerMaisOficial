@@ -10,6 +10,10 @@ const RUNTIME_API_BASE_URL = String(
 const DEFAULT_BOOK_COVER_URL =
   window.APP_CONFIG?.DEFAULT_BOOK_COVER_URL ||
   "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+const FRONTEND_BASE_PATH = (() => {
+  const currentPath = window.location.pathname || "";
+  return /^\/frontend(\/|$)/i.test(currentPath) ? "/frontend" : "";
+})();
 
 function apiUrl(path = "") {
   if (!path) {
@@ -24,9 +28,29 @@ function apiUrl(path = "") {
   return `${RUNTIME_API_BASE_URL}${normalized}`;
 }
 
+function frontendPath(path = "") {
+  if (!path) {
+    return FRONTEND_BASE_PATH || "/";
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const normalized = String(path).replace(/^\/+/, "");
+  return `${FRONTEND_BASE_PATH}/${normalized}`.replace(/\/{2,}/g, "/");
+}
+
+function isCurrentPage(pageName) {
+  return (window.location.pathname || "")
+    .toLowerCase()
+    .endsWith(`/${String(pageName).toLowerCase()}`);
+}
+
 window.API_BASE_URL = RUNTIME_API_BASE_URL;
 window.DEFAULT_BOOK_COVER_URL = DEFAULT_BOOK_COVER_URL;
 window.apiUrl = apiUrl;
+window.frontendPath = frontendPath;
 
 // ==================== UPLOAD DE IMAGEM ====================
 async function uploadImagemLivro(arquivo) {
@@ -792,7 +816,7 @@ async function cadastrarUsuario(formData) {
       console.error("Erro no auto-login:", loginError);
       // Se auto-login falhar, redireciona para login manual
       setTimeout(() => {
-        window.location.href = "/frontend/login.html";
+        window.location.href = frontendPath("login.html");
       }, 500);
     }
 
@@ -809,7 +833,7 @@ async function cadastrarLivro(formData) {
     const token = getToken();
     if (!token) {
       alert("VocÃª precisa estar logado para cadastrar livros");
-      window.location.href = "/frontend/login.html";
+      window.location.href = frontendPath("login.html");
       return;
     }
 
@@ -897,7 +921,7 @@ async function cadastrarLivro(formData) {
     alert("Livro cadastrado com sucesso!");
 
     // Redirecionar para a pÃ¡gina inicial
-    window.location.href = "/frontend/src/pages/index.html";
+    window.location.href = frontendPath("src/pages/index.html");
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
     alert("Erro ao cadastrar livro: " + (error.message || error));
@@ -983,7 +1007,7 @@ async function loginUsuario(formData, isAutoLogin = false) {
 
     // Redireciona para a pÃ¡gina principal (ajuste conforme sua estrutura)
     setTimeout(() => {
-      window.location.href = "/frontend/src/pages/index.html";
+      window.location.href = frontendPath("src/pages/index.html");
     }, 500);
 
     return data;
@@ -1049,7 +1073,7 @@ async function redefinirSenha(formData) {
     const data = await resposta.json();
     alert("Senha redefinida com sucesso!");
     setTimeout(() => {
-      window.location.href = "/frontend/login.html";
+      window.location.href = frontendPath("login.html");
     }, 500);
     return data;
   } catch (error) {
@@ -1128,7 +1152,7 @@ function logout() {
   }
 
   setTimeout(() => {
-    window.location.href = "/frontend/login.html";
+    window.location.href = frontendPath("login.html");
   }, 300);
 }
 
@@ -1163,7 +1187,7 @@ function atualizarAcessoCadastroLivro() {
   // Verifica se usuÃ¡rio nÃ£o autorizado estÃ¡ na pÃ¡gina de cadastro
   if (!podeCadastrar && window.location.href.includes("cadastroLivro.html")) {
     alert("Acesso negado: apenas bibliotecÃ¡rias podem cadastrar livros.");
-    window.location.href = "/frontend/src/pages/index.html";
+    window.location.href = frontendPath("src/pages/index.html");
   }
 }
 
@@ -1462,7 +1486,7 @@ async function carregarPerfil() {
     // Se nÃ£o estiver logado, redirecionar para login
     if (!id || !token) {
       alert("VocÃª precisa estar logado para acessar o perfil!");
-      window.location.href = "/frontend/login.html";
+      window.location.href = frontendPath("login.html");
       return;
     }
 
@@ -1700,7 +1724,7 @@ async function excluirPerfil() {
     localStorage.removeItem("usuarioLogadoApelido");
     localStorage.removeItem("token");
     atualizarApelidoPerfilHeader("");
-    window.location.href = "/frontend/login.html";
+    window.location.href = frontendPath("login.html");
   } catch (erro) {
     console.error("[excluirPerfil] Erro ao apagar perfil:", erro);
     alert("Erro ao apagar perfil: " + (erro.message || erro));
@@ -1822,11 +1846,7 @@ function renderBooks(books, bibliotecaStatus) {
   if (livrosFiltrados.length === 0) {
     console.warn("[renderBooks] Nenhum livro para renderizar!");
     row.innerHTML =
-<<<<<<< HEAD
-      '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na pagina de avaliação!</p>';
-=======
       '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado com os filtros atuais.</p>';
->>>>>>> 46091ca1d8340a6847ff4135f5131dfa51fc0366
   } else {
     livrosFiltrados.forEach((book) => {
       try {
@@ -2154,14 +2174,14 @@ function irParaAvaliacao(livroId) {
   if (livroId) {
     localStorage.setItem("livroAtualId", livroId);
   }
-  window.location.href = "/frontend/src/pages/Avaliacao.html";
+  window.location.href = frontendPath("src/pages/Avaliacao.html");
 }
 
 // Redireciona para pÃ¡gina de informaÃ§Ãµes
 function irParaInformacoes() {
   const livroId = localStorage.getItem("livroAtualId");
   if (livroId) {
-    window.location.href = "/frontend/src/pages/informacoes.html";
+    window.location.href = frontendPath("src/pages/informacoes.html");
   }
 }
 
@@ -3087,7 +3107,7 @@ async function deletarLivro() {
 
     // Redireciona para biblioteca apÃ³s deletar
     setTimeout(() => {
-      window.location.href = "/frontend/src/pages/biblioteca.html";
+      window.location.href = frontendPath("src/pages/biblioteca.html");
     }, 500);
   } catch (erro) {
     console.error("[deletarLivro] Erro ao deletar livro:", erro);
@@ -3247,7 +3267,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("[DOMContentLoaded] PÃ¡gina carregada:", currentPage);
 
-  if (currentPage.includes("/frontend/src/pages/perfil.html")) {
+  if (isCurrentPage("perfil.html")) {
     desabilitarCampos();
 
     // esconder botÃµes no inÃ­cio
@@ -3271,7 +3291,7 @@ window.addEventListener("DOMContentLoaded", () => {
   atualizarAcessoCadastroLivro();
   atualizarApelidoPerfilHeader(localStorage.getItem("usuarioLogadoApelido"));
 
-  if (currentPage.includes("/frontend/src/pages/perfil.html")) {
+  if (isCurrentPage("perfil.html")) {
     carregarPerfil();
     desabilitarCampos();
   }
@@ -3293,12 +3313,12 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Carrega dados da pÃ¡gina de avaliaÃ§Ã£o
-  if (currentPage.includes("/frontend/src/pages/Avaliacao.html")) {
+  if (isCurrentPage("Avaliacao.html")) {
     carregarDadosLivroAvaliacao();
   }
 
   // Carrega dados da pÃ¡gina de informaÃ§Ãµes
-  if (currentPage.includes("/frontend/src/pages/informacoes.html")) {
+  if (isCurrentPage("informacoes.html")) {
     carregarDadosLivroInformacoes();
   }
 
