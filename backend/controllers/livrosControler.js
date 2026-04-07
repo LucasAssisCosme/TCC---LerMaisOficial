@@ -1,5 +1,6 @@
 const livrosModels = require("../models/livrosModels")
 const multerConfig = require("../config/multer")
+const env = require("../config/env")
 
 module.exports = {
     livroCadastro(req, res) {
@@ -28,7 +29,7 @@ module.exports = {
         });
     },
     listarLivros(req, res) {
-        const capaPadrao = 'https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png';
+        const capaPadrao = env.defaultBookCoverUrl;
 
         livrosModels.listarGeral((erro, livros) => {
             if (erro) {

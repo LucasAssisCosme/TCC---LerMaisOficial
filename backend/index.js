@@ -4,14 +4,15 @@ const express = require('express')
 const cors = require('cors')
 
 const fs = require('fs')
+const env = require('./config/env')
 const multerConfig = require('./config/multer')
 
 const app = express()
 
-app.use(cors())
+app.use(cors(env.corsOptions))
 let frase = "Dudu maravilhoso"
 
-const port = 3000
+const port = env.port
 
 
 // const caminho = path.join(__dirname, "views")
@@ -27,13 +28,23 @@ const rankingRoutes = require("./routes/rankingRoutes")
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 
+app.get('/frontend-config.js', (req, res) => {
+  res.type('application/javascript')
+  res.send(
+    `window.APP_CONFIG = ${JSON.stringify({
+      API_BASE_URL: env.publicApiBaseUrl,
+      DEFAULT_BOOK_COVER_URL: env.defaultBookCoverUrl,
+    })};`,
+  )
+})
+
 app.use(express.static(path.join(__dirname, '..', 'frontend')))
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use(`/${env.uploadsRoutePrefix}`, express.static(env.uploadsRootDir))
 
 // Rota de teste para debug
 app.get('/test-uploads', (req, res) => {
-  const uploadPath = path.join(__dirname, 'uploads', 'perfis');
-  const uploadPathLivros = path.join(__dirname, 'uploads', 'livro_capa');
+  const uploadPath = env.profileUploadDir;
+  const uploadPathLivros = env.bookCoverUploadDir;
   
   try {
     const filesProfile = fs.readdirSync(uploadPath);
@@ -59,8 +70,8 @@ app.get('/test-uploads', (req, res) => {
 app.get('/verificar-arquivo/:tipo/:nome', (req, res) => {
   const { tipo, nome } = req.params;
   const uploadDir = tipo === 'livro' ? 
-    path.join(__dirname, 'uploads', 'livro_capa') :
-    path.join(__dirname, 'uploads', 'perfis');
+    env.bookCoverUploadDir :
+    env.profileUploadDir;
   
   const caminhoCompleto = path.join(uploadDir, nome);
   const existe = fs.existsSync(caminhoCompleto);
@@ -134,7 +145,7 @@ app.post('/upload-livro-capa', multerConfig.uploadLivroCapa.single('imagemFile')
       });
     }
 
-    const urlImagem = `/uploads/livro_capa/${nomeArquivoFinal}`;
+    const urlImagem = env.buildPublicPath(env.bookCoverUploadSubdir, nomeArquivoFinal);
     
     res.json({
       sucesso: true,
@@ -183,7 +194,7 @@ app.use("/ranking", rankingRoutes)
 
 //Coloca o servidor para funcionar
 app.listen(port, () => {
-    console.log(`Servidor funcionando em http://localhost:${port}`);
+    console.log(`Servidor funcionando em ${env.appBaseUrl}`);
 })
 
 

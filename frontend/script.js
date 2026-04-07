@@ -1,4 +1,32 @@
-﻿const API_BASE_URL = "http://localhost:3000";
+﻿const API_BASE_URL = window.location.origin || "";
+
+const RUNTIME_API_BASE_URL = String(
+  window.APP_CONFIG?.API_BASE_URL ||
+    (/127\.0\.0\.1:550\d|localhost:550\d/i.test(API_BASE_URL)
+      ? "http://localhost:3000"
+      : API_BASE_URL) ||
+    "http://localhost:3000",
+).replace(/\/$/, "");
+const DEFAULT_BOOK_COVER_URL =
+  window.APP_CONFIG?.DEFAULT_BOOK_COVER_URL ||
+  "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+
+function apiUrl(path = "") {
+  if (!path) {
+    return RUNTIME_API_BASE_URL;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${RUNTIME_API_BASE_URL}${normalized}`;
+}
+
+window.API_BASE_URL = RUNTIME_API_BASE_URL;
+window.DEFAULT_BOOK_COVER_URL = DEFAULT_BOOK_COVER_URL;
+window.apiUrl = apiUrl;
 
 // ==================== UPLOAD DE IMAGEM ====================
 async function uploadImagemLivro(arquivo) {
@@ -6,7 +34,7 @@ async function uploadImagemLivro(arquivo) {
     const formData = new FormData();
     formData.append("imagemFile", arquivo);
 
-    const response = await fetch("http://localhost:3000/upload-livro-capa", {
+    const response = await fetch(apiUrl("/upload-livro-capa"), {
       method: "POST",
       body: formData,
     });
@@ -39,10 +67,10 @@ function normalizarUrlMidia(url) {
   }
 
   if (urlLimpa.startsWith("/")) {
-    return `${API_BASE_URL}${urlLimpa}`;
+    return `${RUNTIME_API_BASE_URL}${urlLimpa}`;
   }
 
-  return `${API_BASE_URL}/${urlLimpa.replace(/^\.?\//, "")}`;
+  return `${RUNTIME_API_BASE_URL}/${urlLimpa.replace(/^\.?\//, "")}`;
 }
 
 const PAGE_TRANSITION_DURATION = 280;
@@ -149,6 +177,501 @@ function setupTransitionLinks() {
   });
 }
 
+const SKELETON_STYLE_ID = "ler-mais-skeleton-style";
+
+function setupSkeletonStyles() {
+  if (
+    !document.head ||
+    document.getElementById(SKELETON_STYLE_ID)
+  ) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.id = SKELETON_STYLE_ID;
+  style.textContent = `
+    @keyframes lm-skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .lm-skeleton {
+      display: block;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.08) 25%,
+        rgba(255, 255, 255, 0.18) 37%,
+        rgba(255, 255, 255, 0.08) 63%
+      );
+      background-size: 200% 100%;
+      animation: lm-skeleton-shimmer 1.3s linear infinite;
+      border-radius: 16px;
+    }
+
+    .lm-skeleton-line {
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .lm-skeleton-line.lm-lg {
+      height: 22px;
+    }
+
+    .lm-skeleton-line.lm-xl {
+      height: 34px;
+    }
+
+    .lm-skeleton-circle {
+      border-radius: 999px;
+    }
+
+    .lm-loading-host {
+      position: relative;
+    }
+
+    .lm-loading-host.lm-loading > *:not(.lm-skeleton-overlay) {
+      visibility: hidden;
+    }
+
+    .lm-skeleton-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 24px;
+      pointer-events: none;
+    }
+
+    .lm-skeleton-page {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+    }
+
+    .lm-skeleton-hero {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .lm-skeleton-stack {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .lm-skeleton-cover-large {
+      width: 220px;
+      max-width: 100%;
+      aspect-ratio: 11 / 17;
+      flex-shrink: 0;
+      border-radius: 16px;
+    }
+
+    .lm-skeleton-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 140px;
+      padding: 18px 22px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .lm-skeleton-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .lm-skeleton-field {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .lm-skeleton-input {
+      height: 48px;
+      border-radius: 14px;
+    }
+
+    .lm-skeleton-textarea {
+      height: 140px;
+      border-radius: 18px;
+    }
+
+    .lm-skeleton-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .lm-skeleton-button {
+      width: 160px;
+      height: 44px;
+      border-radius: 12px;
+    }
+
+    .lm-skeleton-book-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .lm-skeleton-book-cover {
+      width: 100%;
+      aspect-ratio: 11 / 17;
+      border-radius: 14px;
+    }
+
+    .lm-skeleton-book-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 4px;
+    }
+
+    .lm-skeleton-book-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 25px;
+    }
+
+    .lm-skeleton-status-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .lm-skeleton-status-item {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .lm-skeleton-flag {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 1280px) {
+      .lm-skeleton-book-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 992px) {
+      .lm-skeleton-book-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .lm-skeleton-overlay {
+        padding: 18px;
+      }
+
+      .lm-skeleton-book-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .lm-skeleton-cover-large {
+        width: min(220px, 100%);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .lm-skeleton-book-grid,
+      .lm-skeleton-form {
+        grid-template-columns: 1fr;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function skeletonLine(width = "100%", extraClass = "") {
+  const classes = ["lm-skeleton", "lm-skeleton-line", extraClass]
+    .filter(Boolean)
+    .join(" ");
+  return `<span class="${classes}" style="width:${width}"></span>`;
+}
+
+function skeletonBlock(height, width = "100%", extraClass = "") {
+  const classes = ["lm-skeleton", extraClass].filter(Boolean).join(" ");
+  return `<span class="${classes}" style="height:${height};width:${width}"></span>`;
+}
+
+function skeletonBookCardsMarkup(count = 6) {
+  return Array.from({ length: count }, () => `
+    <div class="lm-skeleton-book-card">
+      <span class="lm-skeleton lm-skeleton-book-cover"></span>
+      <div class="lm-skeleton-book-meta">
+        ${skeletonLine("88%", "lm-lg")}
+        ${skeletonLine("62%")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderSkeletonOverlay(host, markup, extraClass = "") {
+  if (!host) {
+    return;
+  }
+
+  setupSkeletonStyles();
+
+  host.classList.add("lm-loading-host", "lm-loading");
+
+  let overlay = host.querySelector(".lm-skeleton-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    host.appendChild(overlay);
+  }
+
+  overlay.className = `lm-skeleton-overlay ${extraClass}`.trim();
+  overlay.innerHTML = markup;
+}
+
+function clearSkeletonOverlay(host) {
+  if (!host) {
+    return;
+  }
+
+  host.classList.remove("lm-loading-host", "lm-loading");
+  const overlay = host.querySelector(".lm-skeleton-overlay");
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function showBibliotecaSkeleton() {
+  setupSkeletonStyles();
+
+  const countEl = document.querySelector(".books-header h3");
+  if (countEl) {
+    countEl.innerHTML = skeletonLine("190px", "lm-lg");
+  }
+
+  const row = document.querySelector(".books-grid .row");
+  if (row) {
+    row.innerHTML = Array.from({ length: 6 }, () => `
+      <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+        ${skeletonBookCardsMarkup(1)}
+      </div>
+    `).join("");
+  }
+
+  const rankElem = document.querySelector(".ranking-text.mb-2");
+  if (rankElem) {
+    rankElem.innerHTML = `
+      ${skeletonLine("100%", "lm-xl")}
+      <div style="margin-top:12px;">${skeletonLine("78%", "lm-lg")}</div>
+    `;
+  }
+
+  const pageMeterElem = document.querySelector(
+    ".overview-card .badge.bg-light.text-dark",
+  );
+  if (pageMeterElem) {
+    pageMeterElem.innerHTML = skeletonLine("140px", "lm-lg");
+  }
+}
+
+function marcarCapaLivroCarregada(img) {
+  if (!img) {
+    return;
+  }
+
+  img.classList.add("is-loaded");
+  const cover = img.closest(".book-cover");
+  if (cover) {
+    cover.classList.add("cover-loaded");
+  }
+}
+
+function tratarErroCapaLivro(img) {
+  if (!img) {
+    return;
+  }
+
+  const fallback = DEFAULT_BOOK_COVER_URL;
+
+  if (img.dataset.fallbackApplied === "true") {
+    marcarCapaLivroCarregada(img);
+    return;
+  }
+
+  img.dataset.fallbackApplied = "true";
+  img.src = normalizarUrlMidia(fallback);
+}
+
+function showPerfilSkeleton() {
+  const host = document.querySelector(".perfil-container");
+  if (!host) {
+    return;
+  }
+
+  renderSkeletonOverlay(
+    host,
+    `
+      <div class="lm-skeleton-page">
+        ${skeletonLine("220px", "lm-xl")}
+        ${skeletonBlock("150px", "150px", "lm-skeleton-circle")}
+        <div class="lm-skeleton-form">
+          <div class="lm-skeleton-field">
+            ${skeletonLine("90px")}
+            ${skeletonBlock("48px", "100%", "lm-skeleton-input")}
+          </div>
+          <div class="lm-skeleton-field">
+            ${skeletonLine("120px")}
+            ${skeletonBlock("48px", "100%", "lm-skeleton-input")}
+          </div>
+          <div class="lm-skeleton-field">
+            ${skeletonLine("90px")}
+            ${skeletonBlock("48px", "100%", "lm-skeleton-input")}
+          </div>
+          <div class="lm-skeleton-field">
+            ${skeletonLine("110px")}
+            ${skeletonBlock("48px", "100%", "lm-skeleton-input")}
+          </div>
+          <div class="lm-skeleton-field" style="grid-column: 1 / -1;">
+            ${skeletonLine("70px")}
+            ${skeletonBlock("140px", "100%", "lm-skeleton-textarea")}
+          </div>
+        </div>
+        <div class="lm-skeleton-actions">
+          ${skeletonBlock("44px", "150px", "lm-skeleton-button")}
+          ${skeletonBlock("44px", "150px", "lm-skeleton-button")}
+          ${skeletonBlock("44px", "150px", "lm-skeleton-button")}
+        </div>
+      </div>
+    `,
+  );
+}
+
+function hidePerfilSkeleton() {
+  clearSkeletonOverlay(document.querySelector(".perfil-container"));
+}
+
+function showAvaliacaoSkeleton() {
+  const host = document.querySelector(".avaliacao-container");
+  if (!host) {
+    return;
+  }
+
+  renderSkeletonOverlay(
+    host,
+    `
+      <div class="lm-skeleton-page">
+        <div class="lm-skeleton-hero">
+          ${skeletonBlock("350px", "220px", "lm-skeleton-cover-large")}
+          <div class="lm-skeleton-stack">
+            ${skeletonLine("72%", "lm-xl")}
+            ${skeletonLine("96%")}
+            ${skeletonLine("88%")}
+            ${skeletonBlock("48px", "260px", "lm-skeleton-input")}
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+              ${Array.from({ length: 5 }, () => skeletonBlock("34px", "34px", "lm-skeleton-circle")).join("")}
+            </div>
+          </div>
+        </div>
+        <div class="lm-skeleton-panel">
+          ${skeletonLine("150px", "lm-lg")}
+          ${skeletonLine("100%")}
+          ${skeletonLine("92%")}
+          ${skeletonLine("70%")}
+          ${skeletonBlock("40px", "110px", "lm-skeleton-button")}
+        </div>
+        <div class="lm-skeleton-panel">
+          ${skeletonLine("170px", "lm-lg")}
+          ${skeletonLine("100%")}
+          ${skeletonLine("86%")}
+          ${skeletonLine("74%")}
+          ${skeletonBlock("40px", "110px", "lm-skeleton-button")}
+        </div>
+      </div>
+    `,
+  );
+}
+
+function hideAvaliacaoSkeleton() {
+  clearSkeletonOverlay(document.querySelector(".avaliacao-container"));
+}
+
+function showInformacoesSkeleton() {
+  const host = document.querySelector(".informacoes-container");
+  if (!host) {
+    return;
+  }
+
+  renderSkeletonOverlay(
+    host,
+    `
+      <div class="lm-skeleton-page">
+        <div class="lm-skeleton-hero">
+          ${skeletonBlock("360px", "240px", "lm-skeleton-cover-large")}
+          <div class="lm-skeleton-stack">
+            ${skeletonLine("68%", "lm-xl")}
+            ${skeletonLine("42%")}
+            ${skeletonLine("82%")}
+            ${skeletonLine("66%")}
+            ${skeletonLine("54%")}
+            <div class="lm-skeleton-panel" style="padding:0;background:transparent;min-height:auto;">
+              ${skeletonLine("130px", "lm-lg")}
+              ${skeletonLine("100%")}
+              ${skeletonLine("96%")}
+              ${skeletonLine("88%")}
+              ${skeletonLine("72%")}
+            </div>
+            <div class="lm-skeleton-actions">
+              ${skeletonBlock("44px", "180px", "lm-skeleton-button")}
+              ${skeletonBlock("44px", "180px", "lm-skeleton-button")}
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+  );
+}
+
+function hideInformacoesSkeleton() {
+  clearSkeletonOverlay(document.querySelector(".informacoes-container"));
+}
+
+window.renderIndexSkeleton = function renderIndexSkeleton() {
+  const container = document.getElementById("categoriesContainer");
+  if (!container) {
+    return;
+  }
+
+  setupSkeletonStyles();
+
+  container.innerHTML = `
+    <h2 class="section-title">MAIS FAMOSOS DO MOMENTO</h2>
+    ${["ROMANCE", "FANTASIA"].map((titulo) => `
+      <div class="categoria">
+        <h3>${titulo}</h3>
+        <div class="lm-skeleton-book-grid">
+          ${skeletonBookCardsMarkup(6)}
+        </div>
+      </div>
+    `).join("")}
+  `;
+};
+
 // ==================== VALIDAR SENHA ====================
 function validarSenha(senha) {
 // ValidaÃ§Ãµes bÃ¡sicas
@@ -234,7 +757,7 @@ async function cadastrarUsuario(formData) {
       apelido: formData.get("apelido"),
     };
 
-    const resposta = await fetch("http://localhost:3000/usuario/cadastrar", {
+    const resposta = await fetch(apiUrl("/usuario/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -349,7 +872,7 @@ async function cadastrarLivro(formData) {
 
     console.log("Enviando dados do livro:", payload);
 
-    const resposta = await fetch("http://localhost:3000/livros/cadastrar", {
+    const resposta = await fetch(apiUrl("/livros/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -412,7 +935,7 @@ async function loginUsuario(formData, isAutoLogin = false) {
       senha: formData.get("senha"),
     };
 
-    const resposta = await fetch("http://localhost:3000/usuario/login", {
+    const resposta = await fetch(apiUrl("/usuario/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -508,7 +1031,7 @@ async function redefinirSenha(formData) {
     };
 
     const resposta = await fetch(
-      "http://localhost:3000/usuario/esqueceuSenha",
+      apiUrl("/usuario/esqueceuSenha"),
       {
         method: "POST",
         headers: {
@@ -647,7 +1170,123 @@ function atualizarAcessoCadastroLivro() {
 let bibliotecaAutoRefreshId = null;
 let bibliotecaCachedBooks = [];
 let bibliotecaCachedStatus = [];
+let bibliotecaFiltroStatusAtivo = "";
 let paginasCarregadas = new Set();
+const BIBLIOTECA_STATUS_VALIDOS = ["lido", "lendo", "quero_ler"];
+
+function obterLivroBibliotecaId(item) {
+  const id = item?.livro_id ?? item?.id ?? null;
+  return id === null || typeof id === "undefined" ? "" : String(id);
+}
+
+function criarMapaStatusBiblioteca(statusList = []) {
+  const statusMap = new Map();
+
+  statusList.forEach((item) => {
+    const livroId = obterLivroBibliotecaId(item);
+    const progresso = String(item?.progresso || "").trim();
+
+    if (livroId && BIBLIOTECA_STATUS_VALIDOS.includes(progresso)) {
+      statusMap.set(livroId, progresso);
+    }
+  });
+
+  return statusMap;
+}
+
+function livroCorrespondeBuscaBiblioteca(livro, termo = "") {
+  const termoNormalizado = String(termo || "").trim().toLowerCase();
+  if (!termoNormalizado) {
+    return true;
+  }
+
+  const titulo = String(livro?.titulo || livro?.nome || "").toLowerCase();
+  const autor = String(livro?.autor || "").toLowerCase();
+
+  return (
+    titulo.includes(termoNormalizado) || autor.includes(termoNormalizado)
+  );
+}
+
+function livroCorrespondeStatusBiblioteca(livro, statusMap, statusFiltro = "") {
+  if (!statusFiltro) {
+    return true;
+  }
+
+  const livroId = obterLivroBibliotecaId(livro);
+  const progresso =
+    statusMap.get(livroId) || String(livro?.progresso || "").trim();
+
+  return progresso === statusFiltro;
+}
+
+function atualizarEstadoFiltrosBiblioteca() {
+  const itensFiltro = document.querySelectorAll(".status .item[data-status]");
+
+  itensFiltro.forEach((item) => {
+    const ativo = item.dataset.status === bibliotecaFiltroStatusAtivo;
+    item.classList.toggle("item-active", ativo);
+    item.setAttribute("aria-pressed", String(ativo));
+  });
+}
+
+function aplicarFiltrosBiblioteca() {
+  const row = document.querySelector(".books-grid .row");
+  if (!row) {
+    return;
+  }
+
+  const inputSearch = document.querySelector(
+    '.books-grid input[type="search"]',
+  );
+  const termo = inputSearch ? inputSearch.value.trim().toLowerCase() : "";
+  const statusMap = criarMapaStatusBiblioteca(bibliotecaCachedStatus);
+
+  const livrosFiltrados = bibliotecaCachedBooks.filter(
+    (livro) =>
+      livroCorrespondeBuscaBiblioteca(livro, termo) &&
+      livroCorrespondeStatusBiblioteca(
+        livro,
+        statusMap,
+        bibliotecaFiltroStatusAtivo,
+      ),
+  );
+
+  renderBooks(livrosFiltrados, bibliotecaCachedStatus);
+  atualizarEstadoFiltrosBiblioteca();
+}
+
+function setupFiltrosStatusBiblioteca() {
+  const itensFiltro = document.querySelectorAll(".status .item[data-status]");
+
+  itensFiltro.forEach((item) => {
+    if (item.dataset.filterBound === "true") {
+      return;
+    }
+
+    const alternarFiltro = () => {
+      const statusSelecionado = item.dataset.status || "";
+      bibliotecaFiltroStatusAtivo =
+        bibliotecaFiltroStatusAtivo === statusSelecionado
+          ? ""
+          : statusSelecionado;
+
+      aplicarFiltrosBiblioteca();
+    };
+
+    item.addEventListener("click", alternarFiltro);
+    item.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        alternarFiltro();
+      }
+    });
+
+    item.dataset.filterBound = "true";
+  });
+
+  atualizarEstadoFiltrosBiblioteca();
+}
 
 async function atualizarBibliotecaELista() {
   // Verifica se os elementos necessÃ¡rios existem
@@ -661,6 +1300,10 @@ async function atualizarBibliotecaELista() {
   }
 
   console.log("[atualizarBibliotecaELista] Buscando livros...");
+
+  if (!bibliotecaCachedBooks.length) {
+    showBibliotecaSkeleton();
+  }
 
   // A biblioteca deve mostrar apenas os livros salvos com status pelo usuÃ¡rio
   const livrosDaBiblioteca = await fetchBiblioteca();
@@ -676,24 +1319,15 @@ async function atualizarBibliotecaELista() {
     progresso: livro.progresso || "",
   }));
 
-  const termo = inputSearch ? inputSearch.value.trim().toLowerCase() : "";
-
-  if (termo) {
-    const filtrados = livrosDaBiblioteca.filter(
-      (livro) =>
-        (livro.titulo || livro.nome || "").toLowerCase().includes(termo) ||
-        (livro.autor || "").toLowerCase().includes(termo),
-    );
-    renderBooks(filtrados, bibliotecaCachedStatus);
-  } else {
-    renderBooks(livrosDaBiblioteca, bibliotecaCachedStatus);
-  }
+  aplicarFiltrosBiblioteca();
 
   const usuarioId = getUsuarioLogadoId();
   if (usuarioId) {
     const ranking = await fetchRanking(usuarioId);
     if (ranking) {
       renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
+    } else {
+      renderRank("-", "-");
     }
   } else {
     renderRank("-", "-");
@@ -721,7 +1355,7 @@ async function fetchBiblioteca() {
       return [];
     }
 
-    const url = `http://localhost:3000/biblioteca/usuario/${usuarioId}`;
+    const url = apiUrl(`/biblioteca/usuario/${usuarioId}`);
     console.log("[fetchBiblioteca] Fazendo requisiÃ§Ã£o para:", url);
 
     const resposta = await fetch(url, {
@@ -762,7 +1396,7 @@ async function fetchLivrosPublicos() {
   try {
     console.log("[fetchLivrosPublicos] Buscando livros pÃºblicos...");
 
-    const resposta = await fetch("http://localhost:3000/livros/");
+    const resposta = await fetch(apiUrl("/livros/"));
 
     console.log("[fetchLivrosPublicos] Status HTTP:", resposta.status);
 
@@ -808,7 +1442,7 @@ async function fetchLivrosPublicos() {
 
 async function fetchLivros() {
   try {
-    const resposta = await fetch("http://localhost:3000/livros/");
+    const resposta = await fetch(apiUrl("/livros/"));
     if (!resposta.ok) throw new Error(`Erro ${resposta.status}`);
     const data = await resposta.json();
     return data.livros || [];
@@ -819,6 +1453,8 @@ async function fetchLivros() {
 }
 
 async function carregarPerfil() {
+  showPerfilSkeleton();
+
   try {
     const id = getUsuarioLogadoId();
     const token = getToken();
@@ -830,7 +1466,7 @@ async function carregarPerfil() {
       return;
     }
 
-    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+    const response = await fetch(apiUrl(`/usuario/${id}`), {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -871,6 +1507,8 @@ async function carregarPerfil() {
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
     alert("Erro ao carregar perfil: " + erro.message);
+  } finally {
+    hidePerfilSkeleton();
   }
 }
 
@@ -948,7 +1586,7 @@ async function salvarPerfil() {
       formData.append("foto_perfil", file);
     }
 
-    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+    const response = await fetch(apiUrl(`/usuario/${id}`), {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -1043,7 +1681,7 @@ async function excluirPerfil() {
       return;
     }
 
-    const resposta = await fetch(`http://localhost:3000/usuario/deletar/${id}`, {
+    const resposta = await fetch(apiUrl(`/usuario/deletar/${id}`), {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -1105,7 +1743,7 @@ async function salvarStatusBiblioteca(
 
     console.log("[Frontend] Enviando status:", payload);
 
-    const resposta = await fetch("http://localhost:3000/biblioteca/cadastrar", {
+    const resposta = await fetch(apiUrl("/biblioteca/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1165,24 +1803,15 @@ function renderBooks(books, bibliotecaStatus) {
     return;
   }
 
-  const statusMap = new Map();
-  const statusValidos = ["lido", "lendo", "quero_ler"];
-
-  bibliotecaStatus.forEach((item) => {
-    if (item.livro_id) {
-      statusMap.set(item.livro_id, item.progresso);
-    } else if (item.id) {
-      statusMap.set(item.id, item.progresso);
-    }
-  });
+  const statusMap = criarMapaStatusBiblioteca(bibliotecaStatus);
 
   row.innerHTML = "";
 
   // Filtrar apenas livros com status vÃ¡lido
   const livrosFiltrados = books.filter((book) => {
-    const livroId = book.livro_id || book.id;
+    const livroId = obterLivroBibliotecaId(book);
     const progresso = statusMap.get(livroId) || book.progresso || "";
-    return statusValidos.includes(progresso);
+    return BIBLIOTECA_STATUS_VALIDOS.includes(progresso);
   });
 
   console.log(
@@ -1193,19 +1822,23 @@ function renderBooks(books, bibliotecaStatus) {
   if (livrosFiltrados.length === 0) {
     console.warn("[renderBooks] Nenhum livro para renderizar!");
     row.innerHTML =
+<<<<<<< HEAD
       '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na pagina de avaliação!</p>';
+=======
+      '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado com os filtros atuais.</p>';
+>>>>>>> 46091ca1d8340a6847ff4135f5131dfa51fc0366
   } else {
     livrosFiltrados.forEach((book) => {
       try {
         // Trata diferentes estruturas de IDs
-        const livroId = book.livro_id || book.id;
+        const livroId = obterLivroBibliotecaId(book);
         const titulo = book.titulo || book.nome || "Sem tÃ­tulo";
         const autor = book.autor || book.author || "Desconhecido";
         const capa =
           book.imagem_capa ||
           book.capa ||
           book.image ||
-          "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+          DEFAULT_BOOK_COVER_URL;
 
         const progresso = statusMap.get(livroId) || book.progresso || "";
         const status = getStatusTag(progresso);
@@ -1213,7 +1846,7 @@ function renderBooks(books, bibliotecaStatus) {
         let capaUrl = normalizarUrlMidia(
           capa && capa.trim()
             ? capa
-            : "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png",
+            : DEFAULT_BOOK_COVER_URL,
         );
 
         // Remover qualquer versÃ£o anterior (com ?v=) e adicionar cache-buster novo
@@ -1226,7 +1859,15 @@ function renderBooks(books, bibliotecaStatus) {
           <div class="col-6 col-md-4 col-lg-3 col-xl-2" data-livro-id="${livroId}">
             <article class="book-card" style="cursor: pointer;" onclick="irParaAvaliacao(${livroId})">
               <div class="book-ribbon ${status.ribbonClass}" aria-hidden="true"></div>
-              <div class="book-cover" style="background-image:url('${capaUrl}');" aria-label="Capa do livro ${titulo}"></div>
+              <div class="book-cover" aria-label="Capa do livro ${titulo}">
+                <img
+                  src="${capaUrl}"
+                  alt="Capa do livro ${titulo}"
+                  loading="lazy"
+                  onload="marcarCapaLivroCarregada(this)"
+                  onerror="tratarErroCapaLivro(this)"
+                />
+              </div>
               <div class="book-info p-3">
                 <h4 class="book-title mb-1">${titulo}</h4>
                 <p class="book-author mb-0">${autor}</p>
@@ -1259,7 +1900,7 @@ async function fetchRanking(usuarioId = 1) {
       return null;
     }
     const resposta = await fetch(
-      `http://localhost:3000/ranking/paginometro/${usuarioId}`,
+      apiUrl(`/ranking/paginometro/${usuarioId}`),
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1312,17 +1953,16 @@ async function initBibliotecaGrid() {
     return;
   }
 
-  if (inputSearch) {
+  setupFiltrosStatusBiblioteca();
+
+  if (inputSearch && inputSearch.dataset.bibliotecaSearchBound !== "true") {
     inputSearch.addEventListener("input", () => {
       const termo = inputSearch.value.trim().toLowerCase();
       console.log("[initBibliotecaGrid] Filtro ativado com termo:", termo);
-      const filtrados = bibliotecaCachedBooks.filter(
-        (book) =>
-          book.titulo.toLowerCase().includes(termo) ||
-          book.autor.toLowerCase().includes(termo),
-      );
-      renderBooks(filtrados, bibliotecaCachedStatus);
+      aplicarFiltrosBiblioteca();
     });
+
+    inputSearch.dataset.bibliotecaSearchBound = "true";
   }
 
   console.log("[initBibliotecaGrid] Chamando atualizarBibliotecaELista...");
@@ -1476,7 +2116,7 @@ function aplicarFavoritaPadrao() {
 async function carregarFavoritaLivro(usuarioId, livroId, token) {
   try {
     const respostaFavorita = await fetch(
-      `http://localhost:3000/livros/${livroId}/favorita/${usuarioId}`,
+      apiUrl(`/livros/${livroId}/favorita/${usuarioId}`),
       {
         headers: { Authorization: `Bearer ${token}` },
       },
@@ -1527,6 +2167,8 @@ function irParaInformacoes() {
 
 // Carrega dados do livro na pÃ¡gina de avaliaÃ§Ã£o
 async function carregarDadosLivroAvaliacao() {
+  showAvaliacaoSkeleton();
+
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
@@ -1542,7 +2184,7 @@ async function carregarDadosLivroAvaliacao() {
 
     // Buscar dados do livro
     const respostaLivro = await fetch(
-      `http://localhost:3000/livros/${livroId}`,
+      apiUrl(`/livros/${livroId}`),
     );
     if (!respostaLivro.ok) throw new Error("Erro ao buscar livro");
 
@@ -1592,7 +2234,7 @@ async function carregarDadosLivroAvaliacao() {
       // Carregar status current da biblioteca
       try {
         const resposta = await fetch(
-          `http://localhost:3000/biblioteca/usuario/${usuarioId}`,
+          apiUrl(`/biblioteca/usuario/${usuarioId}`),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -1624,7 +2266,7 @@ async function carregarDadosLivroAvaliacao() {
 
       try {
         const respostaResenha = await fetch(
-          `http://localhost:3000/resenha/usuario/${usuarioId}/livro/${livroId}`,
+          apiUrl(`/resenha/usuario/${usuarioId}/livro/${livroId}`),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -1655,7 +2297,7 @@ async function carregarDadosLivroAvaliacao() {
 
       try {
         const respostaAvaliacao = await fetch(
-          `http://localhost:3000/avaliacoes/usuario/${usuarioId}/livro/${livroId}`,
+          apiUrl(`/avaliacoes/usuario/${usuarioId}/livro/${livroId}`),
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -1677,6 +2319,8 @@ async function carregarDadosLivroAvaliacao() {
   } catch (erro) {
     console.error("Erro ao carregar livro:", erro);
     alert("Erro ao carregar livro");
+  } finally {
+    hideAvaliacaoSkeleton();
   }
 }
 
@@ -1733,7 +2377,7 @@ async function salvarAvaliacao(estrelas) {
       estrelas: estrelas,
     };
 
-    const response = await fetch("http://localhost:3000/avaliacoes/cadastrar", {
+    const response = await fetch(apiUrl("/avaliacoes/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1893,7 +2537,7 @@ async function salvarResenha() {
       texto: texto,
     };
 
-    const response = await fetch("http://localhost:3000/resenha/cadastrar", {
+    const response = await fetch(apiUrl("/resenha/cadastrar"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1971,7 +2615,7 @@ async function salvarFavorita() {
     };
 
     const response = await fetch(
-      "http://localhost:3000/livros/favorita/cadastrar",
+      apiUrl("/livros/favorita/cadastrar"),
       {
         method: "POST",
         headers: {
@@ -2331,7 +2975,7 @@ async function salvarAlteracoesLivro() {
 
     console.log("[salvarAlteracoesLivro] Enviando dados:", payload);
 
-    const response = await fetch(`http://localhost:3000/livros/${livroId}`, {
+    const response = await fetch(apiUrl(`/livros/${livroId}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -2421,7 +3065,7 @@ async function deletarLivro() {
 
     console.log("[deletarLivro] Deletando livro ID:", livroId);
 
-    const response = await fetch(`http://localhost:3000/livros/${livroId}`, {
+    const response = await fetch(apiUrl(`/livros/${livroId}`), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -2453,6 +3097,8 @@ async function deletarLivro() {
 
 // Carrega dados na pÃ¡gina de informaÃ§Ãµes
 async function carregarDadosLivroInformacoes() {
+  showInformacoesSkeleton();
+
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
@@ -2465,7 +3111,7 @@ async function carregarDadosLivroInformacoes() {
       livroId,
     );
 
-    const response = await fetch(`http://localhost:3000/livros/${livroId}`);
+    const response = await fetch(apiUrl(`/livros/${livroId}`));
     if (!response.ok) throw new Error("Erro ao buscar livro");
 
     const data = await response.json();
@@ -2478,6 +3124,8 @@ async function carregarDadosLivroInformacoes() {
     alternarModoEdicaoLivro(false);
   } catch (erro) {
     console.error("Erro ao carregar livro:", erro);
+  } finally {
+    hideInformacoesSkeleton();
   }
 }
 
@@ -2492,7 +3140,7 @@ async function carregarFotoPerfilHeader() {
       return;
     }
 
-    const response = await fetch(`http://localhost:3000/usuario/${id}`, {
+    const response = await fetch(apiUrl(`/usuario/${id}`), {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -2591,6 +3239,7 @@ function setupImageUpload() {
 window.addEventListener("DOMContentLoaded", () => {
   setupPageTransitions();
   setupTransitionLinks();
+  setupSkeletonStyles();
 
   // Identifica qual pÃ¡gina estÃ¡ sendo carregada
   const currentPage = window.location.pathname;
@@ -2599,7 +3248,6 @@ window.addEventListener("DOMContentLoaded", () => {
   console.log("[DOMContentLoaded] PÃ¡gina carregada:", currentPage);
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
-    carregarPerfil();
     desabilitarCampos();
 
     // esconder botÃµes no inÃ­cio
@@ -2660,4 +3308,5 @@ window.addEventListener("DOMContentLoaded", () => {
   // Setup de uploads de imagem
   setupImageUpload();
 });
+
 

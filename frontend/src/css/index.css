@@ -289,7 +289,7 @@ main {
 /* GRID */
 .livros {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 25px;
 }
 
@@ -311,12 +311,15 @@ main {
 
 /* VER MAIS */
 .ver-mais {
+  border: 0;
+  background: transparent;
   color: #ffcc70;
   font-size: 14px;
   cursor: pointer;
   margin-top: 12px;
   display: inline-block;
   font-weight: 500;
+  padding: 0;
 }
 
 .ver-mais:hover {
@@ -324,7 +327,76 @@ main {
   color: #ffd98f;
 }
 
+.sem-resultados {
+  text-align: center;
+  color: #fff3ea;
+  font-size: 18px;
+  padding: 24px 0 8px;
+}
+
+.livros-modal-dialog {
+  max-width: min(1100px, calc(100vw - 32px));
+}
+
+.livros-modal-content {
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #f3e1d4, #e4c4ae);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.livros-modal-header {
+  border-bottom: 0;
+  padding: 24px 24px 0;
+}
+
+.livros-modal-body {
+  padding: 8px 24px 24px;
+}
+
+.livros-modal-title {
+  color: #7f1f0e;
+  font-size: 28px;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.livros-modal-close {
+  box-shadow: none !important;
+}
+
+.livros-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px;
+}
+
+.livros-modal-grid img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+}
+
+.livros-modal-grid img:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
+}
+
 /* RESPONSIVO */
+@media (max-width: 1280px) {
+  .livros {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .livros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .banner {
     flex-direction: column;
@@ -342,5 +414,41 @@ main {
 
   .search-box input {
     width: 100%;
+  }
+
+  .livros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .livros-modal-dialog {
+    max-width: calc(100vw - 20px);
+  }
+
+  .livros-modal-content {
+    border-radius: 20px;
+  }
+
+  .livros-modal-header {
+    padding: 20px 18px 0;
+  }
+
+  .livros-modal-body {
+    padding: 8px 18px 20px;
+  }
+
+  .livros-modal-title {
+    font-size: 22px;
+  }
+
+  .livros-modal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .livros,
+  .livros-modal-grid {
+    grid-template-columns: 1fr;
   }
 }

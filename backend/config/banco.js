@@ -1,13 +1,14 @@
 const mysql = require("mysql2")
+const env = require("./env")
 
 //criar uma variavel para conexão com o banco
 
 const conn= mysql.createConnection({
-    host: "localhost", 
-    port: "3306",
-    database: "sistema_leitura",
-    user: "root",
-    password: "usbw"
+    host: env.dbHost, 
+    port: env.dbPort,
+    database: env.dbName,
+    user: env.dbUser,
+    password: env.dbPassword
 })
 
 //Conectar ao banco de dados, ou tentar pelo menos
