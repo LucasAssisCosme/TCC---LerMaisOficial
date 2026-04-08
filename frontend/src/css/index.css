@@ -7,10 +7,13 @@
   transition: all 0.3s ease;
 }
 .home-page {
-  background-color: #e4cebf;
-  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
+  min-height: 100vh;
+  background: 
+    linear-gradient(rgba(0,0,0,0.6), rgba(131, 32, 32, 0.7)),
+    url('/image/fundo.jpg') no-repeat center/cover;
+  background-attachment: fixed;
 }
+
 img {
   max-width: 100%;
 }
@@ -129,11 +132,12 @@ justify-content: space-between;
 }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
 }
 
 body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -187,7 +191,7 @@ font-size:13px;
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: #f4f4f4;
+  background: transparent;
 }
 
 /* CONTAINER */
@@ -251,7 +255,7 @@ main {
 
 
 .books-container {
-  background: linear-gradient(135deg, #a13719, #6e3a2c);
+  background: linear-gradient(135deg, #a13619c0, #811e1e65);
   margin: 40px auto;
   padding: 40px;
   border-radius: 25px;

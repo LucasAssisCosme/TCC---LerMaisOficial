@@ -18,7 +18,9 @@ body {
 }
 
 .home-page {
-  background: linear-gradient(135deg, #e6d3c5, #c2a18d);
+  background: 
+    linear-gradient(rgba(0,0,0,0.7), rgba(0, 0, 0, 0.055)),
+    url('/image/fundo.jpg') no-repeat center/cover;
 }
 
 .container {
@@ -201,6 +203,8 @@ header {
   color: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   outline: none;
+  background: rgba(176, 80, 60, 0.9);
+  backdrop-filter: blur(10px);
 }
 
 .search-input::placeholder,
@@ -373,6 +377,8 @@ header {
   gap: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+    background: rgba(176, 80, 60, 0.9);
+  backdrop-filter: blur(8px);
 }
 
 .card-quadrado:hover {

@@ -1822,17 +1822,13 @@ function renderBooks(books, bibliotecaStatus) {
   if (livrosFiltrados.length === 0) {
     console.warn("[renderBooks] Nenhum livro para renderizar!");
     row.innerHTML =
-<<<<<<< HEAD
-      '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado na sua biblioteca. Adicione livros na pagina de avaliação!</p>';
-=======
       '<p style="grid-column: 1/-1; text-align: center; color: white; padding: 40px; font-size: 18px;">Nenhum livro encontrado com os filtros atuais.</p>';
->>>>>>> 46091ca1d8340a6847ff4135f5131dfa51fc0366
   } else {
     livrosFiltrados.forEach((book) => {
       try {
         // Trata diferentes estruturas de IDs
         const livroId = obterLivroBibliotecaId(book);
-        const titulo = book.titulo || book.nome || "Sem tÃ­tulo";
+        const titulo = book.titulo || book.nome || "Sem ti­tulo";
         const autor = book.autor || book.author || "Desconhecido";
         const capa =
           book.imagem_capa ||
@@ -1895,7 +1891,7 @@ async function fetchRanking(usuarioId = 1) {
   try {
     const token = getToken();
     if (!token) {
-      console.error("Token nÃ£o encontrado! Redirecionando para login.");
+      console.error("Token não encontrado! Redirecionando para login.");
       logout();
       return null;
     }
@@ -1908,7 +1904,7 @@ async function fetchRanking(usuarioId = 1) {
       },
     );
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("SessÃ£o expirada. FaÃ§a login novamente.");
+      alert("Sessão expirada. Faça login novamente.");
       logout();
       return null;
     }
@@ -1923,14 +1919,14 @@ async function fetchRanking(usuarioId = 1) {
 function renderRank(posicao, totalPaginas) {
   const rankElem = document.querySelector(".ranking-text.mb-2");
   if (rankElem) {
-    rankElem.innerHTML = `VocÃª estÃ¡ em <strong>${posicao}Âº lugar</strong> no ranking de mais pÃ¡ginas lidas da sua universidade!`;
+    rankElem.innerHTML = `Voce está em <strong>${posicao}Âº lugar</strong> no Ranking de mais Paginas lidas da sua Universidade!`;
   }
 
   const pageMeterElem = document.querySelector(
     ".overview-card .badge.bg-light.text-dark",
   );
   if (pageMeterElem) {
-    pageMeterElem.textContent = `PaginÃ´metro ${totalPaginas}`;
+    pageMeterElem.textContent = `Paginómetro ${totalPaginas}`;
   }
 }
 
@@ -1985,7 +1981,7 @@ async function initBibliotecaGrid() {
   // Listener global para atualizar biblioteca em qualquer pÃ¡gina
   document.addEventListener("StatusLivroAlterado", async () => {
     console.log(
-      "[Global] Evento StatusLivroAlterado - tentando atualizar elementos da biblioteca se visÃ­veis",
+      "[Global] Evento StatusLivroAlterado - tentando atualizar elementos da biblioteca se via­veis",
     );
 
     // Se estiver na pÃ¡gina de biblioteca
@@ -1997,7 +1993,7 @@ async function initBibliotecaGrid() {
 
     // Se estiver na pÃ¡gina de AvaliaÃ§Ã£o, recarregar dados
     if (window.location.href.includes("Avaliacao.html")) {
-      console.log("[Global] Recarregando dados da AvaliaÃ§Ã£o...");
+      console.log("[Global] Recarregando dados da Avaliação...");
       await carregarDadosLivroAvaliacao();
     }
   });
@@ -2172,7 +2168,7 @@ async function carregarDadosLivroAvaliacao() {
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
-      alert("Livro nÃ£o especificado");
+      alert("Livro não especificado");
       return;
     }
 
@@ -2260,7 +2256,7 @@ async function carregarDadosLivroAvaliacao() {
         }
       } catch (e) {
         console.log(
-          "[carregarDadosLivroAvaliacao] Livro ainda nÃ£o estÃ¡ na biblioteca",
+          "[carregarDadosLivroAvaliacao] Livro ainda não está na biblioteca",
         );
       }
 
@@ -2311,7 +2307,7 @@ async function carregarDadosLivroAvaliacao() {
           }
         }
       } catch (e) {
-        console.log("Sem avaliaÃ§Ã£o salva");
+        console.log("Sem avaliação salva");
       }
     }
 
@@ -2367,7 +2363,7 @@ async function salvarAvaliacao(estrelas) {
     const usuarioId = getUsuarioLogadoId();
 
     if (!token || !usuarioId || !livroAtualId) {
-      alert("VocÃª precisa estar logado");
+      alert("Voce precisa estar logado");
       return;
     }
 
@@ -2392,7 +2388,7 @@ async function salvarAvaliacao(estrelas) {
       console.log("AvaliaÃ§Ã£o salva!");
     }
   } catch (erro) {
-    console.error("Erro ao salvar avaliaÃ§Ã£o:", erro);
+    console.error("Erro ao salvar avaliação:", erro);
   }
 }
 
@@ -2412,7 +2408,7 @@ async function atualizarStatusBibliotecaOuSalvar() {
   const livroId = localStorage.getItem("livroAtualId");
 
   if (!usuarioId || !livroId) {
-    alert("UsuÃ¡rio ou livro nÃ£o encontrado");
+    alert("Usuario ou livro não encontrado");
     return;
   }
 
@@ -2443,7 +2439,7 @@ async function atualizarStatusBibliotecaOuSalvar() {
 async function atualizarPaginometro(usuarioId) {
   try {
     console.log(
-      "[atualizarPaginometro] Atualizando paginÃ´metro para usuÃ¡rio:",
+      "[atualizarPaginometro] Atualizando paginÃ´metro para usuario:",
       usuarioId,
     );
 
@@ -2456,30 +2452,30 @@ async function atualizarPaginometro(usuarioId) {
         ".overview-card .badge.bg-light.text-dark",
       );
       if (pageMeterElem) {
-        pageMeterElem.textContent = `PaginÃ´metro ${ranking.total_paginas || 0}`;
+        pageMeterElem.textContent = `Paginómetro ${ranking.total_paginas || 0}`;
         console.log(
-          "[atualizarPaginometro] PaginÃ´metro atualizado para:",
+          "[atualizarPaginometro] Paginómetro atualizado para:",
           ranking.total_paginas,
         );
       } else {
         console.log(
-          "[atualizarPaginometro] Elemento do paginÃ´metro nÃ£o encontrado (pode estar em outra pÃ¡gina)",
+          "[atualizarPaginometro] Elemento do paginómetro nÃ£o encontrado (pode estar em outra pÃ¡gina)",
         );
       }
 
       // Atualizar ranking tambÃ©m
       const rankElem = document.querySelector(".ranking-text.mb-2");
       if (rankElem) {
-        rankElem.innerHTML = `VocÃª estÃ¡ em <strong>${ranking.posicao_ranking || 1}Âº lugar</strong> no ranking de mais pÃ¡ginas lidas da sua universidade!`;
+        rankElem.innerHTML = `Voce está em <strong>${ranking.posicao_ranking || 1}Âº lugar</strong> no ranking de mais paginas lidas da sua universidade!`;
         console.log(
-          "[atualizarPaginometro] Ranking atualizado para posiÃ§Ã£o:",
+          "[atualizarPaginometro] Ranking atualizado para posição:",
           ranking.posicao_ranking,
         );
       }
     }
   } catch (error) {
     console.error(
-      "[atualizarPaginometro] Erro ao atualizar paginÃ´metro:",
+      "[atualizarPaginometro] Erro ao atualizar paginómetro:",
       error,
     );
   }
@@ -2574,8 +2570,8 @@ function habilitarEdicaoFavorita() {
   botoes.style.visibility = "visible";
   botoes.style.opacity = "1";
   if (botaoEditar) botaoEditar.style.display = "none";
-  textarea.scrollIntoView({ block: "center", behavior: "smooth" });
-  window.setTimeout(() => textarea.focus({ preventScroll: true }), 150);
+  textarea.focus();
+  botoes.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 function cancelarFavorita() {
@@ -3245,7 +3241,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const currentPage = window.location.pathname;
   paginasCarregadas.add(currentPage);
 
-  console.log("[DOMContentLoaded] PÃ¡gina carregada:", currentPage);
+  console.log("[DOMContentLoaded] Pagina carregada:", currentPage);
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
     desabilitarCampos();
@@ -3260,7 +3256,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Evita carregar mais de uma vez na mesma pÃ¡gina
   if (paginasCarregadas.size > 1) {
-    console.log("[DOMContentLoaded] PÃ¡gina jÃ¡ carregada, ignorando...");
+    console.log("[DOMContentLoaded] Pagina ja carregada, ignorando...");
     return;
   }
 
@@ -3289,7 +3285,7 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("[DOMContentLoaded] Inicializando biblioteca grid...");
     initBibliotecaGrid();
   } else {
-    console.warn("[DOMContentLoaded] UsuÃ¡rio nÃ£o logado ou token ausente!");
+    console.warn("[DOMContentLoaded] Usuario não logado ou token ausente!");
   }
 
   // Carrega dados da pÃ¡gina de avaliaÃ§Ã£o
