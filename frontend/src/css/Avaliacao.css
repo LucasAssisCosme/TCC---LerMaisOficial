@@ -114,13 +114,15 @@ flex-wrap: wrap;
 }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
 }
 
 body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 .app-footer{
 display:flex;
@@ -165,7 +167,7 @@ font-size:13px;
 }
 
 .avaliacao-container {
-  margin: 26px auto;
+  margin: 38px auto 42px;
   width: min(1200px, calc(100% - 32px));
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(22px);
@@ -174,7 +176,7 @@ font-size:13px;
   overflow: hidden;
 }
 .hero-livro {
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 
 .overlay {
@@ -184,10 +186,10 @@ font-size:13px;
 .hero-content {
   max-width: 1270px; 
   margin: 0 auto;
-  padding: 31px 31px 0;
+  padding: 42px 36px 8px;
 
   display: flex;
-  gap: 28px;
+  gap: 36px;
   align-items: flex-start;
   flex-wrap: wrap;
 
@@ -196,16 +198,17 @@ font-size:13px;
 .info {
   flex: 1;
   min-width: 280px;
+  padding-top: 4px;
 }
 
 .conteudo {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 12px 35px 26px;
+  padding: 18px 35px 34px;
 
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .capa {
@@ -225,7 +228,7 @@ font-size:13px;
   font-weight: 600;
   color: #fff;
   line-height: 1.1;
-  margin: 0 0 6px;
+  margin: 0 0 14px;
 }
 
 .estrelas {
@@ -239,9 +242,10 @@ font-size:13px;
 }
 .descricao {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 16px;
   font-size: 24px;
   color: #cfcfcf;
+  line-height: 1.5;
   word-break: break-word;
 
 }
@@ -249,13 +253,13 @@ font-size:13px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 14px;
   flex-wrap: wrap;
   position: relative;
   background: rgba(255,255,255,0.06);
-  padding: 18px 22px 72px;
+  padding: 24px 26px 88px;
   border-radius: 18px;
-  min-height: 128px;
+  min-height: 148px;
 
 
   transition: 0.2s;
@@ -267,7 +271,7 @@ font-size:13px;
 .secao h2 {
   font-size: 20px;
   color: #ffffff;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .secao p {
@@ -312,8 +316,8 @@ font-size:13px;
   cursor: pointer;
   transition: 0.2s;
   position: absolute;
-  right: 22px;
-  bottom: 18px;
+  right: 26px;
+  bottom: 22px;
 }
 
 .btn-editar:hover {
@@ -495,7 +499,7 @@ font-size:13px;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: 18px;
   align-self: flex-start;
 }
 
@@ -523,16 +527,16 @@ font-size:13px;
 @media (max-width: 900px) {
   .avaliacao-container {
     width: calc(100% - 24px);
-    margin: 24px auto;
+    margin: 30px auto 34px;
     border-radius: 24px;
   }
 
   .hero-content {
-    padding: 28px 20px 0;
+    padding: 32px 24px 8px;
   }
 
   .conteudo {
-    padding: 30px 20px 32px;
+    padding: 24px 20px 32px;
   }
 
   .info h1 {
@@ -557,7 +561,7 @@ font-size:13px;
   }
 
   .hero-content {
-    padding: 24px 16px 0;
+    padding: 28px 16px 8px;
     justify-content: center;
   }
 
@@ -597,7 +601,7 @@ font-size:13px;
   }
 
   .secao {
-    padding: 18px 16px;
+    padding: 18px 16px 84px;
   }
 
   .btn-editar,

@@ -6,9 +6,18 @@
   text-decoration: none;
 }
 .home-page {
-    background-color: #DAC1B1
+  min-height: 108vh;
+  background: url('/image/est.jpg') center/cover no-repeat;
 }
 
+.home-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(14px);
+  z-index: -1;
+}
 .container{
   max-width: 1800px;
   margin: 0 auto;
@@ -175,20 +184,20 @@ font-size:13px;
 
 
 .cadastro-box {
-  background: #7f1f0e9c;
+  background: #974334cc;
   width: 100%;
   max-width: 980px;
   margin: 50px auto;
   padding: 45px 55px 50px;
   border-radius: 28px;
-  border: 2px solid #681616;
+  border: 2px solid #68161628;
   color: #5a2c20;
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
 }
 
 .cadastro-box h1 {
   text-align: center;
-  font-size: 26px;
+  font-size: 30px;
   margin-bottom: 28px;
   color: #ffffff;
   letter-spacing: 0.4px;
@@ -208,7 +217,7 @@ font-size:13px;
 .formulario {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px 40px;
+  gap: 45px 55px;
   align-items: start;
 }
 
@@ -219,16 +228,25 @@ font-size:13px;
   gap: 14px;
 }
 
+
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+}
+
+.campo-largo {
+  grid-column: 1 / -1;
+}
+
+.campo-assunto {
+  width: 100%;
 }
 
 label {
   font-size: 20px;
   font-weight: 600;
-  color: #6b3a2f;
+  color: #ffffff;
 }
 
 input,
@@ -291,7 +309,7 @@ input[type="file"]::file-selector-button {
 button {
   align-self: center;
   margin-top: 12px;
-  background: #b45a3a;
+  background: #911f1f;
   color: white;
   padding: 12px 36px;
   border-radius: 28px;
