@@ -1972,7 +1972,7 @@ function renderRank(posicao, totalPaginas) {
     ".overview-card .badge.bg-light.text-dark",
   );
   if (pageMeterElem) {
-    pageMeterElem.textContent = `PaginÃ´metro ${totalPaginas}`;
+    pageMeterElem.textContent = `Paginómetro ${totalPaginas}`;
   }
 }
 
@@ -2485,7 +2485,7 @@ async function atualizarStatusBibliotecaOuSalvar() {
 async function atualizarPaginometro(usuarioId) {
   try {
     console.log(
-      "[atualizarPaginometro] Atualizando paginÃ´metro para usuário:",
+      "[atualizarPaginometro] Atualizando paginômetro para usuário:",
       usuarioId,
     );
 
@@ -2498,21 +2498,21 @@ async function atualizarPaginometro(usuarioId) {
         ".overview-card .badge.bg-light.text-dark",
       );
       if (pageMeterElem) {
-        pageMeterElem.textContent = `PaginÃ´metro ${ranking.total_paginas || 0}`;
+        pageMeterElem.textContent = `Paginómetro ${ranking.total_paginas || 0}`;
         console.log(
-          "[atualizarPaginometro] PaginÃ´metro atualizado para:",
+          "[atualizarPaginometro] Paginómetro atualizado para:",
           ranking.total_paginas,
         );
       } else {
         console.log(
-          "[atualizarPaginometro] Elemento do paginÃ´metro não encontrado (pode estar em outra página)",
+          "[atualizarPaginometro] Elemento do paginómetro não encontrado (pode estar em outra pagina)",
         );
       }
 
       // Atualizar ranking também
       const rankElem = document.querySelector(".ranking-text.mb-2");
       if (rankElem) {
-        rankElem.innerHTML = `Você está em <strong>${ranking.posicao_ranking || 1}Âº lugar</strong> no ranking de mais páginas lidas da sua universidade!`;
+        rankElem.innerHTML = `Voce está em <strong>${ranking.posicao_ranking || 1}º lugar</strong> no ranking de mais paginas lidas da sua universidade!`;
         console.log(
           "[atualizarPaginometro] Ranking atualizado para posição:",
           ranking.posicao_ranking,
