@@ -28,10 +28,10 @@
 
       <nav>
         <ul class="nav-list">
-          <li class="item-list">
+          <li class="item-list active">
             <a href="index.html">
               <i class="bi bi-house"></i>
-              InÃ­cio
+              Início
             </a>
           </li>
 
@@ -42,7 +42,7 @@
             </a>
           </li>
 
-          <li class="item-list active">
+          <li class="item-list">
             <a href="biblioteca.html">
               <i class="bi bi-book"></i>
               Biblioteca
@@ -67,15 +67,15 @@
 
     <div class="banner-right">
       <p>
-        Bem-vindo! Cada livro Ã© uma nova descoberta.
-        Estamos com vocÃª nessa jornada. Boa leitura!
+        Bem-vindo! Cada livro é uma nova descoberta.
+        Estamos com você nessa jornada. Boa leitura!
       </p>
     </div>
   </section>
 
   <main>
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="ðŸ” Pesquise livros">
+      <input type="text" id="searchInput" placeholder="🔍 Pesquise livros">
     </div>
 
     <section class="books-container" id="categoriesContainer">
@@ -132,9 +132,12 @@
   ></script>
   <script>
     let livrosCached = [];
-    let generosFiltrados = {};
     let livrosModalInstance = null;
     const LIMITE_LIVROS_VITRINE = 6;
+    const INDEX_RECENT_BOOKS_TITLE = "Adicionados Recentemente";
+    const INDEX_RECENT_COLLECTION_KEY = "__recentes__";
+    const INDEX_RECENT_BOOKS_STORAGE_KEY = "lerMaisLivrosRecentes";
+    const INDEX_RECENT_BOOKS_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
     function normalizarGeneroCategoria(genero) {
       const valor = String(genero || "").trim();
@@ -146,7 +149,7 @@
         Aventura: "Aventura",
         Ficcao_Cientifica: "Ficcao_Cientifica",
         "Ficcao Cientifica": "Ficcao_Cientifica",
-        "FicÃ§Ã£o CientÃ­fica": "Ficcao_Cientifica",
+        "Ficção Científica": "Ficcao_Cientifica",
         Drama: "Drama",
         Autoajuda: "Autoajuda",
         Outro: "Outro",
@@ -164,13 +167,21 @@
         Fantasia: "Fantasia",
         Terror: "Terror",
         Aventura: "Aventura",
-        Ficcao_Cientifica: "Ficcao Cientifica",
+        Ficcao_Cientifica: "Ficção Científica",
         Drama: "Drama",
         Autoajuda: "Autoajuda",
         Outro: "Outros",
       };
 
       return titulos[generoNormalizado] || "Outros";
+    }
+
+    function obterTituloColecao(colecao) {
+      if (colecao === INDEX_RECENT_COLLECTION_KEY) {
+        return INDEX_RECENT_BOOKS_TITLE;
+      }
+
+      return obterTituloGenero(colecao);
     }
 
     function obterCapaLivro(livro) {
@@ -181,10 +192,96 @@
       return typeof normalizarUrlMidia === "function" ? normalizarUrlMidia(capa) : capa;
     }
 
+    function obterLivroId(livro) {
+      return String(livro?.livro_id ?? livro?.id ?? "").trim();
+    }
+
+    function lerLivrosRecentesLocais() {
+      try {
+        const bruto = localStorage.getItem(INDEX_RECENT_BOOKS_STORAGE_KEY);
+        const registros = bruto ? JSON.parse(bruto) : {};
+        const agora = Date.now();
+        const filtrados = {};
+
+        Object.entries(registros || {}).forEach(([id, dataIso]) => {
+          const timestamp = Date.parse(String(dataIso || ""));
+          if (!Number.isNaN(timestamp) && agora - timestamp <= INDEX_RECENT_BOOKS_WINDOW_MS) {
+            filtrados[id] = new Date(timestamp).toISOString();
+          }
+        });
+
+        localStorage.setItem(
+          INDEX_RECENT_BOOKS_STORAGE_KEY,
+          JSON.stringify(filtrados),
+        );
+
+        return filtrados;
+      } catch (error) {
+        console.warn("[Home] Nao foi possivel ler livros recentes locais:", error);
+        return {};
+      }
+    }
+
+    function obterDataLivroEmMillis(livro) {
+      const candidatos = [
+        livro?.criado_em,
+        livro?.created_at,
+        livro?.data_cadastro,
+        livro?.data_criacao,
+      ];
+
+      for (const valor of candidatos) {
+        if (!valor) {
+          continue;
+        }
+
+        const texto = String(valor).trim();
+        if (!texto) {
+          continue;
+        }
+
+        const normalizado = texto.includes("T") ? texto : texto.replace(" ", "T");
+        const timestamp = Date.parse(normalizado);
+        if (!Number.isNaN(timestamp)) {
+          return timestamp;
+        }
+      }
+
+      const livroId = obterLivroId(livro);
+      if (!livroId) {
+        return null;
+      }
+
+      const registrosLocais = lerLivrosRecentesLocais();
+      const timestampLocal = Date.parse(String(registrosLocais[livroId] || ""));
+      return Number.isNaN(timestampLocal) ? null : timestampLocal;
+    }
+
+    function livroEhRecente(livro) {
+      const timestamp = obterDataLivroEmMillis(livro);
+      if (timestamp === null) {
+        return false;
+      }
+
+      return Date.now() - timestamp <= INDEX_RECENT_BOOKS_WINDOW_MS;
+    }
+
+    function ordenarLivrosRecentes(livros) {
+      return [...livros].sort((a, b) => {
+        const dataB = obterDataLivroEmMillis(b) || 0;
+        const dataA = obterDataLivroEmMillis(a) || 0;
+        if (dataB !== dataA) {
+          return dataB - dataA;
+        }
+
+        return Number(b?.id || b?.livro_id || 0) - Number(a?.id || a?.livro_id || 0);
+      });
+    }
+
     function abrirLivro(livro) {
       const usuarioId = getUsuarioLogadoId();
       if (!usuarioId) {
-        alert("VocÃª precisa estar logado para ver mais detalhes");
+        alert("Você precisa estar logado para ver mais detalhes");
         window.location.href = window.frontendPath("/login.html");
         return;
       }
@@ -207,7 +304,7 @@
       livrosModalInstance?.hide();
     }
 
-    function abrirModalLivros(genero, livros) {
+    function abrirModalLivros(colecao, livros) {
       const tituloModal = document.getElementById("livrosModalTitulo");
       const gridModal = document.getElementById("livrosModalGrid");
       const modalBody = document.querySelector("#livrosModal .modal-body");
@@ -216,7 +313,7 @@
         return;
       }
 
-      tituloModal.textContent = obterTituloGenero(genero).toUpperCase();
+      tituloModal.textContent = obterTituloColecao(colecao).toUpperCase();
       gridModal.innerHTML = "";
 
       livros.forEach((livro) => {
@@ -247,42 +344,58 @@
       });
     }
 
-    async function carregarCategoriasLivros() {
-      window.renderIndexSkeleton?.();
+    function montarColecoesHome(livros) {
+      const livrosPorGenero = {};
+      const livrosRecentes = [];
 
-      try {
-        const resposta = await fetch(window.apiUrl("/livros/"));
-        if (!resposta.ok) {
-          throw new Error(`Erro ao buscar livros: ${resposta.status}`);
+      livros.forEach((livro) => {
+        const genero = normalizarGeneroCategoria(livro.genero);
+        if (!livrosPorGenero[genero]) {
+          livrosPorGenero[genero] = [];
         }
+        livrosPorGenero[genero].push(livro);
 
-        const data = await resposta.json();
-        livrosCached = data.livros || [];
-
-        const livrosPorGenero = {};
-        livrosCached.forEach((livro) => {
-          const genero = normalizarGeneroCategoria(livro.genero);
-          if (!livrosPorGenero[genero]) {
-            livrosPorGenero[genero] = [];
-          }
-          livrosPorGenero[genero].push(livro);
-        });
-
-        generosFiltrados = livrosPorGenero;
-        renderizarCategorias(livrosPorGenero);
-      } catch (error) {
-        console.error("Erro ao carregar categorias:", error);
-        const container = document.getElementById("categoriesContainer");
-        if (container) {
-          container.innerHTML = `
-            <h2 class="section-title">MAIS FAMOSOS DO MOMENTO</h2>
-            <p class="sem-resultados">Nao foi possivel carregar os livros agora.</p>
-          `;
+        if (livroEhRecente(livro)) {
+          livrosRecentes.push(livro);
         }
-      }
+      });
+
+      return {
+        livrosPorGenero,
+        livrosRecentes: ordenarLivrosRecentes(livrosRecentes),
+      };
     }
 
-    function renderizarCategorias(livrosPorGenero) {
+    function criarSecaoLivros(colecao, livros) {
+      const categoriaDiv = document.createElement("div");
+      categoriaDiv.className = "categoria";
+
+      const h3 = document.createElement("h3");
+      h3.textContent = obterTituloColecao(colecao).toUpperCase();
+
+      const livrosDiv = document.createElement("div");
+      livrosDiv.className = "livros";
+
+      livros.slice(0, LIMITE_LIVROS_VITRINE).forEach((livro) => {
+        livrosDiv.appendChild(criarCardLivro(livro));
+      });
+
+      const verMais = document.createElement("button");
+      verMais.type = "button";
+      verMais.className = "ver-mais";
+      verMais.textContent = livros.length > LIMITE_LIVROS_VITRINE
+        ? `ver mais (${livros.length - LIMITE_LIVROS_VITRINE} restantes)`
+        : "ver todos";
+      verMais.addEventListener("click", () => abrirModalLivros(colecao, livros));
+
+      categoriaDiv.appendChild(h3);
+      categoriaDiv.appendChild(livrosDiv);
+      categoriaDiv.appendChild(verMais);
+
+      return categoriaDiv;
+    }
+
+    function renderizarCategorias(livrosPorGenero, livrosRecentes = []) {
       const container = document.getElementById("categoriesContainer");
       const titulo = container.querySelector(".section-title");
 
@@ -291,35 +404,15 @@
         container.appendChild(titulo);
       }
 
+      if (livrosRecentes.length > 0) {
+        container.appendChild(
+          criarSecaoLivros(INDEX_RECENT_COLLECTION_KEY, livrosRecentes),
+        );
+      }
+
       Object.entries(livrosPorGenero).forEach(([genero, livros]) => {
         if (livros.length === 0) return;
-
-        const categoriaDiv = document.createElement("div");
-        categoriaDiv.className = "categoria";
-
-        const h3 = document.createElement("h3");
-        h3.textContent = obterTituloGenero(genero).toUpperCase();
-
-        const livrosDiv = document.createElement("div");
-        livrosDiv.className = "livros";
-
-        livros.slice(0, LIMITE_LIVROS_VITRINE).forEach((livro) => {
-          livrosDiv.appendChild(criarCardLivro(livro));
-        });
-
-        const verMais = document.createElement("button");
-        verMais.type = "button";
-        verMais.className = "ver-mais";
-        verMais.textContent = livros.length > LIMITE_LIVROS_VITRINE
-          ? `ver mais (${livros.length - LIMITE_LIVROS_VITRINE} restantes)`
-          : "ver todos";
-        verMais.addEventListener("click", () => abrirModalLivros(genero, livros));
-
-        categoriaDiv.appendChild(h3);
-        categoriaDiv.appendChild(livrosDiv);
-        categoriaDiv.appendChild(verMais);
-
-        container.appendChild(categoriaDiv);
+        container.appendChild(criarSecaoLivros(genero, livros));
       });
 
       if (container.children.length === 1 && titulo) {
@@ -330,28 +423,43 @@
       }
     }
 
-    function filtrarLivros(termo) {
-      if (!termo.trim()) {
-        renderizarCategorias(generosFiltrados);
-        return;
-      }
+    async function carregarCategoriasLivros() {
+      window.renderIndexSkeleton?.();
 
-      const termoLower = termo.toLowerCase();
-      const livrosFiltrados = livrosCached.filter((livro) =>
-        livro.titulo.toLowerCase().includes(termoLower) ||
-        livro.autor.toLowerCase().includes(termoLower),
-      );
-
-      const livrosPorGenero = {};
-      livrosFiltrados.forEach((livro) => {
-        const genero = normalizarGeneroCategoria(livro.genero);
-        if (!livrosPorGenero[genero]) {
-          livrosPorGenero[genero] = [];
+      try {
+        const resposta = await fetch(window.apiUrl("/livros/"));
+        if (!resposta.ok) {
+          throw new Error(`Erro ao buscar livros: ${resposta.status}`);
         }
-        livrosPorGenero[genero].push(livro);
-      });
 
-      renderizarCategorias(livrosPorGenero);
+        const data = await resposta.json();
+        livrosCached = Array.isArray(data.livros) ? data.livros : [];
+
+        const { livrosPorGenero, livrosRecentes } = montarColecoesHome(livrosCached);
+        renderizarCategorias(livrosPorGenero, livrosRecentes);
+      } catch (error) {
+        console.error("Erro ao carregar categorias:", error);
+        const container = document.getElementById("categoriesContainer");
+        if (container) {
+          container.innerHTML = `
+            <h2 class="section-title">MAIS FAMOSOS DO MOMENTO</h2>
+            <p class="sem-resultados">Não foi possível carregar os livros agora.</p>
+          `;
+        }
+      }
+    }
+
+    function filtrarLivros(termo) {
+      const termoNormalizado = String(termo || "").trim().toLowerCase();
+      const livrosFiltrados = !termoNormalizado
+        ? livrosCached
+        : livrosCached.filter((livro) =>
+          String(livro.titulo || "").toLowerCase().includes(termoNormalizado) ||
+          String(livro.autor || "").toLowerCase().includes(termoNormalizado)
+        );
+
+      const { livrosPorGenero, livrosRecentes } = montarColecoesHome(livrosFiltrados);
+      renderizarCategorias(livrosPorGenero, livrosRecentes);
     }
 
     document.getElementById("searchInput")?.addEventListener("input", (e) => {

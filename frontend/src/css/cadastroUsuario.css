@@ -99,3 +99,41 @@
     border-radius: 10px;
     margin: 40px 0;
 }   
+
+/* Estilos para sugestões de apelido */
+.sugestoes-apelido {
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid #f8d7da;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.sugestoes-apelido .texto-erro {
+  color: #ffc107;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.lista-sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lista-sugestoes .btn {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  white-space: nowrap;
+}
+
+.lista-sugestoes .btn-outline-primary {
+  color: #fff;
+  border-color: #ffc107;
+}
+
+.lista-sugestoes .btn-outline-primary:hover {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #333;
+}   

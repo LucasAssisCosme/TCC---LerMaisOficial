@@ -281,6 +281,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .label-edit {
@@ -292,11 +293,17 @@ body {
 .input-edit,
 .textarea-edit {
   width: 100%;
+  display: block;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
   color: white;
   padding: 12px 14px;
+}
+
+.input-edit {
+  min-height: 46px;
 }
 
 .input-edit::placeholder,

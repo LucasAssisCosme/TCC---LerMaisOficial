@@ -14,7 +14,109 @@ function executarQuery(sql, valores = []) {
   });
 }
 
+function normalizarBaseApelido(apelido) {
+  const base = String(apelido || "")
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_]/g, "")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
+
+  return base || "leitor";
+}
+
+async function gerarSugestoesDisponiveis(apelidoBase, usuarioIgnoradoId = null) {
+  const base = normalizarBaseApelido(apelidoBase);
+  const valores = [];
+  let sql = `SELECT apelido FROM usuarios WHERE apelido IS NOT NULL AND apelido <> ''`;
+
+  if (usuarioIgnoradoId !== null && usuarioIgnoradoId !== undefined) {
+    sql += ` AND id <> ?`;
+    valores.push(usuarioIgnoradoId);
+  }
+
+  const usuarios = await executarQuery(sql, valores);
+  const apelidosExistentes = new Set(
+    usuarios.map((usuario) => String(usuario.apelido || "").trim().toLowerCase()),
+  );
+
+  const sugestoes = [];
+  const candidatos = [
+    `${base}_1`,
+    `${base}_2`,
+    `${base}_3`,
+    `${base}_4`,
+    `${base}_5`,
+    `${base}123`,
+    `${base}2026`,
+    `${base}_oficial`,
+    `${base}_books`,
+    `${base}_leitor`,
+  ];
+
+  for (const candidato of candidatos) {
+    const sugestao = candidato.slice(0, 50);
+    const chave = sugestao.toLowerCase();
+
+    if (!apelidosExistentes.has(chave) && !sugestoes.includes(sugestao)) {
+      sugestoes.push(sugestao);
+    }
+
+    if (sugestoes.length >= 5) {
+      break;
+    }
+  }
+
+  let contador = 6;
+  while (sugestoes.length < 5) {
+    const sugestao = `${base}_${contador}`.slice(0, 50);
+    const chave = sugestao.toLowerCase();
+    if (!apelidosExistentes.has(chave) && !sugestoes.includes(sugestao)) {
+      sugestoes.push(sugestao);
+    }
+    contador += 1;
+  }
+
+  return sugestoes;
+}
+
 module.exports = {
+  buscarPorApelido: (apelido, callback, usuarioIgnoradoId = null) => {
+    const apelidoLimpo = String(apelido || "").trim();
+
+    if (!apelidoLimpo) {
+      callback(null, null);
+      return;
+    }
+
+    let sql = `SELECT id, apelido FROM usuarios WHERE LOWER(apelido) = LOWER(?)`;
+    const valores = [apelidoLimpo];
+
+    if (usuarioIgnoradoId !== null && usuarioIgnoradoId !== undefined) {
+      sql += ` AND id <> ?`;
+      valores.push(usuarioIgnoradoId);
+    }
+
+    sql += ` LIMIT 1`;
+
+    conn.query(sql, valores, (erro, resultados) => {
+      if (erro) {
+        return callback(erro, null);
+      }
+
+      callback(null, resultados[0] || null);
+    });
+  },
+
+  gerarSugestoesApelido: (apelido, callback, usuarioIgnoradoId = null) => {
+    gerarSugestoesDisponiveis(apelido, usuarioIgnoradoId)
+      .then((sugestoes) => callback(null, sugestoes))
+      .catch((erro) => callback(erro, null));
+  },
+
   login: (email, senha, callback) => {
     const sql = `SELECT * FROM usuarios WHERE email = ?`;
     const valores = [email];

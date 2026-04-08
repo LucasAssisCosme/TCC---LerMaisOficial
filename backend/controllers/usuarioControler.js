@@ -2,8 +2,40 @@ const usuarioModels = require("../models/usuarioModels");
 const autenticacao = require("../middleware/autenticacao");
 const multerConfig = require("../config/multer");
 const env = require("../config/env");
-const path = require('path');
-const fs = require('fs');
+const path = require("path");
+const fs = require("fs");
+
+function limparArquivoTemporarioUpload(file) {
+  if (!file || !file.path) {
+    return;
+  }
+
+  try {
+    if (fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+  } catch (erro) {
+    console.error("[UPLOAD] Erro ao limpar arquivo temporario:", erro);
+  }
+}
+
+function responderApelidoDuplicado(res, apelido, usuarioIgnoradoId = null) {
+  usuarioModels.gerarSugestoesApelido(
+    apelido,
+    (erroSugestao, sugestoes) => {
+      if (erroSugestao) {
+        console.error("[APELIDO] Erro ao gerar sugestoes:", erroSugestao);
+      }
+
+      res.status(409).json({
+        mensagem: "Esse username já está em uso.",
+        campo: "apelido",
+        sugestoes: Array.isArray(sugestoes) ? sugestoes : [],
+      });
+    },
+    usuarioIgnoradoId,
+  );
+}
 
 module.exports = {
   formLogin(req, res) {
@@ -12,27 +44,25 @@ module.exports = {
 
   loginUsuario(req, res) {
     const { email, senha } = req.body;
-    // Manda as informações do objeto para o model
+
     usuarioModels.login(email, senha, (erro, logado) => {
       if (erro) {
         return res.status(500).json({ erro: "erro no servidor" });
       }
-      // Se não conseguiu logar, manda uma mensagem de erro
+
       if (!logado) {
-        res.status(401).json({ erro: "Email ou senha inválidos" });
+        return res.status(401).json({ erro: "Email ou senha inválidos" });
       }
-      // Se conseguiu manda uma mensagem de confirmação
-      else {
-        const token = autenticacao.gerarToken(logado);
-        res.json({ message: "Bem vindo", usuario: logado, token });
-      }
+
+      const token = autenticacao.gerarToken(logado);
+      return res.json({ message: "Bem vindo", usuario: logado, token });
     });
   },
 
   usuarioCadastro(req, res) {
-    //Reenderiza a pagina de cadastro
     res.json({ titulo: "Cadastro" });
   },
+
   salvarUsuario(req, res) {
     const {
       nome,
@@ -43,121 +73,121 @@ module.exports = {
       genero_favorito,
       apelido,
     } = req.body;
-    const tipoUsuario = 'aluno';
 
-    //Manda as informações para o model
-    usuarioModels.salvar(
-      { nome, email, senha, foto_perfil, bio, genero_favorito, tipo: tipoUsuario, apelido },
-      (erro, novoUsuario) => {
-        //se deu erro, renderiza a mensagem de erro mostrando a mensagem
-        if (erro) {
-          return res.status(500).json({ mensagem: "Erro ao salvar o usuario" });
-        }
+    const tipoUsuario = "aluno";
+    const apelidoLimpo = String(apelido || "").trim();
 
-        //Se deu certo renderiza a pagina de confirmação
-        res.json({
-          titulo: "Cadastro confirmado",
-          tipo: "cadastro",
-          novoUsuario,
-        });
-      },
-    );
+    usuarioModels.buscarPorApelido(apelidoLimpo, (erroApelido, usuarioExistente) => {
+      if (erroApelido) {
+        console.error("[APELIDO] Erro ao validar username:", erroApelido);
+        return res.status(500).json({ mensagem: "Erro ao validar username" });
+      }
+
+      if (usuarioExistente) {
+        return responderApelidoDuplicado(res, apelidoLimpo);
+      }
+
+      usuarioModels.salvar(
+        {
+          nome,
+          email,
+          senha,
+          foto_perfil,
+          bio,
+          genero_favorito,
+          tipo: tipoUsuario,
+          apelido: apelidoLimpo,
+        },
+        (erro, novoUsuario) => {
+          if (erro) {
+            return res.status(500).json({ mensagem: "Erro ao salvar o usuario" });
+          }
+
+          return res.json({
+            titulo: "Cadastro confirmado",
+            tipo: "cadastro",
+            novoUsuario,
+          });
+        },
+      );
+    });
   },
 
-  
   listarUsuarios(req, res) {
-    //Acessar o model e resgatar as informações
     usuarioModels.listarTodos((erro, usuarios) => {
       if (erro) {
         return res.status(500).json({ mensagem: "Erro ao listar os usuarios" });
       }
-      //Se deu certo, renderizar a pagina de lista usuarios
-      res.json({
+
+      return res.json({
         titulo: "Lista de usuarios",
         usuarios,
       });
     });
   },
+
   buscarUsuario(req, res) {
-    //Buscar id como parametro url
     const id = req.params.id;
 
-    //Acessar model para realizar busca
     usuarioModels.buscarPorid(id, (erro, usuario) => {
-      //Se deu erro na busca, informar
-      //ou se não achou usuario
       if (erro || !usuario) {
         return res.status(500).json({ mensagem: "Erro ao buscar usuario" });
       }
 
-      // Se achou usuario, renderiza pagina de ediçõa
-      res.json({
+      return res.json({
         titulo: "Edição",
         usuario,
       });
-
-      // res.json(req.body)
     });
   },
-mudarSenhaUsuario(req, res) {
 
-  const id = req.params.id
+  mudarSenhaUsuario(req, res) {
+    const id = req.params.id;
+    const { email, novaSenha, confirmarSenha } = req.body;
 
-  const {
-    email,
-    novaSenha,
-    confirmarSenha
-  } = req.body
+    if (novaSenha !== confirmarSenha) {
+      return res.status(400).json({
+        mensagem: "As senhas não coincidem",
+      });
+    }
 
-  if (novaSenha !== confirmarSenha) {
-    return res.status(400).json({
-      mensagem: "As senhas não coincidem"
-    })
-  }
-
-  usuarioModels.esqueceuSenha(
-    email,
-    novaSenha,
-    id,
-    (erro, resultado) => {
-
+    usuarioModels.esqueceuSenha(email, novaSenha, id, (erro, resultado) => {
       if (erro) {
         return res.status(500).json({
-          mensagem: erro.message
-        })
+          mensagem: erro.message,
+        });
       }
 
-      res.json({
+      return res.json({
         titulo: "Nova senha confirmada",
-        usuario: resultado
-      })
-    }
-  )
-},
+        usuario: resultado,
+      });
+    });
+  },
 
-mudarSenhaUsuarioPorEmail(req, res) {
-  const { email, novaSenha, confirmarSenha } = req.body
+  mudarSenhaUsuarioPorEmail(req, res) {
+    const { email, novaSenha, confirmarSenha } = req.body;
 
-  if (!email || !novaSenha || !confirmarSenha) {
-    return res.status(400).json({ mensagem: "Email e senhas são obrigatórios" })
-  }
-
-  if (novaSenha !== confirmarSenha) {
-    return res.status(400).json({ mensagem: "As senhas não coincidem" })
-  }
-
-  usuarioModels.esqueceuSenhaPorEmail(email, novaSenha, (erro, resultado) => {
-    if (erro) {
-      return res.status(500).json({ mensagem: erro.message })
+    if (!email || !novaSenha || !confirmarSenha) {
+      return res.status(400).json({ mensagem: "Email e senhas são obrigatórios" });
     }
 
-    if (!resultado) {
-      return res.status(404).json({ mensagem: "Email ou usuário não encontrado" })
+    if (novaSenha !== confirmarSenha) {
+      return res.status(400).json({ mensagem: "As senhas não coincidem" });
     }
 
-    res.json({ titulo: "Nova senha confirmada", usuario: resultado })
-  })
-},
+    usuarioModels.esqueceuSenhaPorEmail(email, novaSenha, (erro, resultado) => {
+      if (erro) {
+        return res.status(500).json({ mensagem: erro.message });
+      }
+
+      if (!resultado) {
+        return res.status(404).json({ mensagem: "Email ou usuário não encontrado" });
+      }
+
+      return res.json({ titulo: "Nova senha confirmada", usuario: resultado });
+    });
+  },
 
   atualizarUsuario(req, res) {
     const id = req.params.id;
@@ -173,47 +203,66 @@ mudarSenhaUsuarioPorEmail(req, res) {
     console.log("[ATUALIZAR] Req.body:", req.body);
     console.log("[ATUALIZAR] Req.file:", req.file);
 
-    // Preparar dados para atualização
-    const dados = { nome, email, bio, genero_favorito, apelido };
-    
-    // Se houver arquivo, verificar se é duplicado antes de adicionar
-    if (req.file) {
-      try {
-        // Verificar se imagem duplicada já existe
-        const caminhoTemporario = path.join(multerConfig.uploadDir, req.file.filename);
-        const nomeArquivoFinal = multerConfig.verificarImagemDuplicada(caminhoTemporario);
-        
-        if (nomeArquivoFinal) {
-          dados.foto_perfil = env.buildPublicPath(env.profileUploadSubdir, nomeArquivoFinal);
-          console.log("[ATUALIZAR] Arquivo (verificado de duplicatas):", dados.foto_perfil);
-        } else {
-          console.error("[ATUALIZAR] Erro ao verificar duplicatas");
-          return res.status(500).json({ mensagem: "Erro ao processar imagem" });
+    const apelidoLimpo = String(apelido || "").trim();
+    const dados = { nome, email, bio, genero_favorito, apelido: apelidoLimpo };
+
+    const continuarAtualizacao = () => {
+      if (req.file) {
+        try {
+          const caminhoTemporario = path.join(multerConfig.uploadDir, req.file.filename);
+          const nomeArquivoFinal = multerConfig.verificarImagemDuplicada(caminhoTemporario);
+
+          if (nomeArquivoFinal) {
+            dados.foto_perfil = env.buildPublicPath(env.profileUploadSubdir, nomeArquivoFinal);
+            console.log("[ATUALIZAR] Arquivo (verificado de duplicatas):", dados.foto_perfil);
+          } else {
+            console.error("[ATUALIZAR] Erro ao verificar duplicatas");
+            return res.status(500).json({ mensagem: "Erro ao processar imagem" });
+          }
+        } catch (erro) {
+          console.error("[ATUALIZAR] Erro ao processar arquivo:", erro);
+          return res.status(500).json({ mensagem: "Erro ao processar arquivo" });
         }
-      } catch (erro) {
-        console.error("[ATUALIZAR] Erro ao processar arquivo:", erro);
-        return res.status(500).json({ mensagem: "Erro ao processar arquivo" });
       }
+
+      return usuarioModels.atualizar(id, dados, (erro) => {
+        if (erro) {
+          console.log("[ERRO] Ao atualizar:", erro.message);
+          return res.status(500).json({ mensagem: "Erro ao atualizar usuario" });
+        }
+
+        console.log("[SUCESSO] Usuário atualizado");
+        return res.json({
+          tipo: "edicao",
+          titulo: "Edição confirmada",
+          foto_url: dados.foto_perfil ? env.buildPublicUrl(dados.foto_perfil) : null,
+        });
+      });
+    };
+
+    if (!apelidoLimpo) {
+      return continuarAtualizacao();
     }
 
-    usuarioModels.atualizar(id, dados, (erro) => {
-      if (erro) {
-        console.log("[ERRO] Ao atualizar:", erro.message);
-        return res.status(500).json({ mensagem: "Erro ao atualizar usuario" });
+    return usuarioModels.buscarPorApelido(apelidoLimpo, (erroApelido, usuarioExistente) => {
+      if (erroApelido) {
+        console.error("[APELIDO] Erro ao validar username:", erroApelido);
+        limparArquivoTemporarioUpload(req.file);
+        return res.status(500).json({ mensagem: "Erro ao validar username" });
       }
 
-      console.log("[SUCESSO] Usuário atualizado");
-      res.json({
-        tipo: "edicao",
-        titulo: "Edição confirmada",
-        foto_url: dados.foto_perfil ? env.buildPublicUrl(dados.foto_perfil) : null
-      });
-    });
+      if (usuarioExistente) {
+        limparArquivoTemporarioUpload(req.file);
+        return responderApelidoDuplicado(res, apelidoLimpo, id);
+      }
+
+      return continuarAtualizacao();
+    }, id);
   },
+
   deletarUsuario(req, res) {
     const id = req.params.id;
 
-    //Acessar model e solicitar a exclusão do usuario
     usuarioModels.deletar(id, (erro, sucesso) => {
       if (erro) {
         console.error("[deletarUsuario] Erro ao deletar usuario:", erro);
@@ -227,8 +276,8 @@ mudarSenhaUsuarioPorEmail(req, res) {
       }
 
       const deletado = { usuario: "Selecionado" };
-      //Renderiza a tela de sucesso
-      res.json({
+
+      return res.json({
         tipo: "excluir",
         titulo: "usuario deletado",
         deletado,

@@ -18,7 +18,18 @@ module.exports = {
           return callback(erro, null)
         }
 
-        const novoProduto = { id:resultados.insertId, titulo, autor, genero, ano, numero_paginas, descricao, imagem_capa, editora }
+        const novoProduto = {
+          id: resultados.insertId,
+          titulo,
+          autor,
+          genero,
+          ano,
+          numero_paginas,
+          descricao,
+          imagem_capa: capaFinal,
+          editora,
+          criado_em: new Date().toISOString(),
+        }
 
         callback(null, novoProduto)
      } )

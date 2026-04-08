@@ -3,162 +3,183 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - InÃ­cio</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Ler Mais - Início</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../css/Avaliacao.css?v=20260406a" />
-
   </head>
 
   <body class="home-page">
-  <header>
-    <div class="header"> 
-      <div class="info-perfil">
-            <img src="../../logo.png" alt="">    
-            <div class="perfil">
-              <img src="../../User.png" alt="">
-           <a href="perfil.html">PERFIL</a>
+    <header>
+      <div class="header">
+        <div class="info-perfil">
+          <img src="../../logo.png" alt="" />
+          <div class="perfil">
+            <img src="../../User.png" alt="" />
+            <a href="perfil.html">PERFIL</a>
+          </div>
+        </div>
+        <nav>
+          <ul class="nav-list">
+            <li class="item-list">
+              <a href="index.html">
+                <i class="bi bi-house"></i>
+                Início
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="cadastroLivro.html">
+                <i class="bi bi-plus-circle"></i>
+                Cadastrar
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="biblioteca.html">
+                <i class="bi bi-book"></i>
+                Biblioteca
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="../../login.html">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="avaliacao-container">
+      <section class="hero-livro">
+        <div class="overlay"></div>
+
+        <div class="hero-content">
+          <img
+            id="capaLivro"
+            class="capa"
+            style="cursor: pointer;"
+            onclick="irParaInformacoes()"
+          />
+
+          <div class="info">
+            <!-- MODO VISUALIZAÇÃO -->
+            <div id="infoVisualizacao">
+              <h1 id="tituloLivro">Amor, Teoricamente</h1>
+              <p class="descricao" id="descricaoLivro">
+                Uma história envolvente que mistura romance, humor e ciência,
+                conquistando do começo ao fim.
+              </p>
             </div>
-      </div>        
-   <nav>
-  <ul class="nav-list">
-    
-    <li class="item-list">
-      <a href="index.html">
-        <i class="bi bi-house"></i>
-        InÃ­cio
-      </a>
-    </li>
 
-    <li class="item-list">
-      <a href="cadastroLivro.html">
-        <i class="bi bi-plus-circle"></i>
-        Cadastrar
-      </a>
-    </li>
+            <!-- MODO EDIÇÃO -->
+            <div id="infoEdicao" style="display: none;">
+              <input
+                type="text"
+                id="tituloLivroEdit"
+                placeholder="Título do livro"
+                class="input-edit"
+              />
+              <textarea
+                id="descricaoLivroEdit"
+                placeholder="Descrição do livro"
+                class="textarea-edit"
+                rows="4"
+              ></textarea>
 
-    <li class="item-list active">
-      <a href="biblioteca.html">
-        <i class="bi bi-book"></i>
-        Biblioteca
-      </a>
-    </li>
+              <label for="capaLivroFileEdit" class="label-edit">Imagem da Capa</label>
+              <input
+                type="file"
+                id="capaLivroFileEdit"
+                accept="image/*"
+                class="input-edit"
+              />
+            </div>
 
-    <li class="item-list">
-      <a href="../../login.html">
-        <i class="bi bi-box-arrow-right"></i>
-        Sair
-      </a>
-    </li>
+            <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
+              <option value="">Adicionar à biblioteca</option>
+              <option value="lendo">Lendo</option>
+              <option value="lido">Lido</option>
+              <option value="quero_ler">Quero ler</option>
+            </select>
 
-  </ul>
-</nav>
-    </div>
-  </header>
-<main class="avaliacao-container">
+            <div class="estrelas" id="avaliacaoEstrelas">
+              <span class="star" data-value="1">⭐</span>
+              <span class="star" data-value="2">⭐</span>
+              <span class="star" data-value="3">⭐</span>
+              <span class="star" data-value="4">⭐</span>
+              <span class="star" data-value="5">⭐</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-
-  <section class="hero-livro">
-
-    <div class="overlay"></div>
-
-    <div class="hero-content">
-      <img id="capaLivro" src="https://covers.openlibrary.org/b/id/11153254-L.jpg" class="capa" style="cursor: pointer;" onclick="irParaInformacoes()">
-
-      <div class="info">
-        <!-- MODO VISUALIZAÃ‡ÃƒO -->
-        <div id="infoVisualizacao">
-          <h1 id="tituloLivro">Amor, Teoricamente</h1>
-          <p class="descricao" id="descricaoLivro">
-            Uma histÃ³ria envolvente que mistura romance, humor e ciÃªncia,
-            conquistando do comeÃ§o ao fim.
+      <!-- CONTEÚDO -->
+      <section class="conteudo">
+        <div class="secao">
+          <h2>Sua resenha</h2>
+          <p id="resenhaTexto">
+            Amor, Teoricamente me conquistou do começo ao fim! A Elsie é
+            divertida, inteligente e muito humana, e o jeito como a história
+            mistura romance, humor e ciência é simplesmente encantador.
           </p>
+          <button
+            id="btnEditarResenha"
+            class="btn-editar"
+            onclick="habilitarEdicaoResenha()"
+          >
+            Editar
+          </button>
+          <textarea id="resenhaInput" class="texto-edicao" style="display: none;"></textarea>
+          <div id="botoesResenha" style="display: none; margin-top: 10px;">
+            <button class="btn-salvar" onclick="salvarResenha()">Salvar</button>
+            <button class="btn-cancelar" onclick="cancelarResenha()">Cancelar</button>
+          </div>
         </div>
 
-        <!-- MODO EDIÃ‡ÃƒO -->
-        <div id="infoEdicao" style="display: none;">
-          <input type="text" id="tituloLivroEdit" placeholder="TÃ­tulo do livro" class="input-edit">
-          <textarea id="descricaoLivroEdit" placeholder="DescriÃ§Ã£o do livro" class="textarea-edit" rows="4"></textarea>
-          
-          <label for="capaLivroFileEdit" class="label-edit">Imagem da Capa</label>
-          <input type="file" id="capaLivroFileEdit" accept="image/*" class="input-edit">
+        <div class="secao">
+          <h2>Parte favorita</h2>
+          <p id="favoritaTexto">
+            Quando Elsie e Jack deixam a rivalidade de lado e mostram uma
+            conexão real e sincera.
+          </p>
+          <button
+            id="btnEditarFavorita"
+            class="btn-editar"
+            onclick="habilitarEdicaoFavorita()"
+          >
+            Editar
+          </button>
+          <textarea id="favoritaInput" class="texto-edicao" style="display: none;"></textarea>
+          <div id="botoesFavorita" style="display: none; margin-top: 10px;">
+            <button class="btn-salvar" onclick="salvarFavorita()">Salvar</button>
+            <button class="btn-cancelar" onclick="cancelarFavorita()">Cancelar</button>
+          </div>
         </div>
+      </section>
+    </main>
 
-        <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
-          <option value="">Adicionar Ã  biblioteca </option>
-          <option value="lendo">ðŸ“– Lendo</option>
-          <option value="lido">âœ… Lido</option>
-          <option value="quero_ler">ðŸ’­ Quero Ler</option>
-        </select>
-   
-
-        <div class="estrelas" id="avaliacaoEstrelas">
-          <span class="star" data-value="1">â­</span>
-          <span class="star" data-value="2">â­</span>
-          <span class="star" data-value="3">â­</span>
-          <span class="star" data-value="4">â­</span>
-          <span class="star" data-value="5">â­</span>
-        </div>
-
-      
+    <footer class="app-footer">
+      <div class="footer-left">
+        <a href="index.html">Home</a>
+        <a href="perfil.html">Perfil</a>
       </div>
-    </div>
 
-  </section>
-
-  <!-- CONTEÃšDO -->
-  <section class="conteudo">
-
-    <div class="secao">
-      <h2>Sua resenha</h2>
-      <p id="resenhaTexto">
-        Amor, Teoricamente me conquistou do comeÃ§o ao fim!
-        A Elsie Ã© divertida, inteligente e muito humana,
-        e o jeito como a histÃ³ria mistura romance, humor
-        e ciÃªncia Ã© simplesmente encantador.
-      </p>
-      <button id="btnEditarResenha" class="btn-editar" onclick="habilitarEdicaoResenha()">Editar</button>
-      <textarea id="resenhaInput" class="texto-edicao" style="display: none;"></textarea>
-      <div id="botoesResenha" style="display: none; margin-top: 10px;">
-        <button class="btn-salvar" onclick="salvarResenha()">Salvar</button>
-        <button class="btn-cancelar" onclick="cancelarResenha()">Cancelar</button>
+      <div class="footer-center">
+        <img src="../../logo.png" alt="Logo" class="footer-logo" />
       </div>
-    </div>
 
-    <div class="secao">
-      <h2>Parte favorita</h2>
-      <p id="favoritaTexto">
-        Quando Elsie e Jack deixam a rivalidade de lado
-        e mostram uma conexÃ£o real e sincera.
-      </p>
-      <button id="btnEditarFavorita" class="btn-editar" onclick="habilitarEdicaoFavorita()">Editar</button>
-      <textarea id="favoritaInput" class="texto-edicao" style="display: none;"></textarea>
-      <div id="botoesFavorita" style="display: none; margin-top: 10px;">
-        <button class="btn-salvar" onclick="salvarFavorita()">Salvar</button>
-        <button class="btn-cancelar" onclick="cancelarFavorita()">Cancelar</button>
+      <div class="footer-right">
+        <small>Todos os direitos reservados</small>
       </div>
-    </div>
+    </footer>
 
-  </section>
-
-</main>
-<footer class="app-footer">
-
-  <div class="footer-left">
-    <a href="index.html">Home</a>
-    <a href="perfil.html">Perfil</a>
-  </div>
-
-  <div class="footer-center">
-    <img src="../../logo.png" alt="Logo" class="footer-logo">
-  </div>
-
-  <div class="footer-right">
-    <small>Todos os direitos reservados</small>
-  </div>
-
-</footer>
-
-<script src="/frontend-config.js"></script>
-<script src="../../script.js?v=20260406a"></script>
-</body>
+    <script src="/frontend-config.js"></script>
+    <script src="../../script.js?v=20260406a"></script>
+  </body>
 </html>

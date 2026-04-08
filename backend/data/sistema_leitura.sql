@@ -83,6 +83,7 @@ CREATE TABLE partes_favoritas (
 );
 
 ALTER TABLE livros ADD editora VARCHAR(100) NOT NULL;
+ALTER TABLE livros ADD COLUMN criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE usuarios MODIFY apelido VARCHAR(100) NULL;
 ALTER TABLE usuarios MODIFY genero_favorito ENUM('Romance',
 'Fantasia',
