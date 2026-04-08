@@ -38,7 +38,10 @@ app.get('/frontend-config.js', (req, res) => {
   )
 })
 
-app.use(express.static(path.join(__dirname, '..', 'frontend')))
+const frontendStaticPath = path.join(__dirname, '..', 'frontend')
+
+app.use('/frontend', express.static(frontendStaticPath))
+app.use(express.static(frontendStaticPath))
 app.use(`/${env.uploadsRoutePrefix}`, express.static(env.uploadsRootDir))
 
 // Rota de teste para debug
