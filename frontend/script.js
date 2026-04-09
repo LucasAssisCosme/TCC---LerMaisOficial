@@ -1646,7 +1646,7 @@ async function salvarPerfil() {
     }
 
     const resultado = await response.json();
-    alert("Perfil atualizado com sucesso! ðŸ˜");
+    alert("Perfil atualizado com sucesso!");
 
     console.log("[salvarPerfil] Resultado:", resultado);
 

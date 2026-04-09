@@ -44,6 +44,52 @@ app.use('/frontend', express.static(frontendStaticPath))
 app.use(express.static(frontendStaticPath))
 app.use(`/${env.uploadsRoutePrefix}`, express.static(env.uploadsRootDir))
 
+// Rota explícita para servir imagens de perfil
+app.get('/uploads/perfis/:filename', (req, res) => {
+  const filename = req.params.filename;
+  if (!filename.match(/^[a-zA-Z0-9_\-\.]+$/)) {
+    return res.status(400).json({ erro: 'Nome de arquivo inválido' });
+  }
+  
+  const filepath = path.join(env.profileUploadDir, filename);
+  
+  // Validar que o arquivo está dentro do diretório permitido
+  if (!path.normalize(filepath).startsWith(path.normalize(env.profileUploadDir))) {
+    return res.status(403).json({ erro: 'Acesso negado' });
+  }
+  
+  if (!fs.existsSync(filepath)) {
+    console.log('[SERVE] Arquivo não encontrado:', filepath);
+    return res.status(404).json({ erro: 'Arquivo não encontrado' });
+  }
+  
+  console.log('[SERVE] Servindo arquivo:', filepath);
+  res.sendFile(filepath);
+});
+
+// Rota explícita para servir capas de livros
+app.get('/uploads/livro_capa/:filename', (req, res) => {
+  const filename = req.params.filename;
+  if (!filename.match(/^[a-zA-Z0-9_\-\.]+$/)) {
+    return res.status(400).json({ erro: 'Nome de arquivo inválido' });
+  }
+  
+  const filepath = path.join(env.bookCoverUploadDir, filename);
+  
+  // Validar que o arquivo está dentro do diretório permitido
+  if (!path.normalize(filepath).startsWith(path.normalize(env.bookCoverUploadDir))) {
+    return res.status(403).json({ erro: 'Acesso negado' });
+  }
+  
+  if (!fs.existsSync(filepath)) {
+    console.log('[SERVE] Arquivo não encontrado:', filepath);
+    return res.status(404).json({ erro: 'Arquivo não encontrado' });
+  }
+  
+  console.log('[SERVE] Servindo arquivo:', filepath);
+  res.sendFile(filepath);
+});
+
 // Rota de teste para debug
 app.get('/test-uploads', (req, res) => {
   const uploadPath = env.profileUploadDir;
