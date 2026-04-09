@@ -469,6 +469,13 @@
     window.addEventListener("DOMContentLoaded", () => {
       configurarModalLivros();
       carregarCategoriasLivros();
+      
+      // Abrir modal automaticamente após um pequeno delay
+      setTimeout(() => {
+        if (livrosModalInstance) {
+          livrosModalInstance.show();
+        }
+      }, 300);
     });
 
     document.addEventListener("LivroCadastrado", () => {
