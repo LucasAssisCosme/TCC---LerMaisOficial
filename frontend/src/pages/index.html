@@ -321,6 +321,13 @@
       });
 
       modalBody.scrollTop = 0;
+      
+      // Fazer scroll automático para o modal
+      const modalElement = document.getElementById("livrosModal");
+      if (modalElement) {
+        modalElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      
       livrosModalInstance.show();
     }
 
@@ -341,6 +348,11 @@
         if (modalBody) {
           modalBody.scrollTop = 0;
         }
+        
+        // Fazer scroll automático para o modal quando estiver visível
+        setTimeout(() => {
+          modalElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
       });
     }
 
@@ -473,6 +485,11 @@
       // Abrir modal automaticamente após um pequeno delay
       setTimeout(() => {
         if (livrosModalInstance) {
+          const modalElement = document.getElementById("livrosModal");
+          if (modalElement) {
+            // Fazer scroll suave para o modal
+            modalElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
           livrosModalInstance.show();
         }
       }, 300);
