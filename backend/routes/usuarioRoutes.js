@@ -22,29 +22,27 @@ roteador.post("/login", validarLoginUsuario, usuarioControler.loginUsuario)
 //C = Criar novo usuario 
 //Rota para solicitar a página de cadastro
 roteador.post("/cadastrar", validarCadastroUsuario, usuarioControler.salvarUsuario)
-//Rota para enviar dados da página de cadastro
-//Retorna as informações de todos os usuarios
-roteador.get("/", autenticacao.verificarToken, usuarioControler.listarUsuarios)
-//Retorna as informações de um usuário apenas
 
-roteador.get("/:id", autenticacao.verificarToken, validarIdUsuario, usuarioControler.buscarUsuario)
-//Rota mudar senha (por ID + email)
-roteador.post("/esqueceuSenha/:id", validarRedefinirSenha, usuarioControler.mudarSenhaUsuario)
-
-//Rota mudar senha (por email)
-roteador.post("/esqueceuSenha", validarRedefinirSenha, usuarioControler.mudarSenhaUsuarioPorEmail)
-
-//R = Obter informações de usuarios
-//Retorna as informações de todos os usuarios
-
+//R = Obter informações de usuarios - ROTAS ESPECÍFICAS ANTES DAS DINÂMICAS
 // Rota para obter dados do usuário logado
 roteador.get("/me/info", autenticacao.verificarToken, usuarioControler.obterUsuarioLogado)
 
 // Rota para listar TODOS os usuários (apenas para bibliotecários)
 roteador.get("/todos/listar", autenticacao.verificarToken, usuarioControler.listarTodosUsuarios)
 
-// U = Atualizar um usuario
+// ROTAS COM PARÂMETROS DINÂMICOS VÃO DEPOIS
+//Retorna as informações de todos os usuarios
+roteador.get("/", autenticacao.verificarToken, usuarioControler.listarUsuarios)
+//Retorna as informações de um usuário apenas
+roteador.get("/:id", autenticacao.verificarToken, validarIdUsuario, usuarioControler.buscarUsuario)
 
+//Rota mudar senha (por ID + email)
+roteador.post("/esqueceuSenha/:id", validarRedefinirSenha, usuarioControler.mudarSenhaUsuario)
+
+//Rota mudar senha (por email)
+roteador.post("/esqueceuSenha", validarRedefinirSenha, usuarioControler.mudarSenhaUsuarioPorEmail)
+
+// U = Atualizar um usuario
 roteador.patch("/:id", autenticacao.verificarToken, upload.single('foto_perfil'), usuarioControler.atualizarUsuario)
 
 // Rota para mudar tipo de usuário
