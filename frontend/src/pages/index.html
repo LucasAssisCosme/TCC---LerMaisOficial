@@ -482,17 +482,7 @@
       configurarModalLivros();
       carregarCategoriasLivros();
       
-      // Abrir modal automaticamente após um pequeno delay
-      setTimeout(() => {
-        if (livrosModalInstance) {
-          const modalElement = document.getElementById("livrosModal");
-          if (modalElement) {
-            // Fazer scroll suave para o modal
-            modalElement.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-          livrosModalInstance.show();
-        }
-      }, 300);
+      // NÃO abrir modal vazio automaticamente - deixar usuário clicar em uma categoria
     });
 
     document.addEventListener("LivroCadastrado", () => {

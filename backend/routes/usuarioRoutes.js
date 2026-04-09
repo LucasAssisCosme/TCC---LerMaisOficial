@@ -37,9 +37,18 @@ roteador.post("/esqueceuSenha", validarRedefinirSenha, usuarioControler.mudarSen
 //R = Obter informações de usuarios
 //Retorna as informações de todos os usuarios
 
+// Rota para obter dados do usuário logado
+roteador.get("/me/info", autenticacao.verificarToken, usuarioControler.obterUsuarioLogado)
+
+// Rota para listar TODOS os usuários (apenas para bibliotecários)
+roteador.get("/todos/listar", autenticacao.verificarToken, usuarioControler.listarTodosUsuarios)
+
 // U = Atualizar um usuario
 
 roteador.patch("/:id", autenticacao.verificarToken, upload.single('foto_perfil'), usuarioControler.atualizarUsuario)
+
+// Rota para mudar tipo de usuário
+roteador.patch("/:id/tipo", autenticacao.verificarToken, usuarioControler.mudarTipoUsuario)
 
 // D = Deletar um usuario
 

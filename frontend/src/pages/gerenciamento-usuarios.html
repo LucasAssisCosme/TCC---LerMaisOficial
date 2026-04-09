@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ler Mais - Gerenciamento de Usuários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/gerenciamento-usuarios.css" />
+  </head>
+  <body class="home-page">
+    <header>
+      <div class="header">
+        <div class="info-perfil">
+          <img src="../../logo.png" alt="Logo">
+          <div class="perfil">
+            <img src="../../User.png" alt="Foto de perfil">
+            <a href="perfil.html">PERFIL</a>
+          </div>
+        </div>
+
+        <nav>
+          <ul class="nav-list">
+            <li class="item-list">
+              <a href="index.html">
+                <i class="bi bi-house"></i>
+                Início
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="cadastroLivro.html">
+                <i class="bi bi-plus-circle"></i>
+                Cadastrar
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="biblioteca.html">
+                <i class="bi bi-book"></i>
+                Biblioteca
+              </a>
+            </li>
+
+            <li class="item-list active">
+              <a href="gerenciamento-usuarios.html">
+                <i class="bi bi-people"></i>
+                Gerenciar Usuários
+              </a>
+            </li>
+
+            <li class="item-list">
+              <a href="../../login.html">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="gerenciamento-container">
+      <section class="usuarios-section">
+        <div class="usuarios-header">
+          <h1>Gerenciamento de Usuários</h1>
+          <p class="subtitulo">Apenas bibliotecários podem acessar esta página</p>
+        </div>
+
+        <div class="barra-pesquisa">
+          <input 
+            type="text" 
+            id="searchUsuario" 
+            placeholder="🔍 Pesquise por nome, email ou apelido..." 
+            class="search-input"
+          >
+        </div>
+
+        <div class="usuarios-table-wrapper">
+          <table class="usuarios-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Apelido</th>
+                <th>Tipo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usuariosTableBody">
+              <tr class="skeleto-row">
+                <td colspan="7" style="text-align: center; padding: 40px;">
+                  <p style="color: white;">Carregando usuários...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="mensagemNaoEncontrado" style="display: none; text-align: center; color: white; padding: 40px;">
+          <p>Nenhum usuário encontrado</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-left">
+        <a href="index.html">Home</a>
+        <a href="perfil.html">Perfil</a>
+      </div>
+
+      <div class="footer-center">
+        <img src="../../logo.png" alt="Logo" class="footer-logo">
+      </div>
+
+      <div class="footer-right">
+        <small>Todos os direitos reservados</small>
+      </div>
+    </footer>
+
+    <script src="/frontend-config.js"></script>
+    <script src="../../script.js"></script>
+    <script>
+      // ==================== GERENCIAMENTO DE USUÁRIOS ====================
+      
+      let usuariosCached = [];
+      let usuarioLogadoTipo = null;
+
+      // Verificar se é bibliotecário
+      async function verificarAcessoBibliotecario() {
+        try {
+          const token = getToken();
+          if (!token) {
+            window.location.href = "../../login.html";
+            return false;
+          }
+
+          const response = await fetch(apiUrl("/usuario/me/info"), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            window.location.href = "../../login.html";
+            return false;
+          }
+
+          const data = await response.json();
+          usuarioLogadoTipo = data.usuario?.tipo;
+
+          if (data.usuario?.tipo !== "bibliotecario") {
+            alert("Acesso negado! Apenas bibliotecários podem acessar esta página.");
+            window.location.href = "index.html";
+            return false;
+          }
+
+          return true;
+        } catch (erro) {
+          console.error("Erro ao verificar acesso:", erro);
+          window.location.href = "index.html";
+          return false;
+        }
+      }
+
+      // Carregar todos os usuários
+      async function carregarTodosUsuarios() {
+        try {
+          const token = getToken();
+          if (!token) return;
+
+          const response = await fetch(apiUrl("/usuario/todos/listar"), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Erro ao carregar usuários");
+          }
+
+          const data = await response.json();
+          usuariosCached = data.usuarios || [];
+          renderizarUsuarios(usuariosCached);
+        } catch (erro) {
+          console.error("Erro ao carregar usuários:", erro);
+          alert("Erro ao carregar usuários: " + erro.message);
+        }
+      }
+
+      // Renderizar usuários na tabela
+      function renderizarUsuarios(usuarios) {
+        const tbody = document.getElementById("usuariosTableBody");
+        const mensagemNaoEncontrado = document.getElementById("mensagemNaoEncontrado");
+
+        tbody.innerHTML = "";
+
+        if (usuarios.length === 0) {
+          mensagemNaoEncontrado.style.display = "block";
+          return;
+        }
+
+        mensagemNaoEncontrado.style.display = "none";
+
+        usuarios.forEach((usuario) => {
+          const row = document.createElement("tr");
+          
+          const fotoUrl = usuario.foto_perfil 
+            ? (usuario.foto_perfil.startsWith("http") ? usuario.foto_perfil : apiUrl(usuario.foto_perfil))
+            : "../../User.png";
+
+          row.innerHTML = `
+            <td>${usuario.id}</td>
+            <td>
+              <img src="${fotoUrl}" alt="Foto" class="usuario-foto-thumb" onerror="this.src='../../User.png'">
+            </td>
+            <td>${usuario.nome || "-"}</td>
+            <td>${usuario.email || "-"}</td>
+            <td>${usuario.apelido || "-"}</td>
+            <td>
+              <span class="badge-tipo ${usuario.tipo === 'bibliotecario' ? 'badge-bibliotecario' : 'badge-aluno'}">
+                ${usuario.tipo === 'bibliotecario' ? 'Bibliotecário' : 'Aluno'}
+              </span>
+            </td>
+            <td>
+              <button class="btn-mudartipo" onclick="mudarTipoUsuario(${usuario.id}, '${usuario.tipo}')">
+                Mudar para ${usuario.tipo === 'bibliotecario' ? 'Aluno' : 'Bibliotecário'}
+              </button>
+            </td>
+          `;
+
+          tbody.appendChild(row);
+        });
+      }
+
+      // Mudar tipo de usuário
+      async function mudarTipoUsuario(usuarioId, tipoAtual) {
+        try {
+          const novoTipo = tipoAtual === 'bibliotecario' ? 'aluno' : 'bibliotecario';
+          
+          const confirmacao = confirm(
+            `Tem certeza que deseja mudar este usuário para ${novoTipo}?`
+          );
+
+          if (!confirmacao) return;
+
+          const token = getToken();
+          if (!token) return;
+
+          const response = await fetch(apiUrl(`/usuario/${usuarioId}/tipo`), {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ tipo: novoTipo }),
+          });
+
+          if (!response.ok) {
+            const erro = await response.json().catch(() => ({}));
+            throw new Error(erro.mensagem || "Erro ao atualizar tipo de usuário");
+          }
+
+          alert("Tipo de usuário atualizado com sucesso!");
+          carregarTodosUsuarios();
+        } catch (erro) {
+          console.error("Erro ao mudar tipo de usuário:", erro);
+          alert("Erro: " + erro.message);
+        }
+      }
+
+      // Filtrar usuários por pesquisa
+      function filtrarUsuarios(termo) {
+        const termoNormalizado = String(termo || "").trim().toLowerCase();
+        
+        if (!termoNormalizado) {
+          renderizarUsuarios(usuariosCached);
+          return;
+        }
+
+        const usuariosFiltrados = usuariosCached.filter((usuario) =>
+          String(usuario.nome || "").toLowerCase().includes(termoNormalizado) ||
+          String(usuario.email || "").toLowerCase().includes(termoNormalizado) ||
+          String(usuario.apelido || "").toLowerCase().includes(termoNormalizado)
+        );
+
+        renderizarUsuarios(usuariosFiltrados);
+      }
+
+      // Inicializar
+      window.addEventListener("DOMContentLoaded", async () => {
+        const temAcesso = await verificarAcessoBibliotecario();
+        if (temAcesso) {
+          carregarTodosUsuarios();
+        }
+
+        document.getElementById("searchUsuario")?.addEventListener("input", (e) => {
+          filtrarUsuarios(e.target.value);
+        });
+      });
+    </script>
+  </body>
+</html>

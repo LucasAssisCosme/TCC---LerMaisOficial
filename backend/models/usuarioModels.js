@@ -359,4 +359,40 @@ module.exports = {
       }
     });
   },
+
+  // Listar todos os usuários
+  listarTodos: (callback) => {
+    const sql = `
+      SELECT id, nome, email, apelido, tipo, foto_perfil, bio, genero_favorito, criado_em 
+      FROM usuarios 
+      ORDER BY criado_em DESC
+    `;
+
+    conn.query(sql, (erro, resultados) => {
+      if (erro) {
+        console.error("[listarTodos] Erro:", erro);
+        return callback(erro, null);
+      }
+
+      callback(null, resultados);
+    });
+  },
+
+  // Atualizar tipo de usuário
+  atualizarTipo: (id, novoTipo, callback) => {
+    const sql = `UPDATE usuarios SET tipo = ? WHERE id = ?`;
+
+    conn.query(sql, [novoTipo, id], (erro, resultado) => {
+      if (erro) {
+        console.error("[atualizarTipo] Erro:", erro);
+        return callback(erro);
+      }
+
+      if (resultado.affectedRows === 0) {
+        return callback(new Error("Usuário não encontrado"));
+      }
+
+      callback(null);
+    });
+  },
 };

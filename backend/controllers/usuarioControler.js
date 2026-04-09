@@ -304,4 +304,75 @@ module.exports = {
       });
     });
   },
+
+  // Obter dados do usuário logado
+  obterUsuarioLogado(req, res) {
+    const usuarioId = req.usuario?.id;
+
+    if (!usuarioId) {
+      return res.status(401).json({ mensagem: "Não autorizado" });
+    }
+
+    usuarioModels.buscarPorId(usuarioId, (erro, usuario) => {
+      if (erro) {
+        console.error("[obterUsuarioLogado] Erro:", erro);
+        return res.status(500).json({ mensagem: "Erro ao obter dados do usuário" });
+      }
+
+      if (!usuario) {
+        return res.status(404).json({ mensagem: "Usuário não encontrado" });
+      }
+
+      res.json({ usuario });
+    });
+  },
+
+  // Listar TODOS os usuários (apenas para bibliotecários)
+  listarTodosUsuarios(req, res) {
+    const usuarioId = req.usuario?.id;
+    const usuarioTipo = req.usuario?.tipo;
+
+    // Verificar se é bibliotecário
+    if (usuarioTipo !== "bibliotecario") {
+      return res.status(403).json({ mensagem: "Acesso negado. Apenas bibliotecários podem listar usuários." });
+    }
+
+    usuarioModels.listarTodos((erro, usuarios) => {
+      if (erro) {
+        console.error("[listarTodosUsuarios] Erro:", erro);
+        return res.status(500).json({ mensagem: "Erro ao listar usuários" });
+      }
+
+      res.json({ usuarios: usuarios || [] });
+    });
+  },
+
+  // Mudar tipo de usuário (apenas para bibliotecários)
+  mudarTipoUsuario(req, res) {
+    const id = req.params.id;
+    const { tipo } = req.body;
+    const usuarioLogadoTipo = req.usuario?.tipo;
+
+    // Verificar se é bibliotecário
+    if (usuarioLogadoTipo !== "bibliotecario") {
+      return res.status(403).json({ mensagem: "Acesso negado. Apenas bibliotecários podem alterar tipos de usuário." });
+    }
+
+    // Validar tipo
+    if (!tipo || !["aluno", "bibliotecario"].includes(tipo)) {
+      return res.status(400).json({ mensagem: "Tipo de usuário inválido" });
+    }
+
+    usuarioModels.atualizarTipo(id, tipo, (erro) => {
+      if (erro) {
+        console.error("[mudarTipoUsuario] Erro:", erro);
+        return res.status(500).json({ mensagem: "Erro ao atualizar tipo de usuário" });
+      }
+
+      res.json({ 
+        mensagem: "Tipo de usuário atualizado com sucesso",
+        novoTipo: tipo 
+      });
+    });
+  },
 };

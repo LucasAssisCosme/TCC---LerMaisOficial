@@ -1,0 +1,392 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  list-style: none;
+  text-decoration: none;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #120805;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.home-page {
+  min-height: 100vh;
+  background: url("/image/est.jpg") center/cover no-repeat;
+  background-attachment: fixed;
+  background-color: #120805;
+}
+
+.home-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  z-index: -1;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* HEADER */
+header {
+  background-color: #7f1f0e;
+  padding: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-perfil {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.info-perfil img {
+  height: 45px;
+  border-radius: 50px;
+}
+
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.perfil img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: 0.3s;
+}
+
+.perfil a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.perfil:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.perfil:hover img {
+  transform: scale(1.1);
+}
+
+.perfil:hover a {
+  color: #ffe3d9;
+}
+
+.nav-list {
+  display: flex;
+  gap: 15px;
+  list-style: none;
+}
+
+.item-list a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.item-list a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.item-list.active a {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.item-list i {
+  font-size: 18px;
+}
+
+/* FOOTER */
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #8b2a12;
+  color: white;
+  padding: 15px 30px;
+  margin-top: auto;
+}
+
+.footer-left {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-left a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.footer-logo {
+  height: 35px;
+  border-radius: 20px;
+}
+
+.footer-right {
+  font-size: 13px;
+}
+
+/* CONTEÚDO PRINCIPAL */
+.gerenciamento-container {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  width: min(1600px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 16px;
+  min-height: auto;
+}
+
+.usuarios-section {
+  background: rgba(20, 20, 20, 0.85);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  padding: 40px;
+  color: white;
+}
+
+.usuarios-header {
+  margin-bottom: 30px;
+}
+
+.usuarios-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.subtitulo {
+  color: #ddd;
+  font-size: 1rem;
+}
+
+/* BARRA DE PESQUISA */
+.barra-pesquisa {
+  margin-bottom: 30px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* TABELA DE USUÁRIOS */
+.usuarios-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 30px;
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.usuarios-table thead {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.usuarios-table thead th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.usuarios-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.3s ease;
+}
+
+.usuarios-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.usuarios-table tbody tr.skeleto-row {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.usuarios-table td {
+  padding: 16px;
+  color: #ddd;
+}
+
+.usuario-foto-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* BADGES DE TIPO */
+.badge-tipo {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-bibliotecario {
+  background: rgba(168, 50, 28, 0.3);
+  color: #ff9066;
+}
+
+.badge-aluno {
+  background: rgba(33, 150, 243, 0.3);
+  color: #66b3ff;
+}
+
+/* BOTÕES */
+.btn-mudartipo {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #a8321c, #7f1f0e);
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-mudartipo:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+  box-shadow: 0 5px 15px rgba(168, 50, 28, 0.4);
+}
+
+.btn-mudartipo:active {
+  transform: scale(0.98);
+}
+
+/* RESPONSIVO */
+@media (max-width: 1024px) {
+  .usuarios-header h1 {
+    font-size: 2rem;
+  }
+
+  .usuarios-table {
+    font-size: 0.9rem;
+  }
+
+  .usuarios-table thead th,
+  .usuarios-table td {
+    padding: 12px;
+  }
+
+  .btn-mudartipo {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .gerenciamento-container {
+    padding: 16px 8px;
+  }
+
+  .usuarios-section {
+    padding: 20px;
+  }
+
+  .usuarios-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .nav-list {
+    gap: 8px;
+  }
+
+  .item-list a {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+
+  .item-list i {
+    font-size: 16px;
+  }
+
+  .usuarios-table {
+    font-size: 0.8rem;
+  }
+
+  .usuarios-table thead th,
+  .usuarios-table td {
+    padding: 8px;
+  }
+
+  .usuario-foto-thumb {
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-mudartipo {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+}
