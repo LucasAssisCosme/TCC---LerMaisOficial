@@ -263,6 +263,7 @@ body {
   color: #ccc;
   max-width: 560px;
   line-height: 1.7;
+   min-height: 80px; 
 }
 
 .edicao-livro {
