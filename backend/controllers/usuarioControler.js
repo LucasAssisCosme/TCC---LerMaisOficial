@@ -225,17 +225,30 @@ module.exports = {
         }
       }
 
-      return usuarioModels.atualizar(id, dados, (erro) => {
-        if (erro) {
-          console.log("[ERRO] Ao atualizar:", erro.message);
+      return usuarioModels.atualizar(id, dados, (erroAtualizar, usuarioAtualizado) => {
+        if (erroAtualizar) {
+          console.log("[ERRO] Ao atualizar:", erroAtualizar.message);
           return res.status(500).json({ mensagem: "Erro ao atualizar usuario" });
         }
 
         console.log("[SUCESSO] Usuário atualizado");
+        
+        // Construir foto_url com cache-bust
+        let fotoUrl = null;
+        if (dados.foto_perfil) {
+          fotoUrl = env.buildPublicUrl(dados.foto_perfil);
+          // Adicionar cache-bust
+          fotoUrl = fotoUrl + (fotoUrl.includes("?") ? "&" : "?") + "v=" + Date.now();
+        }
+        
         return res.json({
           tipo: "edicao",
           titulo: "Edição confirmada",
-          foto_url: dados.foto_perfil ? env.buildPublicUrl(dados.foto_perfil) : null,
+          foto_url: fotoUrl,
+          usuario: {
+            ...usuarioAtualizado,
+            foto_perfil: fotoUrl || usuarioAtualizado?.foto_perfil,
+          },
         });
       });
     };

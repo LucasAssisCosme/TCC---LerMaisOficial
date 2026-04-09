@@ -1656,20 +1656,42 @@ async function salvarPerfil() {
 
     // Atualizar foto no header se foi enviada
     if (resultado.foto_url || resultado.usuario?.foto_perfil) {
-      const novaFoto = resultado.foto_url || resultado.usuario?.foto_perfil;
+      let novaFoto = resultado.foto_url || resultado.usuario?.foto_perfil;
+      
+      // Adicionar cache-bust se não tiver
+      if (novaFoto && !novaFoto.includes("?v=") && !novaFoto.includes("&v=")) {
+        novaFoto = novaFoto + (novaFoto.includes("?") ? "&" : "?") + "v=" + Date.now();
+      }
 
       // Atualizar foto no header
       const fotoHeader = document.querySelector(".info-perfil .perfil img");
       if (fotoHeader) {
-        fotoHeader.src = novaFoto;
-        console.log("[salvarPerfil] Foto do header atualizada");
+        // Criar nova imagem para forçar reload
+        const tempImg = new Image();
+        tempImg.onload = function() {
+          fotoHeader.src = novaFoto;
+          console.log("[salvarPerfil] Foto do header atualizada:", novaFoto);
+        };
+        tempImg.onerror = function() {
+          console.error("[salvarPerfil] Erro ao carregar foto do header");
+          fotoHeader.src = novaFoto; // Tenta mesmo assim
+        };
+        tempImg.src = novaFoto;
       }
 
       // Atualizar foto no formulário principal
       const fotoMain = document.getElementById("fotoPerfilMain");
       if (fotoMain) {
-        fotoMain.src = novaFoto;
-        console.log("[salvarPerfil] Foto principal atualizada");
+        const tempImg2 = new Image();
+        tempImg2.onload = function() {
+          fotoMain.src = novaFoto;
+          console.log("[salvarPerfil] Foto principal atualizada:", novaFoto);
+        };
+        tempImg2.onerror = function() {
+          console.error("[salvarPerfil] Erro ao carregar foto principal");
+          fotoMain.src = novaFoto;
+        };
+        tempImg2.src = novaFoto;
       }
     }
 
