@@ -40,11 +40,7 @@ app.get('/frontend-config.js', (req, res) => {
 
 const frontendStaticPath = path.join(__dirname, '..', 'frontend')
 
-app.use('/frontend', express.static(frontendStaticPath))
-app.use(express.static(frontendStaticPath))
-app.use(`/${env.uploadsRoutePrefix}`, express.static(env.uploadsRootDir))
-
-// Rota explícita para servir imagens de perfil
+// Rota explícita para servir imagens de perfil (ANTES das rotas estáticas)
 app.get('/uploads/perfis/:filename', (req, res) => {
   const filename = req.params.filename;
   if (!filename.match(/^[a-zA-Z0-9_\-\.]+$/)) {
@@ -67,7 +63,7 @@ app.get('/uploads/perfis/:filename', (req, res) => {
   res.sendFile(filepath);
 });
 
-// Rota explícita para servir capas de livros
+// Rota explícita para servir capas de livros (ANTES das rotas estáticas)
 app.get('/uploads/livro_capa/:filename', (req, res) => {
   const filename = req.params.filename;
   if (!filename.match(/^[a-zA-Z0-9_\-\.]+$/)) {
@@ -89,6 +85,10 @@ app.get('/uploads/livro_capa/:filename', (req, res) => {
   console.log('[SERVE] Servindo arquivo:', filepath);
   res.sendFile(filepath);
 });
+
+app.use('/frontend', express.static(frontendStaticPath))
+app.use(express.static(frontendStaticPath))
+app.use(`/${env.uploadsRoutePrefix}`, express.static(env.uploadsRootDir))
 
 // Rota de teste para debug
 app.get('/test-uploads', (req, res) => {
