@@ -232,13 +232,20 @@ module.exports = {
         }
 
         console.log("[SUCESSO] Usuário atualizado");
+        console.log("[DEBUG] dados.foto_perfil:", dados.foto_perfil);
+        console.log("[DEBUG] env.publicApiBaseUrl:", env.publicApiBaseUrl);
         
         // Construir foto_url com cache-bust
         let fotoUrl = null;
         if (dados.foto_perfil) {
-          fotoUrl = env.buildPublicUrl(dados.foto_perfil);
+          // Garantir que o caminho comece com /
+          const caminhoFoto = dados.foto_perfil.startsWith('/') ? dados.foto_perfil : `/${dados.foto_perfil}`;
+          fotoUrl = env.buildPublicUrl(caminhoFoto);
+          console.log("[DEBUG] fotoUrl gerada:", fotoUrl);
+          
           // Adicionar cache-bust
           fotoUrl = fotoUrl + (fotoUrl.includes("?") ? "&" : "?") + "v=" + Date.now();
+          console.log("[DEBUG] fotoUrl final com cache-bust:", fotoUrl);
         }
         
         return res.json({

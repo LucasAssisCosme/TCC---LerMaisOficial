@@ -75,6 +75,24 @@ function normalizarUrlMidia(url) {
 
 const PAGE_TRANSITION_DURATION = 280;
 
+// Função auxiliar para garantir URLs completas de fotos
+function normalizarUrlFoto(url) {
+  if (!url) return "";
+  
+  // Se já é uma URL completa (começa com http/https), retorna como está
+  if (/^https?:\/\//.test(url)) {
+    return url;
+  }
+  
+  // Se é uma URL relativa, construir a URL completa usando apiUrl
+  if (url.startsWith('/')) {
+    return apiUrl(url);
+  }
+  
+  // Caso contrário, adicionar / e usar apiUrl
+  return apiUrl('/' + url);
+}
+
 function setupPageTransitions() {
   if (!document.body || document.getElementById("page-transition-style")) {
     return;
@@ -1537,16 +1555,18 @@ async function carregarPerfil() {
 
     // Se houver foto de perfil, carregar em todos os elementos
     if (data.usuario.foto_perfil) {
+      const fotoNormalizada = normalizarUrlFoto(data.usuario.foto_perfil);
+      
       // Atualizar foto no header
       const fotoHeader = document.querySelector(".info-perfil .perfil img");
       if (fotoHeader) {
-        fotoHeader.src = data.usuario.foto_perfil;
+        fotoHeader.src = fotoNormalizada;
       }
 
       // Atualizar foto no formulário principal
       const fotoMain = document.getElementById("fotoPerfilMain");
       if (fotoMain) {
-        fotoMain.src = data.usuario.foto_perfil;
+        fotoMain.src = fotoNormalizada;
       }
     }
 
@@ -1658,10 +1678,18 @@ async function salvarPerfil() {
     if (resultado.foto_url || resultado.usuario?.foto_perfil) {
       let novaFoto = resultado.foto_url || resultado.usuario?.foto_perfil;
       
+      // Garantir URL completa (não relativa)
+      if (novaFoto && !novaFoto.match(/^https?:\/\//)) {
+        // Se for URL relativa, usar a URL correta do servidor
+        novaFoto = apiUrl(novaFoto);
+      }
+      
       // Adicionar cache-bust se não tiver
       if (novaFoto && !novaFoto.includes("?v=") && !novaFoto.includes("&v=")) {
         novaFoto = novaFoto + (novaFoto.includes("?") ? "&" : "?") + "v=" + Date.now();
       }
+
+      console.log("[salvarPerfil] URL final da foto:", novaFoto);
 
       // Atualizar foto no header
       const fotoHeader = document.querySelector(".info-perfil .perfil img");
@@ -1673,7 +1701,7 @@ async function salvarPerfil() {
           console.log("[salvarPerfil] Foto do header atualizada:", novaFoto);
         };
         tempImg.onerror = function() {
-          console.error("[salvarPerfil] Erro ao carregar foto do header");
+          console.error("[salvarPerfil] Erro ao carregar foto do header:", novaFoto);
           fotoHeader.src = novaFoto; // Tenta mesmo assim
         };
         tempImg.src = novaFoto;
@@ -1688,7 +1716,7 @@ async function salvarPerfil() {
           console.log("[salvarPerfil] Foto principal atualizada:", novaFoto);
         };
         tempImg2.onerror = function() {
-          console.error("[salvarPerfil] Erro ao carregar foto principal");
+          console.error("[salvarPerfil] Erro ao carregar foto principal:", novaFoto);
           fotoMain.src = novaFoto;
         };
         tempImg2.src = novaFoto;
@@ -3224,19 +3252,21 @@ async function carregarFotoPerfilHeader() {
 
     // Atualiza a imagem de perfil no header se houver foto
     if (data.usuario && data.usuario.foto_perfil) {
+      const fotoNormalizada = normalizarUrlFoto(data.usuario.foto_perfil);
+      
       const imagemHeader = document.querySelector(".info-perfil .perfil img");
       if (imagemHeader) {
-        imagemHeader.src = data.usuario.foto_perfil;
+        imagemHeader.src = fotoNormalizada;
         console.log(
           "[carregarFotoPerfilHeader] Foto carregada:",
-          data.usuario.foto_perfil,
+          fotoNormalizada,
         );
       }
 
       // Se estiver na página de perfil, atualizar também a foto principal
       const fotoMain = document.getElementById("fotoPerfilMain");
       if (fotoMain) {
-        fotoMain.src = data.usuario.foto_perfil;
+        fotoMain.src = fotoNormalizada;
       }
     }
   } catch (erro) {
