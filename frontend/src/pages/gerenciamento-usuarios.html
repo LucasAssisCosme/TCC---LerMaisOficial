@@ -131,34 +131,48 @@
       async function verificarAcessoBibliotecario() {
         try {
           const token = getToken();
+          console.log("[verificarAcesso] Token obtido:", !!token);
+          
           if (!token) {
+            console.error("[verificarAcesso] Nenhum token encontrado");
             window.location.href = "../../login.html";
             return false;
           }
 
+          console.log("[verificarAcesso] Enviando requisição para /usuario/me/info");
+          
           const response = await fetch(apiUrl("/usuario/me/info"), {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           });
 
+          console.log("[verificarAcesso] Status da resposta:", response.status);
+          
           if (!response.ok) {
+            const erro = await response.json().catch(() => ({}));
+            console.error("[verificarAcesso] Erro na resposta:", erro);
             window.location.href = "../../login.html";
             return false;
           }
 
           const data = await response.json();
+          console.log("[verificarAcesso] Dados do usuário:", data);
+          
           usuarioLogadoTipo = data.usuario?.tipo;
 
           if (data.usuario?.tipo !== "bibliotecario") {
+            console.error("[verificarAcesso] Usuário não é bibliotecário, tipo:", data.usuario?.tipo);
             alert("Acesso negado! Apenas bibliotecários podem acessar esta página.");
             window.location.href = "index.html";
             return false;
           }
 
+          console.log("[verificarAcesso] Acesso concedido para bibliotecário");
           return true;
         } catch (erro) {
-          console.error("Erro ao verificar acesso:", erro);
+          console.error("[verificarAcesso] Erro:", erro);
           window.location.href = "index.html";
           return false;
         }

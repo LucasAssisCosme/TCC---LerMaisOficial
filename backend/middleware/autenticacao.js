@@ -28,6 +28,8 @@ module.exports = {
       const decoded = jwt.verify(token, SECRET_KEY);
       req.usuarioId = decoded.id;
       req.usuarioTipo = decoded.tipo;
+      // Também salvar em req.usuario para compatibilidade
+      req.usuario = { id: decoded.id, tipo: decoded.tipo, email: decoded.email };
       next();
     } catch (erro) {
       if (erro.name === "TokenExpiredError") {
