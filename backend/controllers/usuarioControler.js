@@ -129,7 +129,7 @@ module.exports = {
   buscarUsuario(req, res) {
     const id = req.params.id;
 
-    usuarioModels.buscarPorid(id, (erro, usuario) => {
+    usuarioModels.buscarPorId(id, (erro, usuario) => {
       if (erro || !usuario) {
         return res.status(500).json({ mensagem: "Erro ao buscar usuario" });
       }
@@ -333,7 +333,7 @@ module.exports = {
     const usuarioTipo = req.usuario?.tipo;
 
     // Verificar se é bibliotecário
-    if (usuarioTipo !== "bibliotecario") {
+    if (usuarioTipo !== "bibliotecaria") {
       return res.status(403).json({ mensagem: "Acesso negado. Apenas bibliotecários podem listar usuários." });
     }
 
@@ -354,12 +354,12 @@ module.exports = {
     const usuarioLogadoTipo = req.usuario?.tipo;
 
     // Verificar se é bibliotecário
-    if (usuarioLogadoTipo !== "bibliotecario") {
+    if (usuarioLogadoTipo !== "bibliotecaria") {
       return res.status(403).json({ mensagem: "Acesso negado. Apenas bibliotecários podem alterar tipos de usuário." });
     }
 
     // Validar tipo
-    if (!tipo || !["aluno", "bibliotecario"].includes(tipo)) {
+    if (!tipo || !["aluno", "bibliotecaria"].includes(tipo)) {
       return res.status(400).json({ mensagem: "Tipo de usuário inválido" });
     }
 

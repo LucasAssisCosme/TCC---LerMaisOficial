@@ -3,17 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - Gerenciamento de Usuários</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Ler Mais - Gerenciamento de Usuarios</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    >
     <link rel="stylesheet" href="../css/gerenciamento-usuarios.css" />
   </head>
   <body class="home-page">
     <header>
       <div class="header">
         <div class="info-perfil">
-          <img src="../../logo.png" alt="Logo">
+          <img src="../../logo.png" alt="Logo" />
           <div class="perfil">
-            <img src="../../User.png" alt="Foto de perfil">
+            <img src="../../User.png" alt="Foto de perfil" />
             <a href="perfil.html">PERFIL</a>
           </div>
         </div>
@@ -23,7 +26,7 @@
             <li class="item-list">
               <a href="index.html">
                 <i class="bi bi-house"></i>
-                Início
+                Inicio
               </a>
             </li>
 
@@ -44,7 +47,7 @@
             <li class="item-list active">
               <a href="gerenciamento-usuarios.html">
                 <i class="bi bi-people"></i>
-                Gerenciar Usuários
+                Gerenciar Usuarios
               </a>
             </li>
 
@@ -62,15 +65,14 @@
     <main class="gerenciamento-container">
       <section class="usuarios-section">
         <div class="usuarios-header">
-          <h1>Gerenciamento de Usuários</h1>
-          <p class="subtitulo">Apenas bibliotecários podem acessar esta página</p>
+          <h1>Gerenciamento de Usuarios</h1>
         </div>
 
         <div class="barra-pesquisa">
-          <input 
-            type="text" 
-            id="searchUsuario" 
-            placeholder="🔍 Pesquise por nome, email ou apelido..." 
+          <input
+            type="text"
+            id="searchUsuario"
+            placeholder="Pesquise por nome, email ou apelido..."
             class="search-input"
           >
         </div>
@@ -85,21 +87,24 @@
                 <th>Email</th>
                 <th>Apelido</th>
                 <th>Tipo</th>
-                <th>Ações</th>
+                <th>Acoes</th>
               </tr>
             </thead>
             <tbody id="usuariosTableBody">
               <tr class="skeleto-row">
                 <td colspan="7" style="text-align: center; padding: 40px;">
-                  <p style="color: white;">Carregando usuários...</p>
+                  <p style="color: white;">Carregando usuarios...</p>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div id="mensagemNaoEncontrado" style="display: none; text-align: center; color: white; padding: 40px;">
-          <p>Nenhum usuário encontrado</p>
+        <div
+          id="mensagemNaoEncontrado"
+          style="display: none; text-align: center; color: white; padding: 40px;"
+        >
+          <p>Nenhum usuario encontrado</p>
         </div>
       </section>
     </main>
@@ -111,7 +116,7 @@
       </div>
 
       <div class="footer-center">
-        <img src="../../logo.png" alt="Logo" class="footer-logo">
+        <img src="../../logo.png" alt="Logo" class="footer-logo" />
       </div>
 
       <div class="footer-right">
@@ -122,25 +127,20 @@
     <script src="/frontend-config.js"></script>
     <script src="../../script.js"></script>
     <script>
-      // ==================== GERENCIAMENTO DE USUÁRIOS ====================
-      
       let usuariosCached = [];
       let usuarioLogadoTipo = null;
 
-      // Verificar se é bibliotecário
       async function verificarAcessoBibliotecario() {
         try {
           const token = getToken();
           console.log("[verificarAcesso] Token obtido:", !!token);
-          
+
           if (!token) {
             console.error("[verificarAcesso] Nenhum token encontrado");
             window.location.href = "../../login.html";
             return false;
           }
 
-          console.log("[verificarAcesso] Enviando requisição para /usuario/me/info");
-          
           const response = await fetch(apiUrl("/usuario/me/info"), {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -149,27 +149,33 @@
           });
 
           console.log("[verificarAcesso] Status da resposta:", response.status);
-          
+
           if (!response.ok) {
             const erro = await response.json().catch(() => ({}));
             console.error("[verificarAcesso] Erro na resposta:", erro);
-            window.location.href = "../../login.html";
-            return false;
-          }
 
-          const data = await response.json();
-          console.log("[verificarAcesso] Dados do usuário:", data);
-          
-          usuarioLogadoTipo = data.usuario?.tipo;
+            if (response.status === 401) {
+              alert("Sessao expirada. Faca login novamente.");
+              window.location.href = "../../login.html";
+              return false;
+            }
 
-          if (data.usuario?.tipo !== "bibliotecario") {
-            console.error("[verificarAcesso] Usuário não é bibliotecário, tipo:", data.usuario?.tipo);
-            alert("Acesso negado! Apenas bibliotecários podem acessar esta página.");
+            alert("Nao foi possivel validar seu acesso no momento.");
             window.location.href = "index.html";
             return false;
           }
 
-          console.log("[verificarAcesso] Acesso concedido para bibliotecário");
+          const data = await response.json();
+          usuarioLogadoTipo = normalizarTipo(data.usuario?.tipo);
+          localStorage.setItem("usuarioLogadoTipo", usuarioLogadoTipo);
+          window.atualizarAcessoGerenciamentoUsuarios?.();
+
+          if (usuarioLogadoTipo !== "bibliotecaria") {
+            alert("Acesso negado! Apenas bibliotecarias podem acessar esta pagina.");
+            window.location.href = "index.html";
+            return false;
+          }
+
           return true;
         } catch (erro) {
           console.error("[verificarAcesso] Erro:", erro);
@@ -178,11 +184,12 @@
         }
       }
 
-      // Carregar todos os usuários
       async function carregarTodosUsuarios() {
         try {
           const token = getToken();
-          if (!token) return;
+          if (!token) {
+            return;
+          }
 
           const response = await fetch(apiUrl("/usuario/todos/listar"), {
             headers: {
@@ -191,19 +198,18 @@
           });
 
           if (!response.ok) {
-            throw new Error("Erro ao carregar usuários");
+            throw new Error("Erro ao carregar usuarios");
           }
 
           const data = await response.json();
           usuariosCached = data.usuarios || [];
           renderizarUsuarios(usuariosCached);
         } catch (erro) {
-          console.error("Erro ao carregar usuários:", erro);
-          alert("Erro ao carregar usuários: " + erro.message);
+          console.error("Erro ao carregar usuarios:", erro);
+          alert("Erro ao carregar usuarios: " + erro.message);
         }
       }
 
-      // Renderizar usuários na tabela
       function renderizarUsuarios(usuarios) {
         const tbody = document.getElementById("usuariosTableBody");
         const mensagemNaoEncontrado = document.getElementById("mensagemNaoEncontrado");
@@ -219,9 +225,10 @@
 
         usuarios.forEach((usuario) => {
           const row = document.createElement("tr");
-          
-          const fotoUrl = usuario.foto_perfil 
-            ? (usuario.foto_perfil.startsWith("http") ? usuario.foto_perfil : apiUrl(usuario.foto_perfil))
+          const fotoUrl = usuario.foto_perfil
+            ? (usuario.foto_perfil.startsWith("http")
+              ? usuario.foto_perfil
+              : apiUrl(usuario.foto_perfil))
             : "../../User.png";
 
           row.innerHTML = `
@@ -233,13 +240,13 @@
             <td>${usuario.email || "-"}</td>
             <td>${usuario.apelido || "-"}</td>
             <td>
-              <span class="badge-tipo ${usuario.tipo === 'bibliotecario' ? 'badge-bibliotecario' : 'badge-aluno'}">
-                ${usuario.tipo === 'bibliotecario' ? 'Bibliotecário' : 'Aluno'}
+              <span class="badge-tipo ${usuario.tipo === "bibliotecaria" ? "badge-bibliotecario" : "badge-aluno"}">
+                ${usuario.tipo === "bibliotecaria" ? "Bibliotecaria" : "Aluno"}
               </span>
             </td>
             <td>
               <button class="btn-mudartipo" onclick="mudarTipoUsuario(${usuario.id}, '${usuario.tipo}')">
-                Mudar para ${usuario.tipo === 'bibliotecario' ? 'Aluno' : 'Bibliotecário'}
+                Mudar para ${usuario.tipo === "bibliotecaria" ? "Aluno" : "Bibliotecaria"}
               </button>
             </td>
           `;
@@ -248,19 +255,19 @@
         });
       }
 
-      // Mudar tipo de usuário
       async function mudarTipoUsuario(usuarioId, tipoAtual) {
         try {
-          const novoTipo = tipoAtual === 'bibliotecario' ? 'aluno' : 'bibliotecario';
-          
-          const confirmacao = confirm(
-            `Tem certeza que deseja mudar este usuário para ${novoTipo}?`
-          );
+          const novoTipo = tipoAtual === "bibliotecaria" ? "aluno" : "bibliotecaria";
+          const confirmacao = confirm(`Tem certeza que deseja mudar este usuario para ${novoTipo}?`);
 
-          if (!confirmacao) return;
+          if (!confirmacao) {
+            return;
+          }
 
           const token = getToken();
-          if (!token) return;
+          if (!token) {
+            return;
+          }
 
           const response = await fetch(apiUrl(`/usuario/${usuarioId}/tipo`), {
             method: "PATCH",
@@ -273,21 +280,20 @@
 
           if (!response.ok) {
             const erro = await response.json().catch(() => ({}));
-            throw new Error(erro.mensagem || "Erro ao atualizar tipo de usuário");
+            throw new Error(erro.mensagem || "Erro ao atualizar tipo de usuario");
           }
 
-          alert("Tipo de usuário atualizado com sucesso!");
+          alert("Tipo de usuario atualizado com sucesso!");
           carregarTodosUsuarios();
         } catch (erro) {
-          console.error("Erro ao mudar tipo de usuário:", erro);
+          console.error("Erro ao mudar tipo de usuario:", erro);
           alert("Erro: " + erro.message);
         }
       }
 
-      // Filtrar usuários por pesquisa
       function filtrarUsuarios(termo) {
         const termoNormalizado = String(termo || "").trim().toLowerCase();
-        
+
         if (!termoNormalizado) {
           renderizarUsuarios(usuariosCached);
           return;
@@ -302,7 +308,6 @@
         renderizarUsuarios(usuariosFiltrados);
       }
 
-      // Inicializar
       window.addEventListener("DOMContentLoaded", async () => {
         const temAcesso = await verificarAcessoBibliotecario();
         if (temAcesso) {

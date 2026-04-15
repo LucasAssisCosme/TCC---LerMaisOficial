@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Verificar Token e Acesso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+        }
+        
+        body {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ffff00;
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            background: #2d2d2d;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 3px solid #00ff00;
+            border-radius: 5px;
+        }
+        
+        .section h2 {
+            color: #00ff00;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .info {
+            background: #1a1a1a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            word-break: break-all;
+        }
+        
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px 5px 5px 0;
+        }
+        
+        button:hover {
+            background: #00dd00;
+        }
+        
+        .success {
+            color: #00ff00;
+        }
+        
+        .error {
+            color: #ff0000;
+        }
+        
+        .warning {
+            color: #ffff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug - Verificar Token e Acesso</h1>
+        
+        <div class="section">
+            <h2>LocalStorage</h2>
+            <button onclick="exibirLocalStorage()">Ver LocalStorage</button>
+            <div id="localStorage-info"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Token JWT</h2>
+            <button onclick="exibirToken()">Ver Token Completo</button>
+            <button onclick="decodificarToken()">Decodificar Token</button>
+            <div id="token-info"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Testar API</h2>
+            <button onclick="testarMeInfo()">Testar GET /usuario/me/info</button>
+            <button onclick="testarTodosUsuarios()">Testar GET /usuario/todos/listar</button>
+            <div id="api-info"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Ações</h2>
+            <button onclick="acessarGerenciamento()">Tentar acessar Gerenciamento</button>
+            <button onclick="limparLocalStorage()">Limpar LocalStorage</button>
+            <button onclick="voltarLogin()">Voltar para Login</button>
+        </div>
+    </div>
+
+    <script src="/frontend-config.js"></script>
+    <script src="../../script.js"></script>
+    <script>
+        function exibirLocalStorage() {
+            const info = document.getElementById('localStorage-info');
+            const items = {
+                token: localStorage.getItem('token'),
+                usuarioLogadoId: localStorage.getItem('usuarioLogadoId'),
+                usuarioLogadoTipo: localStorage.getItem('usuarioLogadoTipo'),
+                usuarioLogadoApelido: localStorage.getItem('usuarioLogadoApelido'),
+            };
+            
+            let html = '<h3>Itens no LocalStorage:</h3>';
+            for (const [chave, valor] of Object.entries(items)) {
+                const classe = valor ? 'success' : 'error';
+                html += `<div class="info"><strong class="${classe}">${chave}:</strong> ${valor || 'NÃO DEFINIDO'}</div>`;
+            }
+            
+            info.innerHTML = html;
+        }
+        
+        function exibirToken() {
+            const token = getToken();
+            const info = document.getElementById('token-info');
+            
+            if (!token) {
+                info.innerHTML = '<div class="info error"><strong>ERRO:</strong> Nenhum token encontrado no localStorage!</div>';
+                return;
+            }
+            
+            info.innerHTML = `<div class="info"><strong>Token:</strong> ${token}</div>`;
+        }
+        
+        function decodificarToken() {
+            const token = getToken();
+            const info = document.getElementById('token-info');
+            
+            if (!token) {
+                info.innerHTML = '<div class="info error"><strong>ERRO:</strong> Nenhum token encontrado!</div>';
+                return;
+            }
+            
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    throw new Error('Token inválido: não tem 3 partes');
+                }
+                
+                const decoded = JSON.parse(atob(parts[1]));
+                
+                let html = '<h3>Token Decodificado:</h3>';
+                html += '<div class="info"><strong class="success">ID:</strong> ' + decoded.id + '</div>';
+                html += '<div class="info"><strong class="success">Email:</strong> ' + decoded.email + '</div>';
+                html += '<div class="info"><strong class="' + (decoded.tipo === 'bibliotecario' ? 'success' : 'warning') + '">Tipo:</strong> ' + decoded.tipo + '</div>';
+                
+                info.innerHTML = html;
+            } catch (erro) {
+                info.innerHTML = '<div class="info error"><strong>ERRO ao decodificar:</strong> ' + erro.message + '</div>';
+            }
+        }
+        
+        async function testarMeInfo() {
+            const token = getToken();
+            const info = document.getElementById('api-info');
+            
+            if (!token) {
+                info.innerHTML = '<div class="info error"><strong>ERRO:</strong> Nenhum token encontrado!</div>';
+                return;
+            }
+            
+            try {
+                const url = apiUrl('/usuario/me/info');
+                console.log('[DEBUG] URL:', url);
+                console.log('[DEBUG] Token:', token);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                console.log('[DEBUG] Status:', response.status);
+                
+                if (!response.ok) {
+                    const erro = await response.text();
+                    info.innerHTML = `<div class="info error"><strong>ERRO ${response.status}:</strong> ${erro}</div>`;
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                let html = '<h3>Resposta de /usuario/me/info:</h3>';
+                html += '<div class="info"><strong class="success">Status:</strong> OK (200)</div>';
+                html += '<div class="info"><strong class="success">ID:</strong> ' + data.usuario?.id + '</div>';
+                html += '<div class="info"><strong class="success">Nome:</strong> ' + data.usuario?.nome + '</div>';
+                html += '<div class="info"><strong class="success">Email:</strong> ' + data.usuario?.email + '</div>';
+                html += '<div class="info"><strong class="' + (data.usuario?.tipo === 'bibliotecario' ? 'success' : 'warning') + '">Tipo:</strong> ' + data.usuario?.tipo + '</div>';
+                
+                info.innerHTML = html;
+            } catch (erro) {
+                info.innerHTML = '<div class="info error"><strong>ERRO:</strong> ' + erro.message + '</div>';
+            }
+        }
+        
+        async function testarTodosUsuarios() {
+            const token = getToken();
+            const info = document.getElementById('api-info');
+            
+            if (!token) {
+                info.innerHTML = '<div class="info error"><strong>ERRO:</strong> Nenhum token encontrado!</div>';
+                return;
+            }
+            
+            try {
+                const url = apiUrl('/usuario/todos/listar');
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (!response.ok) {
+                    const erro = await response.json();
+                    info.innerHTML = `<div class="info error"><strong>ERRO ${response.status}:</strong> ${erro.mensagem || JSON.stringify(erro)}</div>`;
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                let html = '<h3>Resposta de /usuario/todos/listar:</h3>';
+                html += '<div class="info"><strong class="success">Total de usuários:</strong> ' + data.usuarios?.length + '</div>';
+                html += '<div class="info"><strong>PrimeirosUsuários:</strong><pre>' + JSON.stringify(data.usuarios?.slice(0, 2), null, 2) + '</pre></div>';
+                
+                info.innerHTML = html;
+            } catch (erro) {
+                info.innerHTML = '<div class="info error"><strong>ERRO:</strong> ' + erro.message + '</div>';
+            }
+        }
+        
+        function acessarGerenciamento() {
+            window.location.href = 'gerenciamento-usuarios.html';
+        }
+        
+        function limparLocalStorage() {
+            localStorage.clear();
+            alert('LocalStorage limpo! Você será redirecionado para o login.');
+            window.location.href = '../../login.html';
+        }
+        
+        function voltarLogin() {
+            window.location.href = '../../login.html';
+        }
+        
+        // Exibir info automaticamente
+        window.addEventListener('load', () => {
+            exibirLocalStorage();
+            decodificarToken();
+        });
+    </script>
+</body>
+</html>

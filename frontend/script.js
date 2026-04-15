@@ -1198,14 +1198,11 @@ function logout() {
 
 function isBibliotecariaLogada() {
   const tipo = getUsuarioLogadoTipo();
-  const libera = [
+  return [
     "bibliotecaria",
     "bibliotecario",
     "professor",
-    "bibliotecaria",
-    "bibliotecario",
   ].includes(tipo);
-  return libera;
 }
 
 function atualizarAcessoCadastroLivro() {
@@ -1228,6 +1225,30 @@ function atualizarAcessoCadastroLivro() {
   if (!podeCadastrar && window.location.href.includes("cadastroLivro.html")) {
     alert("Acesso negado: apenas bibliotecárias podem cadastrar livros.");
     window.location.href = "/frontend/src/pages/index.html";
+  }
+}
+
+function atualizarAcessoGerenciamentoUsuarios() {
+  const podeGerenciarUsuarios = isBibliotecariaLogada();
+  const links = document.querySelectorAll('a[href*="gerenciamento-usuarios.html"]');
+
+  links.forEach((link) => {
+    if (podeGerenciarUsuarios) {
+      link.style.display = "";
+      if (link.parentElement) {
+        link.parentElement.style.display = "";
+      }
+      return;
+    }
+
+    link.style.display = "none";
+    if (link.parentElement) {
+      link.parentElement.style.display = "none";
+    }
+  });
+
+  if (!window.location.href.includes("gerenciamento-usuarios.html")) {
+    return;
   }
 }
 
@@ -3363,6 +3384,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initRedefinirSenha();
   initCadastroLivro();
   atualizarAcessoCadastroLivro();
+  atualizarAcessoGerenciamentoUsuarios();
   atualizarApelidoPerfilHeader(localStorage.getItem("usuarioLogadoApelido"));
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {

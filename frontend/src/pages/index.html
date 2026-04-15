@@ -108,7 +108,7 @@
             aria-label="Fechar"
           ></button>
         </div>
-        <div class="modal-body livros-modal-body">
+        <div class="modal-body livros-modal-body" tabindex="0">
           <div id="livrosModalGrid" class="livros-modal-grid"></div>
         </div>
       </div>
@@ -330,11 +330,6 @@
       modalBody.scrollTop = 0;
       
       // Fazer scroll automático para o modal
-      const modalElement = document.getElementById("livrosModal");
-      if (modalElement) {
-        modalElement.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      
       livrosModalInstance.show();
     }
 
@@ -354,12 +349,12 @@
         const modalBody = modalElement.querySelector(".modal-body");
         if (modalBody) {
           modalBody.scrollTop = 0;
+          if (typeof modalBody.focus === "function") {
+            modalBody.focus();
+          }
         }
         
         // Fazer scroll automático para o modal quando estiver visível
-        setTimeout(() => {
-          modalElement.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 100);
       });
     }
 

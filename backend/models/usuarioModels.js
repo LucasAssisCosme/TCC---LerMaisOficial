@@ -83,6 +83,19 @@ async function gerarSugestoesDisponiveis(apelidoBase, usuarioIgnoradoId = null) 
   return sugestoes;
 }
 
+function buscarUsuarioPorId(id, callback) {
+  const sql = `SELECT * FROM usuarios WHERE id = ?`;
+  const valor = [id];
+
+  conn.query(sql, valor, (erro, resultado) => {
+    if (erro) {
+      return callback(erro, null);
+    }
+
+    callback(null, resultado[0] || null);
+  });
+}
+
 module.exports = {
   buscarPorApelido: (apelido, callback, usuarioIgnoradoId = null) => {
     const apelidoLimpo = String(apelido || "").trim();
@@ -204,18 +217,11 @@ module.exports = {
     });
   },
 
-  buscarPorid: (id, callback) => {
-    const sql = `SELECT * FROM usuarios WHERE id = ?`;
-    const valor = [id];
+  buscarPorid: (id, callback) => buscarUsuarioPorId(id, callback),
 
-    conn.query(sql, valor, (erro, resultado) => {
-      if (erro) {
-        return callback(erro, null);
-      }
+  buscarPorId: (id, callback) => buscarUsuarioPorId(id, callback),
 
-      callback(null, resultado[0] || null);
-    });
-  },
+  irPorId: (id, callback) => buscarUsuarioPorId(id, callback),
 
   esqueceuSenha: (email, senha, id, callback) => {
     bcrypt.hash(senha, 10, (erroHash, hash) => {
@@ -363,9 +369,9 @@ module.exports = {
   // Listar todos os usuários
   listarTodos: (callback) => {
     const sql = `
-      SELECT id, nome, email, apelido, tipo, foto_perfil, bio, genero_favorito, criado_em 
+      SELECT id, nome, email, apelido, tipo, foto_perfil, bio, genero_favorito
       FROM usuarios 
-      ORDER BY criado_em DESC
+      ORDER BY id DESC
     `;
 
     conn.query(sql, (erro, resultados) => {
