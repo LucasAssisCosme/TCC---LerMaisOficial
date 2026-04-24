@@ -1635,63 +1635,107 @@ async function carregarPerfil() {
 }
 
 function desabilitarCampos() {
-  document.getElementById("nome").disabled = true;
-  document.getElementById("bio").disabled = true;
-  document.getElementById("email").disabled = true;
-  document.getElementById("apelido").disabled = true;
-  document.getElementById("genero").disabled = true;
-  document.getElementById("inputFoto").disabled = true;
+  [
+    "nome",
+    "bio",
+    "email",
+    "apelido",
+    "genero",
+    "inputFoto",
+    "inputFotoPerfil",
+  ].forEach((id) => {
+    const campo = document.getElementById(id);
+    if (campo) {
+      campo.disabled = true;
+    }
+  });
+
+  const botaoFoto = document.querySelector(".foto-acao");
+  if (botaoFoto) {
+    botaoFoto.disabled = true;
+    botaoFoto.setAttribute("aria-disabled", "true");
+  }
 }
 
 function habilitarCamposPerfil() {
-  document.getElementById("nome").disabled = false;
-  document.getElementById("bio").disabled = false;
-  document.getElementById("email").disabled = false;
-  document.getElementById("apelido").disabled = false;
-  document.getElementById("genero").disabled = false;
-  document.getElementById("inputFoto").disabled = false;
+  [
+    "nome",
+    "bio",
+    "email",
+    "apelido",
+    "genero",
+    "inputFoto",
+    "inputFotoPerfil",
+  ].forEach((id) => {
+    const campo = document.getElementById(id);
+    if (campo) {
+      campo.disabled = false;
+    }
+  });
+
+  const botaoFoto = document.querySelector(".foto-acao");
+  if (botaoFoto) {
+    botaoFoto.disabled = false;
+    botaoFoto.setAttribute("aria-disabled", "false");
+  }
+}
+
+function alternarBotoesPerfil(estaEditando) {
+  const btnSalvar = document.querySelector(".btn-salvar");
+  const btnCancelar = document.querySelector(".btn-cancelar");
+  const btnEditar = document.querySelector(".btn-editar");
+  const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
+  const dicaFoto = document.querySelector(".foto-dica");
+
+  if (btnSalvar) {
+    btnSalvar.hidden = !estaEditando;
+    btnSalvar.style.display = estaEditando ? "inline-block" : "none";
+  }
+
+  if (btnCancelar) {
+    btnCancelar.hidden = !estaEditando;
+    btnCancelar.style.display = estaEditando ? "inline-block" : "none";
+  }
+
+  if (btnEditar) {
+    btnEditar.hidden = estaEditando;
+    btnEditar.style.display = estaEditando ? "none" : "inline-block";
+  }
+
+  if (btnExcluirPerfil) {
+    btnExcluirPerfil.hidden = estaEditando;
+    btnExcluirPerfil.style.display = estaEditando ? "none" : "inline-block";
+  }
+
+  if (dicaFoto) {
+    dicaFoto.textContent = estaEditando
+      ? "Clique na foto para alterar"
+      : "Clique em Editar para liberar alterações";
+  }
+}
+
+function alternarModoEdicaoPerfil(estaEditando) {
+  if (estaEditando) {
+    habilitarCamposPerfil();
+  } else {
+    desabilitarCampos();
+
+    const inputFoto = document.getElementById("inputFoto");
+    if (inputFoto) {
+      inputFoto.value = "";
+    }
+
+    const inputFotoPerfil = document.getElementById("inputFotoPerfil");
+    if (inputFotoPerfil) {
+      inputFotoPerfil.value = "";
+    }
+  }
+
+  alternarBotoesPerfil(estaEditando);
 }
 
 function habilitarEdicao() {
-  habilitarCamposPerfil();
-
-  // Adicionar preview de imagem ao selecionar arquivo
-  const inputFoto = document.getElementById("inputFoto");
-  inputFoto.addEventListener(
-    "change",
-    function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          // Atualizar a foto principal
-          const fotoMain = document.getElementById("fotoPerfilMain");
-          if (fotoMain) {
-            fotoMain.src = e.target.result;
-          }
-
-          // Atualizar a foto do header
-          const fotoHeader = getPerfilHeaderImageElement();
-          if (fotoHeader) {
-            fotoHeader.src = e.target.result;
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    { once: true },
-  ); // Usar { once: true } para evitar listeners duplicados
-
-  // mostrar botÃµes
-  document.querySelector(".btn-salvar").style.display = "inline-block";
-  document.querySelector(".btn-cancelar").style.display = "inline-block";
-
-  // esconder botão editar
-  const btnEditar = document.querySelector(".btn-editar");
-  if (btnEditar) btnEditar.style.display = "none";
-
-  const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
-  if (btnExcluirPerfil) btnExcluirPerfil.style.display = "none";
+  alternarModoEdicaoPerfil(true);
 }
 
 async function salvarPerfil() {
@@ -1783,7 +1827,7 @@ async function salvarPerfil() {
       }
     }
 
-    habilitarCamposPerfil();
+    alternarModoEdicaoPerfil(false);
 
     // Recarregar dados para garantir sincronização
     setTimeout(() => {
@@ -1797,7 +1841,7 @@ async function salvarPerfil() {
 
 function cancelarEdicao() {
   carregarPerfil(); // recarrega dados originais
-  habilitarCamposPerfil();
+  alternarModoEdicaoPerfil(false);
 }
 
 async function excluirPerfil() {
@@ -3681,7 +3725,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
     carregarPerfil();
-    habilitarCamposPerfil();
+    alternarModoEdicaoPerfil(false);
   }
 
   // Apenas inicializa biblioteca se o usuário estiver logado (tem token)
