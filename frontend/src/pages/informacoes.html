@@ -88,7 +88,7 @@
         </div>
 
         <div class="livro-detalhes">
-          <div id="infoVisualizacao">
+          <div id="infoVisualizacao" class="info-hero">
             <h1 id="tituloInfo"></h1>
             <p class="autor" id="autorInfo"></p>
 
@@ -106,24 +106,28 @@
           </div>
 
           <div id="infoEdicao" class="edicao-livro" style="display: none">
-            <label for="tituloLivroEdit" class="label-edit">Título</label>
-            <input
-              type="text"
-              id="tituloLivroEdit"
-              class="input-edit"
-              placeholder="Título do livro"
-            />
+            <div class="campo-edicao">
+              <label for="tituloLivroEdit" class="label-edit">Título</label>
+              <input
+                type="text"
+                id="tituloLivroEdit"
+                class="input-edit"
+                placeholder="Ex.: Amor, Teoricamente"
+              />
+            </div>
 
-            <label for="autorLivroEdit" class="label-edit">Autor</label>
-            <input
-              type="text"
-              id="autorLivroEdit"
-              class="input-edit"
-              placeholder="Autor do livro"
-            />
+            <div class="campo-edicao">
+              <label for="autorLivroEdit" class="label-edit">Autor</label>
+              <input
+                type="text"
+                id="autorLivroEdit"
+                class="input-edit"
+                placeholder="Ex.: Ali Hazelwood"
+              />
+            </div>
 
             <div class="linha-edicao">
-              <div>
+              <div class="campo-edicao">
                 <label for="generoLivroEdit" class="label-edit">Gênero</label>
                 <select id="generoLivroEdit" class="input-edit">
                   <option value="">Selecione um gênero</option>
@@ -138,46 +142,48 @@
                 </select>
               </div>
 
-              <div>
+              <div class="campo-edicao">
                 <label for="anoLivroEdit" class="label-edit">Ano</label>
                 <input
                   type="number"
                   id="anoLivroEdit"
                   class="input-edit"
-                  placeholder="Ano"
+                  placeholder="Ex.: 2023"
                 />
               </div>
             </div>
 
             <div class="linha-edicao">
-              <div>
+              <div class="campo-edicao">
                 <label for="paginasLivroEdit" class="label-edit">Páginas</label>
                 <input
                   type="number"
                   id="paginasLivroEdit"
                   class="input-edit"
-                  placeholder="Número de páginas"
+                  placeholder="Ex.: 322"
                 />
               </div>
 
-              <div>
+              <div class="campo-edicao">
                 <label for="editoraLivroEdit" class="label-edit">Editora</label>
                 <input
                   type="text"
                   id="editoraLivroEdit"
                   class="input-edit"
-                  placeholder="Editora"
+                  placeholder="Ex.: Arqueiro"
                 />
               </div>
             </div>
 
-            <label for="descricaoLivroEdit" class="label-edit">Descrição</label>
-            <textarea
-              id="descricaoLivroEdit"
-              class="textarea-edit"
-              rows="6"
-              placeholder="Descrição do livro"
-            ></textarea>
+            <div class="campo-edicao">
+              <label for="descricaoLivroEdit" class="label-edit">Descrição</label>
+              <textarea
+                id="descricaoLivroEdit"
+                class="textarea-edit"
+                rows="6"
+                placeholder="Descreva o clima da obra, os destaques e o que torna esse livro especial."
+              ></textarea>
+            </div>
           </div>
 
           <div class="acoes" id="acoesLivro" style="display: none">
@@ -193,13 +199,19 @@
           </div>
 
           <div class="acoes" id="acoesEdicao" style="display: none">
-            <button class="btn-primario" onclick="salvarAlteracoesLivro()">
+            <button
+              class="btn-primario"
+              id="btnSalvarLivro"
+              onclick="salvarAlteracoesLivro()"
+            >
               Salvar Alterações
             </button>
             <button class="btn-secundario" onclick="cancelarEdicaoLivro()">
               Cancelar Edição
             </button>
           </div>
+
+          <p class="feedback-edicao" id="feedbackEdicaoLivro" aria-live="polite"></p>
 
           <div class="acoes" id="acoesLivroLeitor">
             <button class="btn-primario" onclick="irParaAvaliacao()">

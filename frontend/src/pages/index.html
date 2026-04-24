@@ -294,6 +294,13 @@
       });
     }
 
+    function selecionarLivrosRecentes(livros) {
+      const livrosOrdenados = ordenarLivrosRecentes(livros);
+      const livrosDentroDaJanela = livrosOrdenados.filter((livro) => livroEhRecente(livro));
+
+      return livrosDentroDaJanela.length > 0 ? livrosDentroDaJanela : livrosOrdenados;
+    }
+
     function abrirLivro(livro) {
       const usuarioId = getUsuarioLogadoId();
       if (!usuarioId) {
@@ -369,7 +376,6 @@
 
     function montarColecoesHome(livros) {
       const livrosPorGenero = {};
-      const livrosRecentes = [];
 
       livros.forEach((livro) => {
         const genero = normalizarGeneroCategoria(livro.genero);
@@ -377,15 +383,11 @@
           livrosPorGenero[genero] = [];
         }
         livrosPorGenero[genero].push(livro);
-
-        if (livroEhRecente(livro)) {
-          livrosRecentes.push(livro);
-        }
       });
 
       return {
         livrosPorGenero,
-        livrosRecentes: ordenarLivrosRecentes(livrosRecentes),
+        livrosRecentes: selecionarLivrosRecentes(livros),
       };
     }
 

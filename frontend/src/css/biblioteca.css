@@ -399,14 +399,53 @@ header {
 .tag,
 .book-ribbon {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 10px;
-  height: 30px;
-  border-radius: 0 0 5px 0;
-  border-width: 0;
+  top: -2px;
+  left: 18px;
+  width: 30px;
+  height: 86px;
   z-index: 3;
   pointer-events: none;
+  border-radius: 0 0 14px 14px;
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  transform-origin: top center;
+  transition: transform 0.28s ease, filter 0.28s ease, box-shadow 0.28s ease;
+  background:
+    linear-gradient(180deg, var(--ribbon-top, #ffffff) 0%, var(--ribbon-base, #cccccc) 56%, var(--ribbon-bottom, #999999) 100%);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.26),
+    0 8px 20px var(--ribbon-glow, rgba(255, 255, 255, 0.18)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -12px 18px rgba(0, 0, 0, 0.16);
+}
+
+.book-card:hover .book-ribbon {
+  transform: translateY(2px) scale(1.03);
+  filter: saturate(1.08) brightness(1.04);
+}
+
+.book-ribbon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 22%, transparent 44%, rgba(0, 0, 0, 0.12) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, transparent 24%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+.book-ribbon::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 251, 245, 0.92);
+  box-shadow:
+    0 0 0 2px rgba(83, 25, 13, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.48);
 }
 
 .verde {
@@ -422,15 +461,24 @@ header {
 }
 
 .ribbon-lido {
-  background: #00ff88 !important;
+  --ribbon-top: #74ffc0;
+  --ribbon-base: #27d67d;
+  --ribbon-bottom: #118c4d;
+  --ribbon-glow: rgba(39, 214, 125, 0.24);
 }
 
 .ribbon-lendo {
-  background: #ffc107 !important;
+  --ribbon-top: #ffe28a;
+  --ribbon-base: #ffc533;
+  --ribbon-bottom: #d48b00;
+  --ribbon-glow: rgba(255, 197, 51, 0.26);
 }
 
 .ribbon-quero {
-  background: #2196f3 !important;
+  --ribbon-top: #84d0ff;
+  --ribbon-base: #3b9eff;
+  --ribbon-bottom: #1d63d1;
+  --ribbon-glow: rgba(59, 158, 255, 0.24);
 }
 
 /* CARD QUADRADO (SIDEBAR) */

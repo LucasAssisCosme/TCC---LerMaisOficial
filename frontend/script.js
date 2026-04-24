@@ -2020,6 +2020,8 @@ function renderBooks(books, bibliotecaStatus) {
         const progresso = statusMap.get(livroId) || book.progresso || "";
         const status = getStatusTag(progresso);
         const progressoPaginas = getBookPageProgress(book, progresso);
+        const resumoProgresso =
+          progresso === "lendo" ? "Em Processo" : `${progressoPaginas.percentual}%`;
 
         let capaUrl = normalizarUrlMidia(
           capa && capa.trim()
@@ -2055,7 +2057,7 @@ function renderBooks(books, bibliotecaStatus) {
                 <p class="book-author">${autor}</p>
                 <div class="book-progress">
                   <div class="book-progress-meta">
-                    <span>${progressoPaginas.percentual}%</span>
+                    <span>${resumoProgresso}</span>
                     <span>${progressoPaginas.paginasLidas} / ${progressoPaginas.totalPaginas || 0}</span>
                   </div>
                   <div class="book-progress-track" aria-hidden="true">
@@ -3008,6 +3010,28 @@ function preencherVisualizacaoLivro(livro) {
   }
 }
 
+function atualizarFeedbackEdicaoLivro(mensagem = "", tipo = "") {
+  const feedbackEl = document.getElementById("feedbackEdicaoLivro");
+  if (!feedbackEl) return;
+
+  feedbackEl.textContent = mensagem;
+  feedbackEl.className = "feedback-edicao";
+
+  if (tipo) {
+    feedbackEl.classList.add(`is-${tipo}`);
+  }
+}
+
+function definirEstadoSalvarLivro({ carregando = false } = {}) {
+  const botaoSalvar = document.getElementById("btnSalvarLivro");
+  if (!botaoSalvar) return;
+
+  botaoSalvar.disabled = carregando;
+  botaoSalvar.textContent = carregando
+    ? "Salvando alterações..."
+    : "Salvar Alterações";
+}
+
 function alternarModoEdicaoLivro(ativo) {
   const infoVisualizacao = document.getElementById("infoVisualizacao");
   const infoEdicao = document.getElementById("infoEdicao");
@@ -3084,6 +3108,7 @@ async function habilitarEdicaoLivro() {
   const dadosBase = livroAtualDados || obterDadosLivroDaTela();
   preencherFormularioEdicaoLivro(dadosBase);
   configurarPreviewCapaLivro();
+  atualizarFeedbackEdicaoLivro("");
   alternarModoEdicaoLivro(true);
 
   console.log("[habilitarEdicaoLivro] Modo de edicao ativado");
@@ -3169,6 +3194,9 @@ async function salvarAlteracoesLivro() {
   }
 
   try {
+    definirEstadoSalvarLivro({ carregando: true });
+    atualizarFeedbackEdicaoLivro("Salvando alterações do livro...", "loading");
+
     const token = getToken();
     if (!token) {
       alert("Voce precisa estar logado");
@@ -3234,6 +3262,7 @@ async function salvarAlteracoesLivro() {
     preencherVisualizacaoLivro(livroAtualDados);
     preencherFormularioEdicaoLivro(livroAtualDados);
     cancelarEdicaoLivro();
+    atualizarFeedbackEdicaoLivro("Alterações salvas com sucesso.", "success");
 
     alert("Livro atualizado com sucesso!");
 
@@ -3243,7 +3272,10 @@ async function salvarAlteracoesLivro() {
     }, 500);
   } catch (erro) {
     console.error("[salvarAlteracoesLivro] Erro completo:", erro);
+    atualizarFeedbackEdicaoLivro(`Erro ao salvar: ${erro.message}`, "error");
     alert("Erro ao salvar alteracoes: " + erro.message);
+  } finally {
+    definirEstadoSalvarLivro({ carregando: false });
   }
 }
 
@@ -3251,6 +3283,7 @@ function cancelarEdicaoLivro() {
   const dadosBase = livroAtualDados || obterDadosLivroDaTela();
   preencherVisualizacaoLivro(dadosBase);
   preencherFormularioEdicaoLivro(dadosBase);
+  atualizarFeedbackEdicaoLivro("");
   alternarModoEdicaoLivro(false);
 
   console.log("[cancelarEdicaoLivro] Modo de edicao cancelado");
