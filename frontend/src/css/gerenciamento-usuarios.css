@@ -56,6 +56,24 @@ header {
   align-items: center;
 }
 
+.logo-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.logo-container img {
+  height: 45px;
+  border-radius: 50px;
+}
+
+.logo-text {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
 .info-perfil img {
   height: 45px;
   border-radius: 50px;

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ler Mais - Biblioteca</title>
+  <link rel="icon" type="image/png" href="../../logo.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/biblioteca.css" />
   </head>
@@ -11,10 +12,19 @@
     <header>
       <div class="header"> 
         <div class="info-perfil">
-          <img src="../../logo.png" alt="">    
-          <div class="perfil">
-            <img src="../../User.png" alt="">
-             <a href="perfil.html">PERFIL</a>
+          <div class="logo-container">
+            <img src="../../logo.png" alt="">
+            <span class="logo-text">LER MAIS</span>
+          </div>
+          <div class="perfil-dropdown">
+            <button class="perfil-btn" type="button" aria-haspopup="true" aria-expanded="false">
+              <img class="perfil-img" src="../../User.png" alt="Foto de perfil">
+              <span class="perfil-nome">PERFIL</span>
+              <span class="perfil-caret" aria-hidden="true"></span>
+            </button>
+            <div class="perfil-menu" role="menu" aria-label="Menu do perfil">
+              <a class="menu-item" href="perfil.html" role="menuitem">Meu perfil</a>
+            </div>
           </div>
         </div>        
    <nav>
@@ -79,37 +89,64 @@
 
     <div class="ranking-header">
       <div class="trophy-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"></path>
-          <path d="M6 9c0 1 0 3 1 5s2 3 5 3 4-1 5-3 1-4 1-5"></path>
-          <path d="M9 14h6v7a3 3 0 0 1-3 3 3 3 0 0 1-3-3v-7z"></path>
-        </svg>
+        <i class="bi bi-trophy"></i>
       </div>
       <h2 class="ranking-text mb-2">
         Você está em - lugar no ranking de mais páginas lidas da sua universidade!
       </h2>
     </div>
 
+    <div class="overview-divider"></div>
+
     <div class="status">
 
       <div class="item" data-status="lido" role="button" tabindex="0" aria-pressed="false">
-        <span class="flag verde"></span>
-        <p>Lido</p>
+        <div class="status-icon-circle verde">
+          <i class="bi bi-book-fill"></i>
+        </div>
+        <div class="status-copy">
+          <p class="status-title">Lido</p>
+          <span class="status-count" data-count-for="lido">0 livros</span>
+        </div>
+        <i class="bi bi-chevron-right status-arrow" aria-hidden="true"></i>
       </div>
 
       <div class="item" data-status="quero_ler" role="button" tabindex="0" aria-pressed="false">
-        <span class="flag azul"></span>
-        <p>Quero ler</p>
+        <div class="status-icon-circle azul">
+          <i class="bi bi-bookmark-fill"></i>
+        </div>
+        <div class="status-copy">
+          <p class="status-title">Quero ler</p>
+          <span class="status-count" data-count-for="quero_ler">0 livros</span>
+        </div>
+        <i class="bi bi-chevron-right status-arrow" aria-hidden="true"></i>
       </div>
 
       <div class="item" data-status="lendo" role="button" tabindex="0" aria-pressed="false">
-        <span class="flag amarelo"></span>
-        <p>Lendo</p>
+        <div class="status-icon-circle amarelo">
+          <i class="bi bi-bookmark-heart-fill"></i>
+        </div>
+        <div class="status-copy">
+          <p class="status-title">Lendo</p>
+          <span class="status-count" data-count-for="lendo">0 livros</span>
+        </div>
+        <i class="bi bi-chevron-right status-arrow" aria-hidden="true"></i>
       </div>
 
     </div>
-    
-    <p><span class="badge bg-light text-dark">Paginômetro -</span></p>
+
+    <div class="overview-divider"></div>
+
+    <div class="paginometro-card">
+      <div class="paginometro-icon">
+        <i class="bi bi-speedometer2"></i>
+      </div>
+      <div class="paginometro-copy">
+        <span class="paginometro-label">Paginômetro</span>
+        <strong class="paginometro-value badge bg-light text-dark">0</strong>
+        <span class="paginometro-meta">páginas lidas</span>
+      </div>
+    </div>
 
   </aside>
 

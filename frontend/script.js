@@ -501,7 +501,7 @@ function showBibliotecaSkeleton() {
   }
 
   const pageMeterElem = document.querySelector(
-    ".overview-card .badge.bg-light.text-dark",
+    ".overview-card .paginometro-value",
   );
   if (pageMeterElem) {
     pageMeterElem.innerHTML = skeletonLine("140px", "lm-lg");
@@ -1138,13 +1138,39 @@ function initRedefinirSenha() {
 function getStatusTag(progresso) {
   switch (progresso) {
     case "lido":
-      return { ribbonClass: "ribbon-lido", label: "Lido" };
+      return { ribbonClass: "ribbon-lido", label: "Lido", progressClass: "is-lido" };
     case "lendo":
-      return { ribbonClass: "ribbon-lendo", label: "Lendo" };
+      return { ribbonClass: "ribbon-lendo", label: "Lendo", progressClass: "is-lendo" };
     case "quero_ler":
     default:
-      return { ribbonClass: "ribbon-quero", label: "Quero ler" };
+      return { ribbonClass: "ribbon-quero", label: "Quero ler", progressClass: "is-quero-ler" };
   }
+}
+
+function getBookPageProgress(book, progresso) {
+  const totalPaginas = Number(book?.numero_paginas || book?.paginas || 0);
+  const paginasLidasInformadas = Number(
+    book?.paginas_lidas ?? book?.pagina_atual ?? book?.progresso_paginas ?? 0,
+  );
+
+  let paginasLidas = Number.isFinite(paginasLidasInformadas)
+    ? paginasLidasInformadas
+    : 0;
+
+  if ((!paginasLidas || paginasLidas < 0) && progresso === "lido" && totalPaginas > 0) {
+    paginasLidas = totalPaginas;
+  }
+
+  paginasLidas = Math.max(0, Math.min(paginasLidas, totalPaginas || paginasLidas));
+
+  const percentual =
+    totalPaginas > 0 ? Math.round((paginasLidas / totalPaginas) * 100) : 0;
+
+  return {
+    totalPaginas,
+    paginasLidas,
+    percentual,
+  };
 }
 
 function getUsuarioLogadoId() {
@@ -1169,12 +1195,20 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
+function getPerfilHeaderImageElement() {
+  return document.querySelector(".perfil-img, .info-perfil .perfil img");
+}
+
+function getPerfilHeaderNameElement() {
+  return document.querySelector(".perfil-nome, .info-perfil .perfil a");
+}
+
 function atualizarApelidoPerfilHeader(apelido) {
-  const linkPerfil = document.querySelector(".info-perfil .perfil a");
-  if (!linkPerfil) return;
+  const nomePerfil = getPerfilHeaderNameElement();
+  if (!nomePerfil) return;
 
   const texto = String(apelido || "").trim();
-  linkPerfil.textContent = texto || "PERFIL";
+  nomePerfil.textContent = texto || "PERFIL";
 }
 
 function logout() {
@@ -1404,6 +1438,7 @@ async function atualizarBibliotecaELista() {
     progresso: livro.progresso || "",
   }));
 
+  renderBibliotecaOverviewStatus();
   aplicarFiltrosBiblioteca();
 
   const usuarioId = getUsuarioLogadoId();
@@ -1579,7 +1614,7 @@ async function carregarPerfil() {
       const fotoNormalizada = normalizarUrlFoto(data.usuario.foto_perfil);
       
       // Atualizar foto no header
-      const fotoHeader = document.querySelector(".info-perfil .perfil img");
+      const fotoHeader = getPerfilHeaderImageElement();
       if (fotoHeader) {
         fotoHeader.src = fotoNormalizada;
       }
@@ -1608,13 +1643,17 @@ function desabilitarCampos() {
   document.getElementById("inputFoto").disabled = true;
 }
 
-function habilitarEdicao() {
+function habilitarCamposPerfil() {
   document.getElementById("nome").disabled = false;
   document.getElementById("bio").disabled = false;
   document.getElementById("email").disabled = false;
   document.getElementById("apelido").disabled = false;
   document.getElementById("genero").disabled = false;
   document.getElementById("inputFoto").disabled = false;
+}
+
+function habilitarEdicao() {
+  habilitarCamposPerfil();
 
   // Adicionar preview de imagem ao selecionar arquivo
   const inputFoto = document.getElementById("inputFoto");
@@ -1632,7 +1671,7 @@ function habilitarEdicao() {
           }
 
           // Atualizar a foto do header
-          const fotoHeader = document.querySelector(".info-perfil .perfil img");
+          const fotoHeader = getPerfilHeaderImageElement();
           if (fotoHeader) {
             fotoHeader.src = e.target.result;
           }
@@ -1713,7 +1752,7 @@ async function salvarPerfil() {
       console.log("[salvarPerfil] URL final da foto:", novaFoto);
 
       // Atualizar foto no header
-      const fotoHeader = document.querySelector(".info-perfil .perfil img");
+      const fotoHeader = getPerfilHeaderImageElement();
       if (fotoHeader) {
         // Criar nova imagem para forçar reload
         const tempImg = new Image();
@@ -1744,17 +1783,7 @@ async function salvarPerfil() {
       }
     }
 
-    // volta pra página de perfil
-    desabilitarCampos();
-
-    document.querySelector(".btn-salvar").style.display = "none";
-    document.querySelector(".btn-cancelar").style.display = "none";
-
-    const btnEditar = document.querySelector(".btn-editar");
-    if (btnEditar) btnEditar.style.display = "inline-block";
-
-    const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
-    if (btnExcluirPerfil) btnExcluirPerfil.style.display = "inline-block";
+    habilitarCamposPerfil();
 
     // Recarregar dados para garantir sincronização
     setTimeout(() => {
@@ -1767,17 +1796,8 @@ async function salvarPerfil() {
 }
 
 function cancelarEdicao() {
-  desabilitarCampos();
   carregarPerfil(); // recarrega dados originais
-
-  document.querySelector(".btn-salvar").style.display = "none";
-  document.querySelector(".btn-cancelar").style.display = "none";
-
-  const btnEditar = document.querySelector(".btn-editar");
-  if (btnEditar) btnEditar.style.display = "inline-block";
-
-  const btnExcluirPerfil = document.querySelector(".btn-excluir-perfil");
-  if (btnExcluirPerfil) btnExcluirPerfil.style.display = "inline-block";
+  habilitarCamposPerfil();
 }
 
 async function excluirPerfil() {
@@ -1955,6 +1975,7 @@ function renderBooks(books, bibliotecaStatus) {
 
         const progresso = statusMap.get(livroId) || book.progresso || "";
         const status = getStatusTag(progresso);
+        const progressoPaginas = getBookPageProgress(book, progresso);
 
         let capaUrl = normalizarUrlMidia(
           capa && capa.trim()
@@ -1971,8 +1992,12 @@ function renderBooks(books, bibliotecaStatus) {
         const card = `
           <div class="col-6 col-md-4 col-lg-3 col-xl-2" data-livro-id="${livroId}">
             <article class="book-card" style="cursor: pointer;" onclick="irParaAvaliacao(${livroId})">
-              <div class="book-ribbon ${status.ribbonClass}" aria-hidden="true"></div>
               <div class="book-cover" aria-label="Capa do livro ${titulo}">
+                <span
+                  class="book-ribbon ${status.ribbonClass}"
+                  aria-label="Status do livro: ${status.label}"
+                  title="${status.label}"
+                ></span>
                 <img
                   src="${capaUrl}"
                   alt="Capa do livro ${titulo}"
@@ -1981,10 +2006,19 @@ function renderBooks(books, bibliotecaStatus) {
                   onerror="tratarErroCapaLivro(this)"
                 />
               </div>
-              <div class="book-info p-3">
-                <h4 class="book-title mb-1">${titulo}</h4>
-                <p class="book-author mb-0">${autor}</p>
-                <small class="text-white-50">${status.label}</small>
+              <div class="book-info">
+                <h4 class="book-title">${titulo}</h4>
+                <p class="book-author">${autor}</p>
+                <div class="book-progress">
+                  <div class="book-progress-meta">
+                    <span>${progressoPaginas.percentual}%</span>
+                    <span>${progressoPaginas.paginasLidas} / ${progressoPaginas.totalPaginas || 0}</span>
+                  </div>
+                  <div class="book-progress-track" aria-hidden="true">
+                    <span class="book-progress-fill ${status.progressClass}" style="width: ${progressoPaginas.percentual}%;"></span>
+                  </div>
+                  <p class="book-pages">${progressoPaginas.totalPaginas || 0} páginas</p>
+                </div>
               </div>
             </article>
           </div>`;
@@ -2036,15 +2070,48 @@ async function fetchRanking(usuarioId = 1) {
 function renderRank(posicao, totalPaginas) {
   const rankElem = document.querySelector(".ranking-text.mb-2");
   if (rankElem) {
-    rankElem.innerHTML = `Você está em <strong>${posicao}Âº lugar</strong> no ranking de mais páginas lidas da sua universidade!`;
+    const posicaoTexto =
+      Number.isFinite(Number(posicao)) && String(posicao).trim() !== ""
+        ? `${posicao}º lugar`
+        : `${posicao} lugar`;
+    rankElem.innerHTML = `Você está em <strong>${posicaoTexto}</strong> no ranking de mais páginas lidas da sua universidade!`;
   }
 
   const pageMeterElem = document.querySelector(
-    ".overview-card .badge.bg-light.text-dark",
+    ".overview-card .paginometro-value",
   );
   if (pageMeterElem) {
-    pageMeterElem.textContent = `Paginómetro ${totalPaginas}`;
+    pageMeterElem.textContent = String(totalPaginas);
   }
+}
+
+function formatarQuantidadeLivros(total) {
+  const quantidade = Number(total) || 0;
+  return `${quantidade} ${quantidade === 1 ? "livro" : "livros"}`;
+}
+
+function renderBibliotecaOverviewStatus() {
+  const contadores = {
+    lido: 0,
+    quero_ler: 0,
+    lendo: 0,
+  };
+
+  bibliotecaCachedStatus.forEach((item) => {
+    const progresso = String(item?.progresso || "").trim();
+    if (Object.prototype.hasOwnProperty.call(contadores, progresso)) {
+      contadores[progresso] += 1;
+    }
+  });
+
+  Object.entries(contadores).forEach(([status, total]) => {
+    const countElem = document.querySelector(
+      `.status-count[data-count-for="${status}"]`,
+    );
+    if (countElem) {
+      countElem.textContent = formatarQuantidadeLivros(total);
+    }
+  });
 }
 
 async function initBibliotecaGrid() {
@@ -2566,10 +2633,10 @@ async function atualizarPaginometro(usuarioId) {
 
       // Atualizar elemento na biblioteca.html (se estiver aberto)
       const pageMeterElem = document.querySelector(
-        ".overview-card .badge.bg-light.text-dark",
+        ".overview-card .paginometro-value",
       );
       if (pageMeterElem) {
-        pageMeterElem.textContent = `Paginómetro ${ranking.total_paginas || 0}`;
+        pageMeterElem.textContent = String(ranking.total_paginas || 0);
         console.log(
           "[atualizarPaginometro] Paginómetro atualizado para:",
           ranking.total_paginas,
@@ -2581,14 +2648,11 @@ async function atualizarPaginometro(usuarioId) {
       }
 
       // Atualizar ranking também
-      const rankElem = document.querySelector(".ranking-text.mb-2");
-      if (rankElem) {
-        rankElem.innerHTML = `Voce está em <strong>${ranking.posicao_ranking || 1}º lugar</strong> no ranking de mais paginas lidas da sua universidade!`;
-        console.log(
-          "[atualizarPaginometro] Ranking atualizado para posição:",
-          ranking.posicao_ranking,
-        );
-      }
+      renderRank(ranking.posicao_ranking || 1, ranking.total_paginas || 0);
+      console.log(
+        "[atualizarPaginometro] Ranking atualizado para posição:",
+        ranking.posicao_ranking,
+      );
     }
   } catch (error) {
     console.error(
@@ -3275,7 +3339,7 @@ async function carregarFotoPerfilHeader() {
     if (data.usuario && data.usuario.foto_perfil) {
       const fotoNormalizada = normalizarUrlFoto(data.usuario.foto_perfil);
       
-      const imagemHeader = document.querySelector(".info-perfil .perfil img");
+      const imagemHeader = getPerfilHeaderImageElement();
       if (imagemHeader) {
         imagemHeader.src = fotoNormalizada;
         console.log(
@@ -3306,7 +3370,7 @@ function setupImageUpload() {
         const reader = new FileReader();
         reader.onload = function (event) {
           // Atualiza foto do header
-          const fotoHeader = document.querySelector(".info-perfil .perfil img");
+          const fotoHeader = getPerfilHeaderImageElement();
           if (fotoHeader) {
             fotoHeader.src = event.target.result;
           }
@@ -3332,7 +3396,7 @@ function setupImageUpload() {
         const reader = new FileReader();
         reader.onload = function (event) {
           // Atualiza foto do header
-          const fotoHeader = document.querySelector(".info-perfil .perfil img");
+          const fotoHeader = getPerfilHeaderImageElement();
           if (fotoHeader) {
             fotoHeader.src = event.target.result;
           }
@@ -3350,28 +3414,256 @@ function setupImageUpload() {
   }
 }
 
+function setupPerfilDropdownStyles() {
+  if (
+    !document.head ||
+    document.getElementById("perfil-dropdown-style")
+  ) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.id = "perfil-dropdown-style";
+  style.textContent = `
+    header,
+    .header,
+    .info-perfil {
+      overflow: visible;
+    }
+
+    header {
+      position: relative;
+      z-index: 40;
+    }
+
+    .perfil-dropdown {
+      position: relative;
+      z-index: 60;
+    }
+
+    .perfil-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.1));
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-sizing: border-box;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+      transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease;
+    }
+
+    .perfil-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.14));
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.24);
+    }
+
+    .perfil-btn:focus-visible {
+      outline: 2px solid rgba(255, 227, 217, 0.95);
+      outline-offset: 3px;
+    }
+
+    .perfil-btn.active {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.16));
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+    }
+
+    .perfil-btn .perfil-img {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.16);
+    }
+
+    .perfil-nome {
+      white-space: nowrap;
+      color: inherit;
+    }
+
+    .perfil-caret {
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-1px);
+      transition: transform 180ms ease;
+      opacity: 0.92;
+      flex-shrink: 0;
+    }
+
+    .perfil-btn.active .perfil-caret {
+      transform: rotate(-135deg) translateY(-1px);
+    }
+
+    .perfil-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      min-width: 210px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      background: rgba(20, 17, 17, 0.92);
+      backdrop-filter: blur(14px);
+      box-sizing: border-box;
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.34);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 180ms ease;
+      z-index: 1200;
+    }
+
+    .perfil-dropdown.active .perfil-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      box-sizing: border-box;
+      color: #f9f4f2;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition:
+        background-color 160ms ease,
+        color 160ms ease;
+    }
+
+    .menu-item:hover,
+    .menu-item:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: #fff;
+      transform: none;
+      outline: none;
+    }
+
+    .menu-item.sair:hover,
+    .menu-item.sair:focus-visible {
+      background: rgba(224, 82, 53, 0.18);
+      color: #ffd8cf;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
 // Inicializa comportamentos quando a página estiver pronta
+// ==================== PERFIL DROPDOWN ====================
+function initPerfilDropdown() {
+  const perfilDropdowns = document.querySelectorAll(".perfil-dropdown");
+  if (!perfilDropdowns.length) {
+    return;
+  }
+
+  const fecharDropdown = (dropdown) => {
+    const botao = dropdown.querySelector(".perfil-btn");
+    dropdown.classList.remove("active");
+
+    if (botao) {
+      botao.classList.remove("active");
+      botao.setAttribute("aria-expanded", "false");
+    }
+  };
+
+  const fecharTodosDropdowns = () => {
+    perfilDropdowns.forEach((dropdown) => fecharDropdown(dropdown));
+  };
+
+  const usuarioApelido = localStorage.getItem("usuarioLogadoApelido");
+  if (usuarioApelido) {
+    document.querySelectorAll(".perfil-nome").forEach((perfilNome) => {
+      perfilNome.textContent = usuarioApelido;
+    });
+  }
+
+  perfilDropdowns.forEach((perfilDropdown) => {
+    const perfilBtn = perfilDropdown.querySelector(".perfil-btn");
+    const menuItems = perfilDropdown.querySelectorAll(".menu-item");
+
+    if (!perfilBtn) {
+      return;
+    }
+
+    perfilBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const vaiAbrir = !perfilDropdown.classList.contains("active");
+
+      fecharTodosDropdowns();
+
+      if (vaiAbrir) {
+        perfilDropdown.classList.add("active");
+        perfilBtn.classList.add("active");
+        perfilBtn.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    menuItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        if (item.dataset.logout === "true") {
+          logout();
+        }
+
+        fecharDropdown(perfilDropdown);
+      });
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".perfil-dropdown")) {
+      fecharTodosDropdowns();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      fecharTodosDropdowns();
+    }
+  });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   setupPageTransitions();
   setupTransitionLinks();
   setupSkeletonStyles();
+  setupPerfilDropdownStyles();
+  initPerfilDropdown();
 
   // Identifica qual página está sendo carregada
   const currentPage = window.location.pathname;
   paginasCarregadas.add(currentPage);
 
   console.log("[DOMContentLoaded] Página carregada:", currentPage);
-
-  if (currentPage.includes("/frontend/src/pages/perfil.html")) {
-    desabilitarCampos();
-
-    // esconder botÃµes no início
-    const btnSalvar = document.querySelector(".btn-salvar");
-    const btnCancelar = document.querySelector(".btn-cancelar");
-
-    if (btnSalvar) btnSalvar.style.display = "none";
-    if (btnCancelar) btnCancelar.style.display = "none";
-  }
 
   // Evita carregar mais de uma vez na mesma página
   if (paginasCarregadas.size > 1) {
@@ -3389,7 +3681,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
     carregarPerfil();
-    desabilitarCampos();
+    habilitarCamposPerfil();
   }
 
   // Apenas inicializa biblioteca se o usuário estiver logado (tem token)

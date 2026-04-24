@@ -6,32 +6,34 @@
   text-decoration: none;
   transition: all 0.3s ease;
 }
+
 .home-page {
-  background-color: #e4cebf;
-  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-color: #5f1010;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
 }
+
 img {
   max-width: 100%;
 }
 
-.container{
+.container {
   max-width: 1800px;
   margin: 0 auto;
 }
 
-header{
-  background-color: #7F1F0E;
+header {
+  background-color: #7f1f0e;
   padding: 12px;
 }
 
-.header{
-display: flex;
-align-items: center;
-justify-content: space-between;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.info-perfil{
+.info-perfil {
   display: flex;
   gap: 24px;
   align-items: center;
@@ -40,44 +42,37 @@ justify-content: space-between;
 .info-perfil img {
   height: 45px;
   border-radius: 50px;
-
 }
 
 .perfil {
   display: flex;
   align-items: center;
   gap: 16px;
-
   padding: 6px 14px;
   border-radius: 20px;
-
   background: rgba(255, 255, 255, 0.15);
-
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
 
 .perfil img {
   width: 38px;
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
   transition: 0.3s;
 }
-
 
 .perfil a {
   color: white;
   text-decoration: none;
   font-weight: 500;
   font-size: 18px;
-
   transition: 0.3s;
 }
 
-/* 🔥 HOVER SUAVE */
 .perfil:hover {
   background: rgba(255, 255, 255, 0.25);
 }
@@ -100,34 +95,29 @@ justify-content: space-between;
   display: flex;
   align-items: center;
   gap: 8px;
-
   padding: 8px 14px;
   border-radius: 8px;
-
   color: white;
   text-decoration: none;
   font-weight: 500;
-
   transition: all 0.3s ease;
 }
-
 
 .item-list a:hover {
   background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
-
 .item-list.active a {
   background-color: rgba(255, 255, 255, 0.25);
 }
-
 
 .item-list i {
   font-size: 18px;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -136,62 +126,54 @@ body {
   display: flex;
   flex-direction: column;
 }
-.app-footer{
-display:flex;
-align-items:center;
-justify-content:space-between;
-background:#8b2a12;
-color:white;
-padding:15px 30px;
-margin-top: auto;
 
-
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #8b2a12;
+  color: white;
+  padding: 15px 30px;
+  margin-top: auto;
 }
 
-
-
-.footer-left{
-display:flex;
-gap:20px;
+.footer-left {
+  display: flex;
+  gap: 20px;
 }
 
-.footer-left a{
-color:white;
-text-decoration:none;
-font-size:14px;
+.footer-left a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
 }
 
-
-
-.footer-center{
-
-left:50%;
-transform:translateX(-50%);
+.footer-center {
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.footer-logo{
-height:35px;
-border-radius: 20px;
+.footer-logo {
+  height: 35px;
+  border-radius: 20px;
 }
 
-.footer-right{
-font-size:13px;
+.footer-right {
+  font-size: 13px;
 }
-
 
 .perfil-container {
-  background-color: #7f1f0eec;
+ background: linear-gradient(135deg, #a1361980, #811e1e65);
   margin: 20px;
   border-radius: 20px;
   padding: 30px;
   color: white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-
 
 .titulo {
   font-size: 32px;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   padding-bottom: 10px;
 }
 
@@ -202,6 +184,23 @@ font-size:13px;
   margin: 35px 0;
 }
 
+.foto-perfil label {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.foto-acao {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+}
 
 .foto-perfil img {
   width: 130px;
@@ -210,16 +209,45 @@ font-size:13px;
   object-fit: cover;
   cursor: pointer;
   border: 3px solid white;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
   transition: 0.3s;
 }
-.foto-perfil img:hover {
+
+.logo-text {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+
+.foto-acao:hover img {
   transform: scale(1.05);
 }
-.foto-perfil span {
-  font-size: 35px;
-  margin-top: 10px;
-  opacity: 0.9;
+
+.foto-icone {
+  position: absolute;
+  right: 4px;
+  bottom: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, #ff6b3d, #ff8c5a);
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
+
+.foto-dica {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
 .grid-perfil {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -242,32 +270,51 @@ font-size:13px;
 .campo input,
 .campo select,
 .campo textarea {
-  background: #f3e5dc;
-  border: none;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 10px;
   padding: 12px;
+  color: white;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 20px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: 0.2s;
   outline: none;
 }
 
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.campo select {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.campo select option {
+  color: #1f1f1f;
+  background: #ffffff;
+}
 
 .campo input:focus,
 .campo select:focus,
 .campo textarea:focus {
-  box-shadow: 0 0 0 2px #ff8c5a;
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 140, 90, 0.9);
+  box-shadow: 0 0 0 3px rgba(255, 140, 90, 0.2);
 }
 
 .campo.grande textarea {
   height: 70px;
 }
 
-
 .botoes {
   display: flex;
   justify-content: flex-end;
   gap: 15px;
   margin-top: 40px;
-  border-top: 1px solid rgba(255,255,255,0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
   padding-top: 20px;
 }
 
@@ -281,17 +328,17 @@ button {
   font-weight: bold;
 }
 
-/* BOTÃO CANCELAR */
 .btn-cancelar {
   background: #6b2f25;
+  display: none;
 }
-
 
 .btn-salvar {
   background: linear-gradient(45deg, #ff6b3d, #ff8c5a);
+  display: none;
 }
 
-.btn-editar{
+.btn-editar {
   background: #e50914;
   border: none;
   padding: 10px 25px;

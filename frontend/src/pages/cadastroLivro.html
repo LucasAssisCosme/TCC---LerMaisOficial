@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ler-mais Cadastro de Livro</title>
+    <link rel="icon" type="image/png" href="../../logo.png" />
     <link rel="stylesheet" href="../css/cadastroDelivro.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
@@ -12,10 +13,19 @@
 
       <div class="header"> 
       <div class="info-perfil">
-            <img src="../../logo.png" alt="">    
-            <div class="perfil">
-              <img src="../../User.png" alt="">
-              <a href="perfil.html">PERFIL</a>
+            <div class="logo-container">
+              <img src="../../logo.png" alt="">
+              <span class="logo-text">LER MAIS</span>
+            </div>
+            <div class="perfil-dropdown">
+              <button class="perfil-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                <img class="perfil-img" src="../../User.png" alt="Foto de perfil">
+                <span class="perfil-nome">PERFIL</span>
+                <span class="perfil-caret" aria-hidden="true"></span>
+              </button>
+              <div class="perfil-menu" role="menu" aria-label="Menu do perfil">
+                <a class="menu-item" href="perfil.html" role="menuitem">Meu perfil</a>
+              </div>
             </div>
       </div>        
    <nav>
@@ -46,7 +56,7 @@
                 <i class="bi bi-people"></i>
                 Gerenciar Usuários
               </a>
-            </li>>
+            </li>
 
     <li class="item-list">
       <a href="../../login.html">
