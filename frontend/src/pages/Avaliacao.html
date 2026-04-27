@@ -10,7 +10,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../css/Avaliacao.css?v=20260427c" />
+    <link rel="stylesheet" href="../css/Avaliacao.css?v=20260427d" />
   </head>
 
   <body class="home-page">
@@ -87,11 +87,12 @@
 
           <button
             type="button"
+            id="btnAcaoInformacoes"
             class="top-action top-action-edit"
             onclick="irParaInformacoes()"
           >
             <i class="bi bi-pencil-square"></i>
-            Editar informações
+  
           </button>
         </div>
 
@@ -124,6 +125,7 @@
                   <span class="star" data-value="5" aria-label="5 estrelas">★</span>
                 </div>
               </div>
+              <p id="avaliacaoSidebarFeedback" class="inline-feedback" aria-live="polite"></p>
             </div>
 
           </aside>
@@ -183,6 +185,7 @@
                   <button class="btn-salvar" onclick="salvarResenha()">Salvar</button>
                   <button class="btn-cancelar" onclick="cancelarResenha()">Cancelar</button>
                 </div>
+                <p id="resenhaFeedback" class="inline-feedback detail-feedback" aria-live="polite"></p>
               </article>
 
               <article class="detail-card">
@@ -206,6 +209,7 @@
                   <button class="btn-salvar" onclick="salvarFavorita()">Salvar</button>
                   <button class="btn-cancelar" onclick="cancelarFavorita()">Cancelar</button>
                 </div>
+                <p id="favoritaFeedback" class="inline-feedback detail-feedback" aria-live="polite"></p>
               </article>
             </div>
           </section>
@@ -229,6 +233,6 @@
     </footer>
 
     <script src="/frontend-config.js"></script>
-    <script src="../../script.js?v=20260427b"></script>
+    <script src="../../script.js?v=20260427d"></script>
   </body>
 </html>

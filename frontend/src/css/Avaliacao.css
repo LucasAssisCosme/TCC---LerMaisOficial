@@ -313,6 +313,25 @@ body {
   gap: 22px;
 }
 
+.inline-feedback {
+  min-height: 22px;
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.inline-feedback.is-error {
+  color: #ffc5c5;
+}
+
+.inline-feedback.is-success {
+  color: #ffe09d;
+}
+
+.inline-feedback.is-loading {
+  color: #fff2cf;
+}
+
 .side-label,
 .rating-hint {
   color: var(--text-soft);
@@ -533,6 +552,10 @@ body {
 #favoritaTexto,
 #resenhaTexto {
   display: block;
+}
+
+.detail-feedback {
+  margin-top: 14px;
 }
 
 .btn-editar,

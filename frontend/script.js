@@ -755,16 +755,57 @@ return { valida: true, mensagem: "Senha válida" };
 
 }
 
+function atualizarFeedbackFormulario(feedbackId, mensagem = "", tipo = "") {
+  const feedback = document.getElementById(feedbackId);
+  if (!feedback) return;
+
+  feedback.textContent = mensagem || "";
+  feedback.classList.remove("is-error", "is-success", "is-loading");
+
+  if (tipo) {
+    feedback.classList.add(`is-${tipo}`);
+  }
+}
+
+function exibirFeedbackOuAlert(feedbackId, mensagem = "", tipo = "error") {
+  const feedback = document.getElementById(feedbackId);
+  if (feedback) {
+    atualizarFeedbackFormulario(feedbackId, mensagem, tipo);
+    return true;
+  }
+
+  if (mensagem && tipo !== "loading") {
+    alert(mensagem);
+  }
+
+  return false;
+}
+
 async function cadastrarUsuario(formData) {
   try {
     const senha = formData.get("senha");
+    atualizarFeedbackFormulario("cadastroUsuarioFeedback");
+    const containerSugestoes = document.getElementById("sugestoesApelido");
+    if (containerSugestoes) {
+      containerSugestoes.style.display = "none";
+    }
 
     // Validar senha
     const validacaoSenha = validarSenha(senha);
     if (!validacaoSenha.valida) {
-      alert(validacaoSenha.mensagem);
+      atualizarFeedbackFormulario(
+        "cadastroUsuarioFeedback",
+        validacaoSenha.mensagem,
+        "error",
+      );
       return;
     }
+
+    atualizarFeedbackFormulario(
+      "cadastroUsuarioFeedback",
+      "Cadastrando usuário...",
+      "loading",
+    );
 
     const payload = {
       nome: formData.get("nome"),
@@ -788,6 +829,11 @@ async function cadastrarUsuario(formData) {
 
       // Tratamento especial para username duplicado
       if (resposta.status === 409 && erroBody.campo === "apelido") {
+        atualizarFeedbackFormulario(
+          "cadastroUsuarioFeedback",
+          "Esse apelido já está em uso. Escolha uma sugestão abaixo.",
+          "error",
+        );
         exibirSugestoesApelido(erroBody.sugestoes || []);
         return;
       }
@@ -804,7 +850,11 @@ async function cadastrarUsuario(formData) {
     }
 
     const data = await resposta.json();
-    alert("Cadastro realizado com sucesso!");
+    atualizarFeedbackFormulario(
+      "cadastroUsuarioFeedback",
+      "Cadastro realizado com sucesso!",
+      "success",
+    );
 
     // Auto-login após cadastro bem-sucedido
     try {
@@ -812,44 +862,66 @@ async function cadastrarUsuario(formData) {
       loginFormData.append("email", formData.get("email"));
       loginFormData.append("senha", senha);
 
-      await loginUsuario(loginFormData, true); // true = auto-login, não mostra alert
+      await loginUsuario(loginFormData, true, 5000); // true = auto-login, não mostra alert
     } catch (loginError) {
       console.error("Erro no auto-login:", loginError);
       // Se auto-login falhar, redireciona para login manual
       setTimeout(() => {
         window.location.href = "/frontend/login.html";
-      }, 500);
+      }, 5000);
     }
 
     return data;
   } catch (error) {
     console.error("Erro ao cadastrar usuário:", error);
-    alert("Erro ao cadastrar usuário: " + (error.message || error));
-    throw error;
+    atualizarFeedbackFormulario(
+      "cadastroUsuarioFeedback",
+      "Erro ao cadastrar usuário: " + (error.message || error),
+      "error",
+    );
   }
 }
 
 async function cadastrarLivro(formData) {
   try {
+    atualizarFeedbackFormulario("cadastroLivroFeedback");
     const token = getToken();
     if (!token) {
-      alert("Você precisa estar logado para cadastrar livros");
+      atualizarFeedbackFormulario(
+        "cadastroLivroFeedback",
+        "Você precisa estar logado para cadastrar livros.",
+        "error",
+      );
       window.location.href = "/frontend/login.html";
       return;
     }
 
     const usuarioId = getUsuarioLogadoId();
     if (!usuarioId) {
-      alert("Erro: ID do usuário não encontrado");
+      atualizarFeedbackFormulario(
+        "cadastroLivroFeedback",
+        "Erro: ID do usuário não encontrado.",
+        "error",
+      );
       return;
     }
 
     // Verificar se há arquivo de imagem (obrigatório)
     const arquivoImagem = document.getElementById("inputImagemLivro")?.files[0];
     if (!arquivoImagem) {
-      alert("Por favor, selecione uma imagem para o livro");
+      atualizarFeedbackFormulario(
+        "cadastroLivroFeedback",
+        "Por favor, selecione uma imagem para o livro.",
+        "error",
+      );
       return;
     }
+
+    atualizarFeedbackFormulario(
+      "cadastroLivroFeedback",
+      "Enviando imagem e cadastrando livro...",
+      "loading",
+    );
 
     let urlImagem;
 
@@ -860,7 +932,11 @@ async function cadastrarLivro(formData) {
         throw new Error("URL da imagem não foi retornada");
       }
     } catch (erro) {
-      alert("Erro ao fazer upload da imagem: " + erro.message);
+      atualizarFeedbackFormulario(
+        "cadastroLivroFeedback",
+        "Erro ao fazer upload da imagem: " + erro.message,
+        "error",
+      );
       return;
     }
 
@@ -882,16 +958,22 @@ async function cadastrarLivro(formData) {
       payload.ano < 1000 ||
       payload.ano > new Date().getFullYear()
     ) {
-      alert(
+      atualizarFeedbackFormulario(
+        "cadastroLivroFeedback",
         "Ano inválido. Use um ano entre 1000 e " +
           new Date().getFullYear() +
           ".",
+        "error",
       );
       return;
     }
 
     if (!payload.numero_paginas || payload.numero_paginas < 1) {
-      alert("Número de páginas inválido.");
+      atualizarFeedbackFormulario(
+        "cadastroLivroFeedback",
+        "Número de páginas inválido.",
+        "error",
+      );
       return;
     }
 
@@ -919,13 +1001,23 @@ async function cadastrarLivro(formData) {
 
     console.log("Livro cadastrado com sucesso:", data);
 
-    alert("Livro cadastrado com sucesso!");
+    atualizarFeedbackFormulario(
+      "cadastroLivroFeedback",
+      "Livro cadastrado com sucesso!",
+      "success",
+    );
 
     // Redirecionar para a página inicial
-    window.location.href = "/frontend/src/pages/index.html";
+    window.setTimeout(() => {
+      window.location.href = "/frontend/src/pages/index.html";
+    }, 5000);
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
-    alert("Erro ao cadastrar livro: " + (error.message || error));
+    atualizarFeedbackFormulario(
+      "cadastroLivroFeedback",
+      "Erro ao cadastrar livro: " + (error.message || error),
+      "error",
+    );
   }
 }
 
@@ -992,8 +1084,16 @@ function initCadastroLivro() {
   });
 }
 
-async function loginUsuario(formData, isAutoLogin = false) {
+async function loginUsuario(
+  formData,
+  isAutoLogin = false,
+  redirectDelayMs = 3000,
+) {
   try {
+    if (!isAutoLogin) {
+      atualizarFeedbackFormulario("loginFeedback", "Entrando...", "loading");
+    }
+
     const payload = {
       email: formData.get("email"),
       senha: formData.get("senha"),
@@ -1040,20 +1140,29 @@ async function loginUsuario(formData, isAutoLogin = false) {
       localStorage.setItem("token", data.token);
     }
 
-    // Só mostra alert se não for auto-login
     if (!isAutoLogin) {
-      alert("Login realizado com sucesso!");
+      exibirFeedbackOuAlert(
+        "loginFeedback",
+        "Login realizado com sucesso!",
+        "success",
+      );
     }
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
     setTimeout(() => {
       window.location.href = "/frontend/src/pages/index.html";
-    }, 500);
+    }, redirectDelayMs);
 
     return data;
   } catch (error) {
     console.error("Erro ao logar:", error);
-    alert("Erro ao logar: " + (error.message || error));
+    if (!isAutoLogin) {
+      exibirFeedbackOuAlert(
+        "loginFeedback",
+        "Erro ao logar: " + (error.message || error),
+        "error",
+      );
+    }
     throw error;
   }
 }
@@ -1237,6 +1346,23 @@ function isBibliotecariaLogada() {
     "bibliotecario",
     "professor",
   ].includes(tipo);
+}
+
+function atualizarAcaoInformacoesAvaliacao() {
+  const botao = document.getElementById("btnAcaoInformacoes");
+  if (!botao) return;
+
+  const rotulo = "Ver informações";
+
+  const textoExistente = Array.from(botao.childNodes).find(
+    (node) => node.nodeType === Node.TEXT_NODE,
+  );
+
+  if (textoExistente) {
+    textoExistente.textContent = ` ${rotulo}`;
+  } else {
+    botao.append(document.createTextNode(` ${rotulo}`));
+  }
 }
 
 function atualizarAcessoCadastroLivro() {
@@ -1740,6 +1866,7 @@ function habilitarEdicao() {
 
 async function salvarPerfil() {
   try {
+    atualizarFeedbackFormulario("perfilFeedback", "Salvando perfil...", "loading");
     const id = getUsuarioLogadoId();
     const token = getToken();
 
@@ -1770,7 +1897,11 @@ async function salvarPerfil() {
     }
 
     const resultado = await response.json();
-    alert("Perfil atualizado com sucesso!");
+    atualizarFeedbackFormulario(
+      "perfilFeedback",
+      "Perfil atualizado com sucesso!",
+      "success",
+    );
 
     console.log("[salvarPerfil] Resultado:", resultado);
 
@@ -1835,7 +1966,11 @@ async function salvarPerfil() {
     }, 500);
   } catch (erro) {
     console.error(erro);
-    alert("Erro ao salvar perfil: " + erro.message);
+    atualizarFeedbackFormulario(
+      "perfilFeedback",
+      "Erro ao salvar perfil: " + erro.message,
+      "error",
+    );
   }
 }
 
@@ -1900,21 +2035,39 @@ async function salvarStatusBiblioteca(
 
     if (!uId || !lId) {
       console.error("Dados inválidos:", { usuarioId, livroId });
-      alert("Erro: IDs inválidos. Abra o console para detalhes.");
+      exibirFeedbackOuAlert(
+        "avaliacaoSidebarFeedback",
+        "Erro: IDs inválidos. Abra o console para detalhes.",
+        "error",
+      );
       return null;
     }
 
     if (!["lido", "lendo", "quero_ler"].includes(progresso)) {
-      alert("Erro: Progresso inválido. Use: lido, lendo ou quero_ler");
+      exibirFeedbackOuAlert(
+        "avaliacaoSidebarFeedback",
+        "Erro: Progresso inválido. Use: lido, lendo ou quero ler.",
+        "error",
+      );
       return null;
     }
 
     const token = getToken();
     if (!token) {
-      alert("Você precisa estar logado");
+      exibirFeedbackOuAlert(
+        "avaliacaoSidebarFeedback",
+        "Você precisa estar logado.",
+        "error",
+      );
       logout();
       return null;
     }
+
+    atualizarFeedbackFormulario(
+      "avaliacaoSidebarFeedback",
+      "Salvando status do livro...",
+      "loading",
+    );
 
     const payload = {
       usuario_id: uId,
@@ -1936,7 +2089,11 @@ async function salvarStatusBiblioteca(
     console.log("[Frontend] Status HTTP:", resposta.status);
 
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("Sessão expirada. Faça login novamente.");
+      exibirFeedbackOuAlert(
+        "avaliacaoSidebarFeedback",
+        "Sessão expirada. Faça login novamente.",
+        "error",
+      );
       logout();
       return null;
     }
@@ -1947,12 +2104,20 @@ async function salvarStatusBiblioteca(
       console.error("[Frontend] Erro na resposta:", data);
       const mensagem = data.mensagem || `Erro ${resposta.status}`;
       console.error("[Frontend] Erro ao salvar:", mensagem);
-      alert("Erro ao salvar: " + mensagem);
+      exibirFeedbackOuAlert(
+        "avaliacaoSidebarFeedback",
+        "Erro ao salvar: " + mensagem,
+        "error",
+      );
       return null;
     }
 
     console.log("[Frontend] Status salvo com sucesso:", data);
-    alert("Livro adicionado a biblioteca!");
+    atualizarFeedbackFormulario(
+      "avaliacaoSidebarFeedback",
+      "Livro adicionado a biblioteca!",
+      "success",
+    );
 
     // Dispara evento para atualizar biblioteca com pequeno delay
     setTimeout(() => {
@@ -1963,7 +2128,11 @@ async function salvarStatusBiblioteca(
     return data;
   } catch (error) {
     console.error("[Frontend] Erro ao salvar status:", error);
-    alert("Erro: " + error.message);
+    exibirFeedbackOuAlert(
+      "avaliacaoSidebarFeedback",
+      "Erro: " + error.message,
+      "error",
+    );
     return null;
   }
 }
@@ -2444,6 +2613,7 @@ async function carregarDadosLivroAvaliacao() {
     }
 
     livroAtualId = livroId;
+    atualizarAcaoInformacoesAvaliacao();
 
     // Mostra botÃµes apenas para bibliotecárias
     if (isBibliotecariaLogada()) {
@@ -2591,9 +2761,19 @@ async function salvarAvaliacao(estrelas) {
     const usuarioId = getUsuarioLogadoId();
 
     if (!token || !usuarioId || !livroAtualId) {
-      alert("Você precisa estar logado");
+      exibirFeedbackOuAlert(
+        "avaliacaoSidebarFeedback",
+        "Você precisa estar logado.",
+        "error",
+      );
       return;
     }
+
+    atualizarFeedbackFormulario(
+      "avaliacaoSidebarFeedback",
+      "Salvando avaliação...",
+      "loading",
+    );
 
     const payload = {
       usuario_id: parseInt(usuarioId),
@@ -2613,10 +2793,20 @@ async function salvarAvaliacao(estrelas) {
     if (response.ok) {
       avaliacaoAtual = estrelas;
       atualizarEstrelas(estrelas);
+      atualizarFeedbackFormulario(
+        "avaliacaoSidebarFeedback",
+        "Avaliação salva!",
+        "success",
+      );
       console.log("Avaliação salva!");
     }
   } catch (erro) {
     console.error("Erro ao salvar avaliação:", erro);
+    exibirFeedbackOuAlert(
+      "avaliacaoSidebarFeedback",
+      "Erro ao salvar avaliação: " + (erro.message || erro),
+      "error",
+    );
   }
 }
 
@@ -2636,7 +2826,11 @@ async function atualizarStatusBibliotecaOuSalvar() {
   const livroId = localStorage.getItem("livroAtualId");
 
   if (!usuarioId || !livroId) {
-    alert("Usuário ou livro não encontrado");
+    exibirFeedbackOuAlert(
+      "avaliacaoSidebarFeedback",
+      "Usuário ou livro não encontrado.",
+      "error",
+    );
     return;
   }
 
@@ -2720,6 +2914,7 @@ function habilitarEdicaoResenha() {
   botoes.style.visibility = "visible";
   botoes.style.opacity = "1";
   if (botaoEditar) botaoEditar.style.display = "none";
+  atualizarFeedbackFormulario("resenhaFeedback");
   textarea.focus();
   botoes.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
@@ -2743,14 +2938,24 @@ async function salvarResenha() {
     const texto = obterTextoSecao(document.getElementById("resenhaInput").value);
 
     if (!token || !usuarioId || !livroAtualId) {
-      alert("Erro ao salvar");
+      exibirFeedbackOuAlert("resenhaFeedback", "Erro ao salvar resenha.", "error");
       return;
     }
 
     if (!texto) {
-      alert("Digite uma resenha antes de salvar.");
+      atualizarFeedbackFormulario(
+        "resenhaFeedback",
+        "Digite uma resenha antes de salvar.",
+        "error",
+      );
       return;
     }
+
+    atualizarFeedbackFormulario(
+      "resenhaFeedback",
+      "Salvando resenha...",
+      "loading",
+    );
 
     const payload = {
       usuario_id: parseInt(usuarioId),
@@ -2767,6 +2972,12 @@ async function salvarResenha() {
       body: JSON.stringify(payload),
     });
 
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.mensagem || data.erro || `Erro ${response.status}`);
+    }
+
     if (response.ok) {
       aplicarTextoOuPadrao(
         document.getElementById("resenhaTexto"),
@@ -2774,10 +2985,19 @@ async function salvarResenha() {
         TEXTO_PADRAO_RESENHA,
       );
       cancelarResenha();
-      alert("Resenha salva!");
+      atualizarFeedbackFormulario(
+        "resenhaFeedback",
+        "Resenha salva!",
+        "success",
+      );
     }
   } catch (erro) {
     console.error("Erro ao salvar resenha:", erro);
+    atualizarFeedbackFormulario(
+      "resenhaFeedback",
+      "Erro ao salvar resenha: " + (erro.message || erro),
+      "error",
+    );
   }
 }
 
@@ -2795,6 +3015,7 @@ function habilitarEdicaoFavorita() {
   botoes.style.visibility = "visible";
   botoes.style.opacity = "1";
   if (botaoEditar) botaoEditar.style.display = "none";
+  atualizarFeedbackFormulario("favoritaFeedback");
   textarea.scrollIntoView({ block: "center", behavior: "smooth" });
   window.setTimeout(() => textarea.focus({ preventScroll: true }), 150);
 }
@@ -2818,7 +3039,7 @@ async function salvarFavorita() {
     const texto = obterTextoSecao(document.getElementById("favoritaInput").value);
 
     if (!token || !usuarioId || !livroAtualId) {
-      alert("Erro ao salvar");
+      exibirFeedbackOuAlert("favoritaFeedback", "Erro ao salvar favorita.", "error");
       return;
     }
 
@@ -2826,8 +3047,15 @@ async function salvarFavorita() {
       document.getElementById("favoritaTexto").textContent =
         TEXTO_PADRAO_FAVORITA;
       cancelarFavorita();
+      atualizarFeedbackFormulario("favoritaFeedback");
       return;
     }
+
+    atualizarFeedbackFormulario(
+      "favoritaFeedback",
+      "Salvando parte favorita...",
+      "loading",
+    );
 
     const payload = {
       usuario_id: parseInt(usuarioId),
@@ -2855,10 +3083,18 @@ async function salvarFavorita() {
 
     await carregarFavoritaLivro(usuarioId, livroAtualId, token);
     cancelarFavorita();
-    alert("Favorita salva!");
+    atualizarFeedbackFormulario(
+      "favoritaFeedback",
+      "Parte favorita salva!",
+      "success",
+    );
   } catch (erro) {
     console.error("Erro ao salvar favorita:", erro);
-    alert("Erro ao salvar favorita: " + (erro.message || erro));
+    atualizarFeedbackFormulario(
+      "favoritaFeedback",
+      "Erro ao salvar favorita: " + (erro.message || erro),
+      "error",
+    );
   }
 }
 

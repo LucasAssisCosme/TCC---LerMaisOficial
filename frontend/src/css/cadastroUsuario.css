@@ -136,4 +136,24 @@
   background-color: #ffc107;
   border-color: #ffc107;
   color: #333;
-}   
+}
+
+.form-feedback {
+  min-height: 24px;
+  margin: -18px 0 18px;
+  text-align: center;
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+
+.form-feedback.is-error {
+  color: #ffd6d6;
+}
+
+.form-feedback.is-success {
+  color: #ffe09d;
+}
+
+.form-feedback.is-loading {
+  color: #fff2cf;
+}
