@@ -1,0 +1,44 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  animation: lm-page-fade 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body > * {
+  animation: lm-page-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes lm-page-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lm-page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body,
+  body > * {
+    animation: none !important;
+  }
+}

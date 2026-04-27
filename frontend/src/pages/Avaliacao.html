@@ -1,15 +1,16 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ler Mais - Início</title>
+    <title>Ler Mais - Detalhes do Livro</title>
     <link rel="icon" type="image/png" href="../../logo.png" />
+    <link rel="stylesheet" href="../../page-transition.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../css/Avaliacao.css?v=20260406a" />
+    <link rel="stylesheet" href="../css/Avaliacao.css?v=20260427c" />
   </head>
 
   <body class="home-page">
@@ -31,6 +32,7 @@
             </div>
           </div>
         </div>
+
         <nav>
           <ul class="nav-list">
             <li class="item-list">
@@ -72,111 +74,142 @@
     </header>
 
     <main class="avaliacao-container">
-      <section class="hero-livro">
-        <div class="overlay"></div>
+      <section class="book-shell">
+        <div class="book-topbar">
+          <button
+            type="button"
+            class="top-action top-action-back"
+            onclick="window.history.length > 1 ? history.back() : window.location.href='biblioteca.html'"
+          >
+            <i class="bi bi-arrow-left"></i>
+            Voltar
+          </button>
 
-        <div class="hero-content">
-          <img
-            id="capaLivro"
-            class="capa"
-            style="cursor: pointer;"
+          <button
+            type="button"
+            class="top-action top-action-edit"
             onclick="irParaInformacoes()"
-          />
+          >
+            <i class="bi bi-pencil-square"></i>
+            Editar informações
+          </button>
+        </div>
 
-          <div class="info">
-            <!-- MODO VISUALIZAÇÃO -->
-            <div id="infoVisualizacao">
+        <section class="book-hero">
+          <aside class="book-sidebar">
+            <div class="book-cover-panel">
+              <img
+                id="capaLivro"
+                class="capa"
+                alt="Capa do livro"
+              />
+            </div>
+
+            <div class="book-side-card">
+              <label for="statusLivro" class="side-label">Status de leitura</label>
+              <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
+                <option value="">Adicionar à biblioteca</option>
+                <option value="lendo">Lendo</option>
+                <option value="quero_ler">Quero ler</option>
+                <option value="lido">Lido</option>
+              </select>
+
+              <div class="rating-block">
+                <p class="rating-hint">Avalie este livro</p>
+                <div class="estrelas" id="avaliacaoEstrelas">
+                  <span class="star" data-value="1" aria-label="1 estrela">★</span>
+                  <span class="star" data-value="2" aria-label="2 estrelas">★</span>
+                  <span class="star" data-value="3" aria-label="3 estrelas">★</span>
+                  <span class="star" data-value="4" aria-label="4 estrelas">★</span>
+                  <span class="star" data-value="5" aria-label="5 estrelas">★</span>
+                </div>
+              </div>
+            </div>
+
+          </aside>
+
+          <section class="book-main">
+            <div id="infoVisualizacao" class="book-summary">
               <h1 id="tituloLivro">Amor, Teoricamente</h1>
-              <p class="descricao" id="descricaoLivro">
-                Uma história envolvente que mistura romance, humor e ciência,
-                conquistando do começo ao fim.
-              </p>
+              <p class="autor-livro" id="autorInfo">Autor: Ali Hazelwood</p>
+
+              <div class="book-meta-row">
+                <div class="meta-chip">
+                  <i class="bi bi-tags"></i>
+                  <span id="generoInfo">Gênero: Romance</span>
+                </div>
+                <div class="meta-chip">
+                  <i class="bi bi-calendar4"></i>
+                  <span id="anoInfo">Ano: 2023</span>
+                </div>
+                <div class="meta-chip">
+                  <i class="bi bi-journal-bookmark"></i>
+                  <span id="paginasInfo">Páginas: 322</span>
+                </div>
+                <div class="meta-chip">
+                  <i class="bi bi-building"></i>
+                  <span id="editoraInfo">Editora: N/A</span>
+                </div>
+              </div>
+
+              <div class="descricao-bloco">
+                <h2>Descrição</h2>
+                <p class="descricao" id="descricaoLivro">
+                  Uma história envolvente que mistura romance, humor e ciência,
+                  conquistando do começo ao fim.
+                </p>
+              </div>
             </div>
 
-            <!-- MODO EDIÇÃO -->
-            <div id="infoEdicao" style="display: none;">
-              <input
-                type="text"
-                id="tituloLivroEdit"
-                placeholder="Título do livro"
-                class="input-edit"
-              />
-              <textarea
-                id="descricaoLivroEdit"
-                placeholder="Descrição do livro"
-                class="textarea-edit"
-                rows="4"
-              ></textarea>
+            <div class="cards-grid">
+              <article class="detail-card">
+                <div class="detail-card-header">
+                  <div class="detail-card-title">
+                    <i class="bi bi-chat-left-text"></i>
+                    <h2>Sua resenha</h2>
+                  </div>
+                  <button
+                    id="btnEditarResenha"
+                    class="btn-editar"
+                    onclick="habilitarEdicaoResenha()"
+                  >
+                    Editar
+                  </button>
+                </div>
 
-              <label for="capaLivroFileEdit" class="label-edit">Imagem da Capa</label>
-              <input
-                type="file"
-                id="capaLivroFileEdit"
-                accept="image/*"
-                class="input-edit"
-              />
+                <p id="resenhaTexto">Nenhuma resenha salva ainda.</p>
+                <textarea id="resenhaInput" class="texto-edicao" style="display: none;"></textarea>
+                <div id="botoesResenha" style="display: none;">
+                  <button class="btn-salvar" onclick="salvarResenha()">Salvar</button>
+                  <button class="btn-cancelar" onclick="cancelarResenha()">Cancelar</button>
+                </div>
+              </article>
+
+              <article class="detail-card">
+                <div class="detail-card-header">
+                  <div class="detail-card-title">
+                    <i class="bi bi-bookmark-heart"></i>
+                    <h2>Parte favorita</h2>
+                  </div>
+                  <button
+                    id="btnEditarFavorita"
+                    class="btn-editar"
+                    onclick="habilitarEdicaoFavorita()"
+                  >
+                    Editar
+                  </button>
+                </div>
+
+                <p id="favoritaTexto">Nenhuma parte favorita salva ainda.</p>
+                <textarea id="favoritaInput" class="texto-edicao" style="display: none;"></textarea>
+                <div id="botoesFavorita" style="display: none;">
+                  <button class="btn-salvar" onclick="salvarFavorita()">Salvar</button>
+                  <button class="btn-cancelar" onclick="cancelarFavorita()">Cancelar</button>
+                </div>
+              </article>
             </div>
-
-            <select id="statusLivro" onchange="atualizarStatusBibliotecaOuSalvar()">
-              <option value="">Adicionar à biblioteca</option>
-              <option value="lendo">Lendo</option>
-              <option value="lido">Lido</option>
-              <option value="quero_ler">Quero ler</option>
-            </select>
-
-            <div class="estrelas" id="avaliacaoEstrelas">
-              <span class="star" data-value="1">⭐</span>
-              <span class="star" data-value="2">⭐</span>
-              <span class="star" data-value="3">⭐</span>
-              <span class="star" data-value="4">⭐</span>
-              <span class="star" data-value="5">⭐</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CONTEÚDO -->
-      <section class="conteudo">
-        <div class="secao">
-          <h2>Sua resenha</h2>
-          <p id="resenhaTexto">
-            Amor, Teoricamente me conquistou do começo ao fim! A Elsie é
-            divertida, inteligente e muito humana, e o jeito como a história
-            mistura romance, humor e ciência é simplesmente encantador.
-          </p>
-          <button
-            id="btnEditarResenha"
-            class="btn-editar"
-            onclick="habilitarEdicaoResenha()"
-          >
-            Editar
-          </button>
-          <textarea id="resenhaInput" class="texto-edicao" style="display: none;"></textarea>
-          <div id="botoesResenha" style="display: none; margin-top: 10px;">
-            <button class="btn-salvar" onclick="salvarResenha()">Salvar</button>
-            <button class="btn-cancelar" onclick="cancelarResenha()">Cancelar</button>
-          </div>
-        </div>
-
-        <div class="secao">
-          <h2>Parte favorita</h2>
-          <p id="favoritaTexto">
-            Quando Elsie e Jack deixam a rivalidade de lado e mostram uma
-            conexão real e sincera.
-          </p>
-          <button
-            id="btnEditarFavorita"
-            class="btn-editar"
-            onclick="habilitarEdicaoFavorita()"
-          >
-            Editar
-          </button>
-          <textarea id="favoritaInput" class="texto-edicao" style="display: none;"></textarea>
-          <div id="botoesFavorita" style="display: none; margin-top: 10px;">
-            <button class="btn-salvar" onclick="salvarFavorita()">Salvar</button>
-            <button class="btn-cancelar" onclick="cancelarFavorita()">Cancelar</button>
-          </div>
-        </div>
+          </section>
+        </section>
       </section>
     </main>
 
@@ -196,6 +229,6 @@
     </footer>
 
     <script src="/frontend-config.js"></script>
-    <script src="../../script.js?v=20260406a"></script>
+    <script src="../../script.js?v=20260427b"></script>
   </body>
 </html>

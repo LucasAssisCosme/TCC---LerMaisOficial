@@ -2426,9 +2426,7 @@ async function carregarDadosLivroAvaliacao() {
     });
 
     // Atualizar UI
-    document.getElementById("tituloLivro").textContent = livro.titulo || "";
-    document.getElementById("descricaoLivro").textContent =
-      livro.descricao || "";
+    preencherVisualizacaoLivro(livro);
 
     if (livro.imagem_capa && livro.imagem_capa.trim()) {
       // Remover qualquer versão anterior (com ?v=)
