@@ -1072,6 +1072,55 @@ function initCadastroUsuario() {
   });
 }
 
+function atualizarVisibilidadeSenha(botao, input, mostrarSenha) {
+  if (!botao || !input) {
+    return;
+  }
+
+  input.type = mostrarSenha ? "text" : "password";
+
+  const acao = mostrarSenha ? "Ocultar senha" : "Mostrar senha";
+  botao.setAttribute("aria-pressed", String(mostrarSenha));
+  botao.setAttribute("aria-label", acao);
+  botao.setAttribute("title", acao);
+
+  const label = botao.querySelector(".password-toggle__label");
+  if (label) {
+    label.textContent = acao;
+  }
+}
+
+function initPasswordToggles() {
+  const botoes = document.querySelectorAll("[data-password-toggle]");
+  if (!botoes.length) {
+    return;
+  }
+
+  botoes.forEach((botao) => {
+    if (botao.dataset.passwordToggleReady === "true") {
+      return;
+    }
+
+    const inputId = botao.getAttribute("aria-controls");
+    const input =
+      (inputId && document.getElementById(inputId)) ||
+      botao.closest(".password-field")?.querySelector("input");
+
+    if (!input) {
+      return;
+    }
+
+    atualizarVisibilidadeSenha(botao, input, input.type === "text");
+
+    botao.addEventListener("click", () => {
+      const mostrarSenha = input.type === "password";
+      atualizarVisibilidadeSenha(botao, input, mostrarSenha);
+    });
+
+    botao.dataset.passwordToggleReady = "true";
+  });
+}
+
 function initCadastroLivro() {
   const form = document.querySelector("form.cadastro-livro-form");
   if (!form) return;
@@ -2916,7 +2965,6 @@ function habilitarEdicaoResenha() {
   if (botaoEditar) botaoEditar.style.display = "none";
   atualizarFeedbackFormulario("resenhaFeedback");
   textarea.focus();
-  botoes.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 function cancelarResenha() {
@@ -3016,8 +3064,7 @@ function habilitarEdicaoFavorita() {
   botoes.style.opacity = "1";
   if (botaoEditar) botaoEditar.style.display = "none";
   atualizarFeedbackFormulario("favoritaFeedback");
-  textarea.scrollIntoView({ block: "center", behavior: "smooth" });
-  window.setTimeout(() => textarea.focus({ preventScroll: true }), 150);
+  textarea.focus();
 }
 
 function cancelarFavorita() {
@@ -3969,6 +4016,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupSkeletonStyles();
   setupPerfilDropdownStyles();
   initPerfilDropdown();
+  initPasswordToggles();
 
   // Identifica qual página está sendo carregada
   const currentPage = window.location.pathname;

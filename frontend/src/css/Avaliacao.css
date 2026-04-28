@@ -501,11 +501,16 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+  align-items: start;
   margin-top: 42px;
 }
 
 .detail-card {
   padding: 22px 22px 20px;
+  min-height: 248px;
+  max-height: 248px;
+  display: flex;
+  flex-direction: column;
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
@@ -539,14 +544,26 @@ body {
   color: var(--text);
 }
 
+.detail-card-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .detail-card p {
+  flex: 1;
   color: var(--text-soft);
   font-size: 14px;
   line-height: 1.7;
   white-space: pre-wrap;
-  min-height: 92px;
+  min-height: 0;
+  height: 100%;
   overflow-wrap: anywhere;
   word-break: break-word;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 #favoritaTexto,
@@ -555,6 +572,7 @@ body {
 }
 
 .detail-feedback {
+  flex-shrink: 0;
   margin-top: 14px;
 }
 
@@ -605,15 +623,18 @@ body {
 #botoesResenha,
 #botoesFavorita {
   display: flex;
+  flex-shrink: 0;
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 18px;
 }
 
 .texto-edicao {
+  flex: 1;
   width: 100%;
-  min-height: 140px;
-  margin-top: 16px;
+  min-height: 0;
+  height: 100%;
+  margin-top: 0;
   padding: 16px 18px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
@@ -621,11 +642,12 @@ body {
   color: var(--text);
   font-size: 15px;
   line-height: 1.7;
-  resize: vertical;
+  resize: none;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
   overflow-x: hidden;
+  overflow-y: auto;
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -729,6 +751,12 @@ body {
 
   .detail-card {
     padding: 18px 16px;
+    min-height: 236px;
+    max-height: 236px;
+  }
+
+  .detail-card-body {
+    display: flex;
   }
 
   .detail-card-header {

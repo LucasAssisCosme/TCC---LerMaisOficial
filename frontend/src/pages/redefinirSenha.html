@@ -6,7 +6,7 @@
     <title>Ler Mais - Redefinir Senha</title>
     <link rel="icon" type="image/png" href="../../logo.png" />
     <link rel="stylesheet" href="../../page-transition.css" />
-    <link rel="stylesheet" href="../css/redefinirSenha.css" />
+    <link rel="stylesheet" href="../css/redefinirSenha.css?v=20260428a" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -35,26 +35,108 @@
           </div>
           <div class="mb-3">
             <label for="inputNovaSenha" class="form-label">Nova Senha</label>
-            <input
-              type="password"
-              id="inputNovaSenha"
-              class="form-control form-control-lg"
-              placeholder="Digite sua nova senha"
-              name="nova_senha"
-              required
-            />
+            <div class="password-field">
+              <input
+                type="password"
+                id="inputNovaSenha"
+                class="form-control form-control-lg"
+                placeholder="Digite sua nova senha"
+                name="nova_senha"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                data-password-toggle
+                aria-controls="inputNovaSenha"
+                aria-label="Mostrar senha"
+                title="Mostrar senha"
+                aria-pressed="false"
+              >
+                <span class="password-toggle__icon" aria-hidden="true">
+                  <svg
+                    class="eye-open"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    class="eye-off"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.7a3 3 0 0 0 4 4" />
+                    <path d="M9.9 5.2A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3 3.8" />
+                    <path d="M6.6 6.7A17.2 17.2 0 0 0 2 12s3.6 7 10 7a10.7 10.7 0 0 0 5-1.2" />
+                  </svg>
+                </span>
+                <span class="visually-hidden password-toggle__label">Mostrar senha</span>
+              </button>
+            </div>
           </div>
 
           <div class="mb-3">
             <label for="inputConfirmarSenha" class="form-label">Confirmar Senha</label>
-            <input
-              type="password"
-              id="inputConfirmarSenha"
-              class="form-control form-control-lg"
-              placeholder="Digite sua senha"
-              name="senha"
-              required
-            />
+            <div class="password-field">
+              <input
+                type="password"
+                id="inputConfirmarSenha"
+                class="form-control form-control-lg"
+                placeholder="Digite sua senha"
+                name="senha"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                data-password-toggle
+                aria-controls="inputConfirmarSenha"
+                aria-label="Mostrar senha"
+                title="Mostrar senha"
+                aria-pressed="false"
+              >
+                <span class="password-toggle__icon" aria-hidden="true">
+                  <svg
+                    class="eye-open"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg
+                    class="eye-off"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.7a3 3 0 0 0 4 4" />
+                    <path d="M9.9 5.2A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3 3.8" />
+                    <path d="M6.6 6.7A17.2 17.2 0 0 0 2 12s3.6 7 10 7a10.7 10.7 0 0 0 5-1.2" />
+                  </svg>
+                </span>
+                <span class="visually-hidden password-toggle__label">Mostrar senha</span>
+              </button>
+            </div>
 
           </div>
 
@@ -73,6 +155,6 @@
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script> -->
      <script src="/frontend-config.js"></script>
-     <script src="../../script.js"></script>
+     <script src="../../script.js?v=20260428a"></script>
   </body>
 </html>
