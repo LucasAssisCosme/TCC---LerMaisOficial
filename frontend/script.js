@@ -10,6 +10,11 @@ const RUNTIME_API_BASE_URL = String(
 const DEFAULT_BOOK_COVER_URL =
   window.APP_CONFIG?.DEFAULT_BOOK_COVER_URL ||
   "https://gabrielchalita.com.br/wp-content/uploads/2019/12/semcapa.png";
+const SWEETALERT_SCRIPT_SRC =
+  "https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js";
+const SWEETALERT_STYLE_HREF =
+  "https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css";
+let sweetAlertLoadPromise = null;
 
 function apiUrl(path = "") {
   if (!path) {
@@ -767,18 +772,165 @@ function atualizarFeedbackFormulario(feedbackId, mensagem = "", tipo = "") {
   }
 }
 
-function exibirFeedbackOuAlert(feedbackId, mensagem = "", tipo = "error") {
+function garantirSweetAlertEstilos() {
+  if (
+    document.querySelector(`link[data-sweetalert-style="true"]`) ||
+    document.querySelector(`link[href="${SWEETALERT_STYLE_HREF}"]`)
+  ) {
+    return;
+  }
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = SWEETALERT_STYLE_HREF;
+  link.dataset.sweetalertStyle = "true";
+  document.head.appendChild(link);
+}
+
+function garantirSweetAlert() {
+  garantirSweetAlertEstilos();
+
+  if (window.Swal?.fire) {
+    return Promise.resolve(window.Swal);
+  }
+
+  if (sweetAlertLoadPromise) {
+    return sweetAlertLoadPromise;
+  }
+
+  sweetAlertLoadPromise = new Promise((resolve) => {
+    const scriptExistente = document.getElementById("sweetalert2-script");
+
+    if (scriptExistente) {
+      scriptExistente.addEventListener(
+        "load",
+        () => resolve(window.Swal || null),
+        { once: true },
+      );
+      scriptExistente.addEventListener(
+        "error",
+        () => resolve(null),
+        { once: true },
+      );
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "sweetalert2-script";
+    script.src = SWEETALERT_SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => resolve(window.Swal || null);
+    script.onerror = () => {
+      console.warn("[garantirSweetAlert] Falha ao carregar SweetAlert2.");
+      resolve(null);
+    };
+    document.head.appendChild(script);
+  });
+
+  return sweetAlertLoadPromise;
+}
+
+function obterTituloAlertaPorTipo(tipo = "info") {
+  switch (tipo) {
+    case "success":
+      return "Sucesso";
+    case "warning":
+      return "Atenção";
+    case "error":
+      return "Erro";
+    case "loading":
+      return "Carregando";
+    default:
+      return "Aviso";
+  }
+}
+
+function obterIconeAlertaPorTipo(tipo = "info") {
+  switch (tipo) {
+    case "success":
+      return "success";
+    case "warning":
+      return "warning";
+    case "error":
+      return "error";
+    default:
+      return "info";
+  }
+}
+
+function obterOpcoesBaseSweetAlert(options = {}) {
+  return {
+    confirmButtonColor: "#7a1f05",
+    cancelButtonColor: "#a45c2a",
+    background: "#fffaf5",
+    color: "#51210f",
+    reverseButtons: true,
+    ...options,
+  };
+}
+
+async function exibirAlertaApp(options = {}) {
+  const swal = await garantirSweetAlert();
+  const config = obterOpcoesBaseSweetAlert(options);
+
+  if (!swal?.fire) {
+    const mensagem = config.text || config.title || "";
+
+    if (config.showCancelButton) {
+      return {
+        isConfirmed: window.confirm(mensagem),
+        isDismissed: false,
+      };
+    }
+
+    if (mensagem) {
+      alert(mensagem);
+    }
+
+    return {
+      isConfirmed: true,
+      isDismissed: false,
+    };
+  }
+
+  return swal.fire(config);
+}
+
+function exibirFeedbackOuAlert(
+  feedbackId,
+  mensagem = "",
+  tipo = "error",
+  options = {},
+) {
+  const {
+    mostrarPopup = false,
+    manterFeedback = false,
+    title,
+    icon,
+    ...alertOptions
+  } = options;
   const feedback = document.getElementById(feedbackId);
+  const deveMostrarFeedback =
+    !!feedback && (tipo === "loading" || !mostrarPopup || manterFeedback);
+
   if (feedback) {
-    atualizarFeedbackFormulario(feedbackId, mensagem, tipo);
-    return true;
+    if (deveMostrarFeedback) {
+      atualizarFeedbackFormulario(feedbackId, mensagem, tipo);
+    } else {
+      atualizarFeedbackFormulario(feedbackId);
+    }
   }
 
-  if (mensagem && tipo !== "loading") {
-    alert(mensagem);
+  if (mensagem && tipo !== "loading" && (!feedback || mostrarPopup)) {
+    void exibirAlertaApp({
+      icon: icon || obterIconeAlertaPorTipo(tipo),
+      title: title || obterTituloAlertaPorTipo(tipo),
+      text: mensagem,
+      ...alertOptions,
+    });
   }
 
-  return false;
+  return deveMostrarFeedback;
 }
 
 async function cadastrarUsuario(formData) {
@@ -793,10 +945,14 @@ async function cadastrarUsuario(formData) {
     // Validar senha
     const validacaoSenha = validarSenha(senha);
     if (!validacaoSenha.valida) {
-      atualizarFeedbackFormulario(
+      exibirFeedbackOuAlert(
         "cadastroUsuarioFeedback",
         validacaoSenha.mensagem,
         "error",
+        {
+          mostrarPopup: true,
+          title: "Senha inválida",
+        },
       );
       return;
     }
@@ -829,10 +985,14 @@ async function cadastrarUsuario(formData) {
 
       // Tratamento especial para username duplicado
       if (resposta.status === 409 && erroBody.campo === "apelido") {
-        atualizarFeedbackFormulario(
+        exibirFeedbackOuAlert(
           "cadastroUsuarioFeedback",
           "Esse apelido já está em uso. Escolha uma sugestão abaixo.",
           "error",
+          {
+            mostrarPopup: true,
+            title: "Apelido indisponível",
+          },
         );
         exibirSugestoesApelido(erroBody.sugestoes || []);
         return;
@@ -850,10 +1010,17 @@ async function cadastrarUsuario(formData) {
     }
 
     const data = await resposta.json();
-    atualizarFeedbackFormulario(
+    exibirFeedbackOuAlert(
       "cadastroUsuarioFeedback",
       "Cadastro realizado com sucesso!",
       "success",
+      {
+        mostrarPopup: true,
+        title: "Conta criada",
+        timer: 2600,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      },
     );
 
     // Auto-login após cadastro bem-sucedido
@@ -874,10 +1041,14 @@ async function cadastrarUsuario(formData) {
     return data;
   } catch (error) {
     console.error("Erro ao cadastrar usuário:", error);
-    atualizarFeedbackFormulario(
+    exibirFeedbackOuAlert(
       "cadastroUsuarioFeedback",
       "Erro ao cadastrar usuário: " + (error.message || error),
       "error",
+      {
+        mostrarPopup: true,
+        title: "Não foi possível cadastrar",
+      },
     );
   }
 }
@@ -892,16 +1063,25 @@ async function cadastrarLivro(formData) {
         "Você precisa estar logado para cadastrar livros.",
         "error",
       );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para cadastrar livros.",
+      });
       window.location.href = "/frontend/login.html";
       return;
     }
 
     const usuarioId = getUsuarioLogadoId();
     if (!usuarioId) {
-      atualizarFeedbackFormulario(
+      exibirFeedbackOuAlert(
         "cadastroLivroFeedback",
         "Erro: ID do usuário não encontrado.",
         "error",
+        {
+          mostrarPopup: true,
+          title: "Usuário não identificado",
+        },
       );
       return;
     }
@@ -909,10 +1089,14 @@ async function cadastrarLivro(formData) {
     // Verificar se há arquivo de imagem (obrigatório)
     const arquivoImagem = document.getElementById("inputImagemLivro")?.files[0];
     if (!arquivoImagem) {
-      atualizarFeedbackFormulario(
+      exibirFeedbackOuAlert(
         "cadastroLivroFeedback",
         "Por favor, selecione uma imagem para o livro.",
         "error",
+        {
+          mostrarPopup: true,
+          title: "Imagem obrigatória",
+        },
       );
       return;
     }
@@ -932,10 +1116,14 @@ async function cadastrarLivro(formData) {
         throw new Error("URL da imagem não foi retornada");
       }
     } catch (erro) {
-      atualizarFeedbackFormulario(
+      exibirFeedbackOuAlert(
         "cadastroLivroFeedback",
         "Erro ao fazer upload da imagem: " + erro.message,
         "error",
+        {
+          mostrarPopup: true,
+          title: "Falha no upload",
+        },
       );
       return;
     }
@@ -958,21 +1146,29 @@ async function cadastrarLivro(formData) {
       payload.ano < 1000 ||
       payload.ano > new Date().getFullYear()
     ) {
-      atualizarFeedbackFormulario(
+      exibirFeedbackOuAlert(
         "cadastroLivroFeedback",
         "Ano inválido. Use um ano entre 1000 e " +
           new Date().getFullYear() +
           ".",
         "error",
+        {
+          mostrarPopup: true,
+          title: "Ano inválido",
+        },
       );
       return;
     }
 
     if (!payload.numero_paginas || payload.numero_paginas < 1) {
-      atualizarFeedbackFormulario(
+      exibirFeedbackOuAlert(
         "cadastroLivroFeedback",
         "Número de páginas inválido.",
         "error",
+        {
+          mostrarPopup: true,
+          title: "Quantidade inválida",
+        },
       );
       return;
     }
@@ -1001,22 +1197,33 @@ async function cadastrarLivro(formData) {
 
     console.log("Livro cadastrado com sucesso:", data);
 
-    atualizarFeedbackFormulario(
+    exibirFeedbackOuAlert(
       "cadastroLivroFeedback",
       "Livro cadastrado com sucesso!",
       "success",
+      {
+        mostrarPopup: true,
+        title: "Livro cadastrado",
+        timer: 4200,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      },
     );
 
     // Redirecionar para a página inicial
     window.setTimeout(() => {
       window.location.href = "/frontend/src/pages/index.html";
-    }, 5000);
+    }, 4500);
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
-    atualizarFeedbackFormulario(
+    exibirFeedbackOuAlert(
       "cadastroLivroFeedback",
       "Erro ao cadastrar livro: " + (error.message || error),
       "error",
+      {
+        mostrarPopup: true,
+        title: "Falha ao cadastrar livro",
+      },
     );
   }
 }
@@ -1133,14 +1340,51 @@ function initCadastroLivro() {
   });
 }
 
+function exibirAlertaLogin(options = {}) {
+  garantirSweetAlertEstilos();
+
+  if (!window.Swal?.fire) {
+    return null;
+  }
+
+  return window.Swal.fire(obterOpcoesBaseSweetAlert(options));
+}
+
+function mostrarCarregamentoLogin() {
+  if (!window.Swal?.fire) {
+    return false;
+  }
+
+  void exibirAlertaLogin({
+    title: "Entrando...",
+    text: "Estamos verificando seus dados.",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      window.Swal.showLoading();
+    },
+  });
+
+  return true;
+}
+
 async function loginUsuario(
   formData,
   isAutoLogin = false,
   redirectDelayMs = 3000,
 ) {
   try {
+    let loginComSwal = false;
+
     if (!isAutoLogin) {
-      atualizarFeedbackFormulario("loginFeedback", "Entrando...", "loading");
+      loginComSwal = mostrarCarregamentoLogin();
+
+      if (!loginComSwal) {
+        atualizarFeedbackFormulario("loginFeedback", "Entrando...", "loading");
+      } else {
+        atualizarFeedbackFormulario("loginFeedback");
+      }
     }
 
     const payload = {
@@ -1190,11 +1434,23 @@ async function loginUsuario(
     }
 
     if (!isAutoLogin) {
-      exibirFeedbackOuAlert(
-        "loginFeedback",
-        "Login realizado com sucesso!",
-        "success",
-      );
+      if (loginComSwal) {
+        window.Swal.close();
+        void exibirAlertaLogin({
+          icon: "success",
+          title: "Login realizado com sucesso!",
+          text: "Redirecionando para a página inicial...",
+          timer: redirectDelayMs,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      } else {
+        exibirFeedbackOuAlert(
+          "loginFeedback",
+          "Login realizado com sucesso!",
+          "success",
+        );
+      }
     }
 
     // Redireciona para a página principal (ajuste conforme sua estrutura)
@@ -1206,11 +1462,24 @@ async function loginUsuario(
   } catch (error) {
     console.error("Erro ao logar:", error);
     if (!isAutoLogin) {
-      exibirFeedbackOuAlert(
-        "loginFeedback",
-        "Erro ao logar: " + (error.message || error),
-        "error",
-      );
+      if (window.Swal?.isVisible()) {
+        window.Swal.close();
+      }
+
+      if (window.Swal?.fire) {
+        await exibirAlertaLogin({
+          icon: "error",
+          title: "Erro ao fazer login",
+          text: error.message || String(error),
+        });
+        atualizarFeedbackFormulario("loginFeedback");
+      } else {
+        exibirFeedbackOuAlert(
+          "loginFeedback",
+          "Erro ao logar: " + (error.message || error),
+          "error",
+        );
+      }
     }
     throw error;
   }
@@ -1224,7 +1493,11 @@ function initLogin() {
     event.preventDefault();
 
     const formData = new FormData(form);
-    await loginUsuario(formData);
+    try {
+      await loginUsuario(formData);
+    } catch (error) {
+      console.error("[initLogin] Falha no login:", error);
+    }
   });
 }
 
@@ -1236,13 +1509,21 @@ async function redefinirSenha(formData) {
     // Validar nova senha
     const validacaoSenha = validarSenha(novaSenha);
     if (!validacaoSenha.valida) {
-      alert(validacaoSenha.mensagem);
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Senha inválida",
+        text: validacaoSenha.mensagem,
+      });
       return;
     }
 
     // Validar se as senhas coincidem
     if (novaSenha !== confirmarSenha) {
-      alert("As senhas não coincidem");
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Senhas diferentes",
+        text: "As senhas não coincidem.",
+      });
       return;
     }
 
@@ -1269,14 +1550,23 @@ async function redefinirSenha(formData) {
     }
 
     const data = await resposta.json();
-    alert("Senha redefinida com sucesso!");
-    setTimeout(() => {
-      window.location.href = "/frontend/login.html";
-    }, 500);
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Senha redefinida",
+      text: "Sua senha foi redefinida com sucesso.",
+      timer: 2200,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
+    window.location.href = "/frontend/login.html";
     return data;
   } catch (error) {
     console.error("Erro ao redefinir senha:", error);
-    alert("Erro ao redefinir senha: " + (error.message || error));
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao redefinir senha",
+      text: error.message || String(error),
+    });
     throw error;
   }
 }
@@ -1756,7 +2046,11 @@ async function carregarPerfil() {
 
     // Se não estiver logado, redirecionar para login
     if (!id || !token) {
-      alert("Você precisa estar logado para acessar o perfil!");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para acessar o perfil.",
+      });
       window.location.href = "/frontend/login.html";
       return;
     }
@@ -1803,7 +2097,11 @@ async function carregarPerfil() {
 
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
-    alert("Erro ao carregar perfil: " + erro.message);
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao carregar perfil",
+      text: erro.message || String(erro),
+    });
   } finally {
     hidePerfilSkeleton();
   }
@@ -1946,10 +2244,19 @@ async function salvarPerfil() {
     }
 
     const resultado = await response.json();
-    atualizarFeedbackFormulario(
+    exibirFeedbackOuAlert(
       "perfilFeedback",
       "Perfil atualizado com sucesso!",
       "success",
+      {
+        mostrarPopup: true,
+        title: "Perfil atualizado",
+        timer: 2200,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      },
     );
 
     console.log("[salvarPerfil] Resultado:", resultado);
@@ -2015,10 +2322,14 @@ async function salvarPerfil() {
     }, 500);
   } catch (erro) {
     console.error(erro);
-    atualizarFeedbackFormulario(
+    exibirFeedbackOuAlert(
       "perfilFeedback",
       "Erro ao salvar perfil: " + erro.message,
       "error",
+      {
+        mostrarPopup: true,
+        title: "Falha ao salvar perfil",
+      },
     );
   }
 }
@@ -2034,15 +2345,25 @@ async function excluirPerfil() {
     const token = getToken();
 
     if (!id || !token) {
-      alert("Voce precisa estar logado para apagar o perfil.");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para apagar o perfil.",
+      });
       logout();
       return;
     }
 
-    const confirmou = window.confirm(
-      "Tem certeza que deseja apagar seu perfil? Essa acao nao pode ser desfeita.",
-    );
-    if (!confirmou) {
+    const confirmacao = await exibirAlertaApp({
+      icon: "warning",
+      title: "Apagar perfil?",
+      text: "Tem certeza que deseja apagar seu perfil? Essa ação não pode ser desfeita.",
+      showCancelButton: true,
+      confirmButtonText: "Apagar",
+      cancelButtonText: "Cancelar",
+      focusCancel: true,
+    });
+    if (!confirmacao.isConfirmed) {
       return;
     }
 
@@ -2059,7 +2380,14 @@ async function excluirPerfil() {
       throw new Error(data.mensagem || `Erro ${resposta.status}`);
     }
 
-    alert("Perfil apagado com sucesso.");
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Perfil apagado",
+      text: "Seu perfil foi apagado com sucesso.",
+      timer: 2200,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
     localStorage.removeItem("usuarioLogadoId");
     localStorage.removeItem("usuarioLogadoTipo");
     localStorage.removeItem("usuarioLogadoApelido");
@@ -2068,7 +2396,11 @@ async function excluirPerfil() {
     window.location.href = "/frontend/login.html";
   } catch (erro) {
     console.error("[excluirPerfil] Erro ao apagar perfil:", erro);
-    alert("Erro ao apagar perfil: " + (erro.message || erro));
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao apagar perfil",
+      text: erro.message || String(erro),
+    });
   }
 }
 
@@ -2088,6 +2420,10 @@ async function salvarStatusBiblioteca(
         "avaliacaoSidebarFeedback",
         "Erro: IDs inválidos. Abra o console para detalhes.",
         "error",
+        {
+          mostrarPopup: true,
+          title: "Dados inválidos",
+        },
       );
       return null;
     }
@@ -2097,17 +2433,26 @@ async function salvarStatusBiblioteca(
         "avaliacaoSidebarFeedback",
         "Erro: Progresso inválido. Use: lido, lendo ou quero ler.",
         "error",
+        {
+          mostrarPopup: true,
+          title: "Status inválido",
+        },
       );
       return null;
     }
 
     const token = getToken();
     if (!token) {
-      exibirFeedbackOuAlert(
+      atualizarFeedbackFormulario(
         "avaliacaoSidebarFeedback",
         "Você precisa estar logado.",
         "error",
       );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para salvar esse status.",
+      });
       logout();
       return null;
     }
@@ -2138,11 +2483,16 @@ async function salvarStatusBiblioteca(
     console.log("[Frontend] Status HTTP:", resposta.status);
 
     if (resposta.status === 401 || resposta.status === 403) {
-      exibirFeedbackOuAlert(
+      atualizarFeedbackFormulario(
         "avaliacaoSidebarFeedback",
         "Sessão expirada. Faça login novamente.",
         "error",
       );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Sessão expirada",
+        text: "Faça login novamente para continuar.",
+      });
       logout();
       return null;
     }
@@ -2157,15 +2507,35 @@ async function salvarStatusBiblioteca(
         "avaliacaoSidebarFeedback",
         "Erro ao salvar: " + mensagem,
         "error",
+        {
+          mostrarPopup: true,
+          title: "Falha ao salvar status",
+        },
       );
       return null;
     }
 
     console.log("[Frontend] Status salvo com sucesso:", data);
-    atualizarFeedbackFormulario(
+    const mensagemStatus =
+      progresso === "lido"
+        ? "Livro marcado como lido!"
+        : progresso === "lendo"
+          ? "Livro marcado como lendo!"
+          : "Livro adicionado em quero ler!";
+
+    exibirFeedbackOuAlert(
       "avaliacaoSidebarFeedback",
-      "Livro adicionado a biblioteca!",
+      mensagemStatus,
       "success",
+      {
+        mostrarPopup: true,
+        title: "Status atualizado",
+        timer: 1800,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      },
     );
 
     // Dispara evento para atualizar biblioteca com pequeno delay
@@ -2181,6 +2551,10 @@ async function salvarStatusBiblioteca(
       "avaliacaoSidebarFeedback",
       "Erro: " + error.message,
       "error",
+      {
+        mostrarPopup: true,
+        title: "Erro ao atualizar status",
+      },
     );
     return null;
   }
@@ -2616,7 +2990,11 @@ async function carregarDadosLivroAvaliacao() {
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
-      alert("Livro não especificado");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Livro não encontrado",
+        text: "Nenhum livro foi selecionado para avaliação.",
+      });
       return;
     }
 
@@ -2761,7 +3139,11 @@ async function carregarDadosLivroAvaliacao() {
     setupEstrelasListeners();
   } catch (erro) {
     console.error("Erro ao carregar livro:", erro);
-    alert("Erro ao carregar livro");
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao carregar livro",
+      text: erro.message || "Não foi possível carregar os dados do livro.",
+    });
   } finally {
     hideAvaliacaoSkeleton();
   }
@@ -4017,6 +4399,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupPerfilDropdownStyles();
   initPerfilDropdown();
   initPasswordToggles();
+  void garantirSweetAlert();
 
   // Identifica qual página está sendo carregada
   const currentPage = window.location.pathname;
