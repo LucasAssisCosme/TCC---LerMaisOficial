@@ -1054,7 +1054,16 @@ async function cadastrarUsuario(formData) {
 }
 
 async function cadastrarLivro(formData) {
+  const form = document.querySelector("form.cadastro-livro-form");
+  const botaoSubmit = form?.querySelector('button[type="submit"]');
+
   try {
+    if (botaoSubmit) {
+      botaoSubmit.disabled = true;
+      botaoSubmit.dataset.originalText = botaoSubmit.textContent || "Confirmar";
+      botaoSubmit.textContent = "Cadastrando...";
+    }
+
     atualizarFeedbackFormulario("cadastroLivroFeedback");
     const token = getToken();
     if (!token) {
@@ -1197,23 +1206,17 @@ async function cadastrarLivro(formData) {
 
     console.log("Livro cadastrado com sucesso:", data);
 
-    exibirFeedbackOuAlert(
-      "cadastroLivroFeedback",
-      "Livro cadastrado com sucesso!",
-      "success",
-      {
-        mostrarPopup: true,
-        title: "Livro cadastrado",
-        timer: 4200,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      },
-    );
+    atualizarFeedbackFormulario("cadastroLivroFeedback");
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Livro cadastrado",
+      text: "Livro cadastrado com sucesso!",
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+      allowEscapeKey: true,
+    });
 
-    // Redirecionar para a página inicial
-    window.setTimeout(() => {
-      window.location.href = "/frontend/src/pages/index.html";
-    }, 4500);
+    window.location.href = "/frontend/src/pages/index.html";
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
     exibirFeedbackOuAlert(
@@ -1225,6 +1228,12 @@ async function cadastrarLivro(formData) {
         title: "Falha ao cadastrar livro",
       },
     );
+  } finally {
+    if (botaoSubmit) {
+      botaoSubmit.disabled = false;
+      botaoSubmit.textContent = botaoSubmit.dataset.originalText || "Confirmar";
+      delete botaoSubmit.dataset.originalText;
+    }
   }
 }
 
@@ -1332,12 +1341,18 @@ function initCadastroLivro() {
   const form = document.querySelector("form.cadastro-livro-form");
   if (!form) return;
 
+  if (form.dataset.submitReady === "true") {
+    return;
+  }
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const formData = new FormData(form);
     await cadastrarLivro(formData);
   });
+
+  form.dataset.submitReady = "true";
 }
 
 function exibirAlertaLogin(options = {}) {
@@ -3685,6 +3700,51 @@ function atualizarFeedbackEdicaoLivro(mensagem = "", tipo = "") {
   }
 }
 
+function obterTipoFeedbackEdicao(tipo = "") {
+  if (tipo === "success" || tipo === "error" || tipo === "loading") {
+    return tipo;
+  }
+
+  return "";
+}
+
+async function exibirFeedbackEdicaoOuAlert(
+  mensagem = "",
+  tipo = "error",
+  options = {},
+) {
+  const {
+    mostrarPopup = false,
+    manterFeedback = false,
+    title,
+    icon,
+    ...alertOptions
+  } = options;
+  const feedbackEl = document.getElementById("feedbackEdicaoLivro");
+  const tipoFeedback = obterTipoFeedbackEdicao(tipo);
+  const deveMostrarFeedback =
+    !!feedbackEl && (tipo === "loading" || !mostrarPopup || manterFeedback);
+
+  if (feedbackEl) {
+    if (deveMostrarFeedback) {
+      atualizarFeedbackEdicaoLivro(mensagem, tipoFeedback);
+    } else {
+      atualizarFeedbackEdicaoLivro("");
+    }
+  }
+
+  if (mensagem && tipo !== "loading" && (!feedbackEl || mostrarPopup)) {
+    return exibirAlertaApp({
+      icon: icon || obterIconeAlertaPorTipo(tipo),
+      title: title || obterTituloAlertaPorTipo(tipo),
+      text: mensagem,
+      ...alertOptions,
+    });
+  }
+
+  return null;
+}
+
 function definirEstadoSalvarLivro({ carregando = false } = {}) {
   const botaoSalvar = document.getElementById("btnSalvarLivro");
   if (!botaoSalvar) return;
@@ -3764,7 +3824,14 @@ function configurarPreviewCapaLivro() {
 
 async function habilitarEdicaoLivro() {
   if (!isBibliotecariaLogada()) {
-    alert("Acesso negado. Apenas bibliotecarias podem editar livros.");
+    await exibirFeedbackEdicaoOuAlert(
+      "Acesso negado. Apenas bibliotecarias podem editar livros.",
+      "warning",
+      {
+        mostrarPopup: true,
+        title: "Acesso negado",
+      },
+    );
     return;
   }
 
@@ -3780,7 +3847,10 @@ async function habilitarEdicaoLivro() {
 async function salvarAlteracoesLivro() {
   const livroId = localStorage.getItem("livroAtualId");
   if (!livroId) {
-    alert("Livro nao encontrado");
+    await exibirFeedbackEdicaoOuAlert("Livro nao encontrado.", "error", {
+      mostrarPopup: true,
+      title: "Livro nao encontrado",
+    });
     return;
   }
 
@@ -3803,12 +3873,20 @@ async function salvarAlteracoesLivro() {
   const editora = editoraInput ? editoraInput.value.trim() : null;
 
   if (!titulo) {
-    alert("Titulo e obrigatorio!");
+    await exibirFeedbackEdicaoOuAlert("Titulo e obrigatorio.", "error", {
+      mostrarPopup: true,
+      manterFeedback: true,
+      title: "Campo obrigatorio",
+    });
     return;
   }
 
   if (!descricao) {
-    alert("Descricao e obrigatoria!");
+    await exibirFeedbackEdicaoOuAlert("Descricao e obrigatoria.", "error", {
+      mostrarPopup: true,
+      manterFeedback: true,
+      title: "Campo obrigatorio",
+    });
     return;
   }
 
@@ -3819,7 +3897,11 @@ async function salvarAlteracoesLivro() {
 
   if (autorInput) {
     if (!autor) {
-      alert("Autor e obrigatorio!");
+      await exibirFeedbackEdicaoOuAlert("Autor e obrigatorio.", "error", {
+        mostrarPopup: true,
+        manterFeedback: true,
+        title: "Campo obrigatorio",
+      });
       return;
     }
     payload.autor = autor;
@@ -3827,7 +3909,11 @@ async function salvarAlteracoesLivro() {
 
   if (generoInput) {
     if (!genero) {
-      alert("Genero e obrigatorio!");
+      await exibirFeedbackEdicaoOuAlert("Genero e obrigatorio.", "error", {
+        mostrarPopup: true,
+        manterFeedback: true,
+        title: "Campo obrigatorio",
+      });
       return;
     }
     payload.genero = genero;
@@ -3837,7 +3923,15 @@ async function salvarAlteracoesLivro() {
     const ano = Number(anoTexto);
     const anoAtual = new Date().getFullYear();
     if (!Number.isInteger(ano) || ano < 1000 || ano > anoAtual) {
-      alert(`Ano invalido. Use um ano entre 1000 e ${anoAtual}.`);
+      await exibirFeedbackEdicaoOuAlert(
+        `Ano invalido. Use um ano entre 1000 e ${anoAtual}.`,
+        "error",
+        {
+          mostrarPopup: true,
+          manterFeedback: true,
+          title: "Ano invalido",
+        },
+      );
       return;
     }
     payload.ano = ano;
@@ -3846,7 +3940,15 @@ async function salvarAlteracoesLivro() {
   if (paginasInput) {
     const paginas = Number(paginasTexto);
     if (!Number.isInteger(paginas) || paginas < 1) {
-      alert("Numero de paginas invalido.");
+      await exibirFeedbackEdicaoOuAlert(
+        "Numero de paginas invalido.",
+        "error",
+        {
+          mostrarPopup: true,
+          manterFeedback: true,
+          title: "Quantidade invalida",
+        },
+      );
       return;
     }
     payload.numero_paginas = paginas;
@@ -3862,7 +3964,15 @@ async function salvarAlteracoesLivro() {
 
     const token = getToken();
     if (!token) {
-      alert("Voce precisa estar logado");
+      await exibirFeedbackEdicaoOuAlert(
+        "Voce precisa estar logado para editar livros.",
+        "warning",
+        {
+          mostrarPopup: true,
+          manterFeedback: true,
+          title: "Login necessario",
+        },
+      );
       return;
     }
 
@@ -3876,7 +3986,15 @@ async function salvarAlteracoesLivro() {
         }
         console.log("[salvarAlteracoesLivro] Upload realizado:", imagemUrl);
       } catch (erro) {
-        alert("Erro ao fazer upload da imagem: " + erro.message);
+        await exibirFeedbackEdicaoOuAlert(
+          "Erro ao fazer upload da imagem: " + erro.message,
+          "error",
+          {
+            mostrarPopup: true,
+            manterFeedback: true,
+            title: "Falha no upload",
+          },
+        );
         return;
       }
     }
@@ -3925,9 +4043,18 @@ async function salvarAlteracoesLivro() {
     preencherVisualizacaoLivro(livroAtualDados);
     preencherFormularioEdicaoLivro(livroAtualDados);
     cancelarEdicaoLivro();
-    atualizarFeedbackEdicaoLivro("Alterações salvas com sucesso.", "success");
-
-    alert("Livro atualizado com sucesso!");
+    await exibirFeedbackEdicaoOuAlert(
+      "Alteracoes salvas com sucesso.",
+      "success",
+      {
+        mostrarPopup: true,
+        manterFeedback: true,
+        title: "Livro atualizado",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        allowEscapeKey: true,
+      },
+    );
 
     console.log("[salvarAlteracoesLivro] Recarregando biblioteca...");
     setTimeout(() => {
@@ -3935,8 +4062,15 @@ async function salvarAlteracoesLivro() {
     }, 500);
   } catch (erro) {
     console.error("[salvarAlteracoesLivro] Erro completo:", erro);
-    atualizarFeedbackEdicaoLivro(`Erro ao salvar: ${erro.message}`, "error");
-    alert("Erro ao salvar alteracoes: " + erro.message);
+    await exibirFeedbackEdicaoOuAlert(
+      `Erro ao salvar alteracoes: ${erro.message}`,
+      "error",
+      {
+        mostrarPopup: true,
+        manterFeedback: true,
+        title: "Falha ao salvar alteracoes",
+      },
+    );
   } finally {
     definirEstadoSalvarLivro({ carregando: false });
   }
