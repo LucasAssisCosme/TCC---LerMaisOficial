@@ -1083,30 +1083,22 @@ async function cadastrarLivro(formData) {
 
     const usuarioId = getUsuarioLogadoId();
     if (!usuarioId) {
-      exibirFeedbackOuAlert(
-        "cadastroLivroFeedback",
-        "Erro: ID do usuário não encontrado.",
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Usuário não identificado",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Usuário não identificado",
+        text: "Erro: ID do usuário não encontrado.",
+      });
       return;
     }
 
     // Verificar se há arquivo de imagem (obrigatório)
     const arquivoImagem = document.getElementById("inputImagemLivro")?.files[0];
     if (!arquivoImagem) {
-      exibirFeedbackOuAlert(
-        "cadastroLivroFeedback",
-        "Por favor, selecione uma imagem para o livro.",
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Imagem obrigatória",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Imagem obrigatória",
+        text: "Por favor, selecione uma imagem para o livro.",
+      });
       return;
     }
 
@@ -1125,15 +1117,11 @@ async function cadastrarLivro(formData) {
         throw new Error("URL da imagem não foi retornada");
       }
     } catch (erro) {
-      exibirFeedbackOuAlert(
-        "cadastroLivroFeedback",
-        "Erro ao fazer upload da imagem: " + erro.message,
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Falha no upload",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Falha no upload",
+        text: "Erro ao fazer upload da imagem: " + erro.message,
+      });
       return;
     }
 
@@ -1155,30 +1143,20 @@ async function cadastrarLivro(formData) {
       payload.ano < 1000 ||
       payload.ano > new Date().getFullYear()
     ) {
-      exibirFeedbackOuAlert(
-        "cadastroLivroFeedback",
-        "Ano inválido. Use um ano entre 1000 e " +
-          new Date().getFullYear() +
-          ".",
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Ano inválido",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Ano inválido",
+        text: "Use um ano entre 1000 e " + new Date().getFullYear() + ".",
+      });
       return;
     }
 
     if (!payload.numero_paginas || payload.numero_paginas < 1) {
-      exibirFeedbackOuAlert(
-        "cadastroLivroFeedback",
-        "Número de páginas inválido.",
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Quantidade inválida",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Quantidade inválida",
+        text: "Número de páginas inválido.",
+      });
       return;
     }
 
@@ -1213,21 +1191,19 @@ async function cadastrarLivro(formData) {
       text: "Livro cadastrado com sucesso!",
       confirmButtonText: "OK",
       allowOutsideClick: false,
-      allowEscapeKey: true,
+      allowEscapeKey: false,
+      timer: 3500,
+      timerProgressBar: true,
     });
 
     window.location.href = "/frontend/src/pages/index.html";
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
-    exibirFeedbackOuAlert(
-      "cadastroLivroFeedback",
-      "Erro ao cadastrar livro: " + (error.message || error),
-      "error",
-      {
-        mostrarPopup: true,
-        title: "Falha ao cadastrar livro",
-      },
-    );
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Falha ao cadastrar livro",
+      text: error.message || String(error),
+    });
   } finally {
     if (botaoSubmit) {
       botaoSubmit.disabled = false;
@@ -1528,6 +1504,7 @@ async function redefinirSenha(formData) {
         icon: "error",
         title: "Senha inválida",
         text: validacaoSenha.mensagem,
+        position: "center",
       });
       return;
     }
@@ -1538,6 +1515,7 @@ async function redefinirSenha(formData) {
         icon: "error",
         title: "Senhas diferentes",
         text: "As senhas não coincidem.",
+        position: "center",
       });
       return;
     }
@@ -1572,6 +1550,7 @@ async function redefinirSenha(formData) {
       timer: 2200,
       timerProgressBar: true,
       showConfirmButton: false,
+      position: "center",
     });
     window.location.href = "/frontend/login.html";
     return data;
@@ -1581,6 +1560,7 @@ async function redefinirSenha(formData) {
       icon: "error",
       title: "Erro ao redefinir senha",
       text: error.message || String(error),
+      position: "center",
     });
     throw error;
   }
@@ -2065,6 +2045,7 @@ async function carregarPerfil() {
         icon: "warning",
         title: "Login necessário",
         text: "Você precisa estar logado para acessar o perfil.",
+        position: "center",
       });
       window.location.href = "/frontend/login.html";
       return;
@@ -2116,6 +2097,7 @@ async function carregarPerfil() {
       icon: "error",
       title: "Erro ao carregar perfil",
       text: erro.message || String(erro),
+      position: "center",
     });
   } finally {
     hidePerfilSkeleton();
@@ -2259,20 +2241,22 @@ async function salvarPerfil() {
     }
 
     const resultado = await response.json();
-    exibirFeedbackOuAlert(
+    
+    atualizarFeedbackFormulario(
       "perfilFeedback",
       "Perfil atualizado com sucesso!",
       "success",
-      {
-        mostrarPopup: true,
-        title: "Perfil atualizado",
-        timer: 2200,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-      },
     );
+
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Perfil atualizado",
+      text: "Seus dados foram atualizados com sucesso!",
+      timer: 2200,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      position: "center",
+    });
 
     console.log("[salvarPerfil] Resultado:", resultado);
 
@@ -2337,15 +2321,12 @@ async function salvarPerfil() {
     }, 500);
   } catch (erro) {
     console.error(erro);
-    exibirFeedbackOuAlert(
-      "perfilFeedback",
-      "Erro ao salvar perfil: " + erro.message,
-      "error",
-      {
-        mostrarPopup: true,
-        title: "Falha ao salvar perfil",
-      },
-    );
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Falha ao salvar perfil",
+      text: erro.message || String(erro),
+      position: "center",
+    });
   }
 }
 
@@ -2364,6 +2345,7 @@ async function excluirPerfil() {
         icon: "warning",
         title: "Login necessário",
         text: "Você precisa estar logado para apagar o perfil.",
+        position: "center",
       });
       logout();
       return;
@@ -2377,6 +2359,7 @@ async function excluirPerfil() {
       confirmButtonText: "Apagar",
       cancelButtonText: "Cancelar",
       focusCancel: true,
+      position: "center",
     });
     if (!confirmacao.isConfirmed) {
       return;
@@ -2402,6 +2385,7 @@ async function excluirPerfil() {
       timer: 2200,
       timerProgressBar: true,
       showConfirmButton: false,
+      position: "center",
     });
     localStorage.removeItem("usuarioLogadoId");
     localStorage.removeItem("usuarioLogadoTipo");
@@ -2415,6 +2399,7 @@ async function excluirPerfil() {
       icon: "error",
       title: "Erro ao apagar perfil",
       text: erro.message || String(erro),
+      position: "center",
     });
   }
 }
@@ -2431,28 +2416,20 @@ async function salvarStatusBiblioteca(
 
     if (!uId || !lId) {
       console.error("Dados inválidos:", { usuarioId, livroId });
-      exibirFeedbackOuAlert(
-        "avaliacaoSidebarFeedback",
-        "Erro: IDs inválidos. Abra o console para detalhes.",
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Dados inválidos",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Dados inválidos",
+        text: "IDs do usuário ou livro não são válidos. Abra o console para detalhes.",
+      });
       return null;
     }
 
     if (!["lido", "lendo", "quero_ler"].includes(progresso)) {
-      exibirFeedbackOuAlert(
-        "avaliacaoSidebarFeedback",
-        "Erro: Progresso inválido. Use: lido, lendo ou quero ler.",
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Status inválido",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Status inválido",
+        text: "Status inválido. Use: lido, lendo ou quero ler.",
+      });
       return null;
     }
 
@@ -2518,15 +2495,11 @@ async function salvarStatusBiblioteca(
       console.error("[Frontend] Erro na resposta:", data);
       const mensagem = data.mensagem || `Erro ${resposta.status}`;
       console.error("[Frontend] Erro ao salvar:", mensagem);
-      exibirFeedbackOuAlert(
-        "avaliacaoSidebarFeedback",
-        "Erro ao salvar: " + mensagem,
-        "error",
-        {
-          mostrarPopup: true,
-          title: "Falha ao salvar status",
-        },
-      );
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Falha ao salvar status",
+        text: mensagem,
+      });
       return null;
     }
 
@@ -2542,16 +2515,18 @@ async function salvarStatusBiblioteca(
       "avaliacaoSidebarFeedback",
       mensagemStatus,
       "success",
-      {
-        mostrarPopup: true,
-        title: "Status atualizado",
-        timer: 1800,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-      },
     );
+
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Status atualizado",
+      text: mensagemStatus,
+      timer: 1800,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end",
+    });
 
     // Dispara evento para atualizar biblioteca com pequeno delay
     setTimeout(() => {
@@ -2562,15 +2537,11 @@ async function salvarStatusBiblioteca(
     return data;
   } catch (error) {
     console.error("[Frontend] Erro ao salvar status:", error);
-    exibirFeedbackOuAlert(
-      "avaliacaoSidebarFeedback",
-      "Erro: " + error.message,
-      "error",
-      {
-        mostrarPopup: true,
-        title: "Erro ao atualizar status",
-      },
-    );
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao atualizar status",
+      text: error.message || String(error),
+    });
     return null;
   }
 }
@@ -3166,38 +3137,124 @@ async function carregarDadosLivroAvaliacao() {
 
 // Setup de listeners das estrelas
 function setupEstrelasListeners() {
-  const estrelas = document.querySelectorAll("#avaliacaoEstrelas .star");
+  const container = document.getElementById("avaliacaoEstrelas");
+  if (!container) {
+    return;
+  }
 
-  estrelas.forEach((star) => {
-    star.style.cursor = "pointer";
+  container.setAttribute("role", "group");
+  container.setAttribute("aria-label", "Avalie este livro");
+
+  let avaliacaoTexto = document.getElementById("avaliacaoTexto");
+  if (!avaliacaoTexto) {
+    avaliacaoTexto = document.createElement("p");
+    avaliacaoTexto.id = "avaliacaoTexto";
+    avaliacaoTexto.className = "rating-value";
+    avaliacaoTexto.textContent = "Clique nas estrelas para avaliar";
+    container.insertAdjacentElement("afterend", avaliacaoTexto);
+  }
+
+  if (container.dataset.bound === "true") {
+    atualizarEstrelas(avaliacaoAtual);
+    return;
+  }
+
+  const estrelas = Array.from(container.querySelectorAll(".star"));
+
+  estrelas.forEach((star, index) => {
+    star.tabIndex = index === 0 ? 0 : -1;
+    star.setAttribute("role", "button");
+    star.setAttribute("aria-pressed", "false");
+
     star.addEventListener("click", function () {
-      const valor = parseInt(this.dataset.value);
+      const valor = Number(this.dataset.value);
       salvarAvaliacao(valor);
     });
 
     star.addEventListener("mouseover", function () {
-      const valor = parseInt(this.dataset.value);
+      const valor = Number(this.dataset.value);
       atualizarEstrelas(valor);
+    });
+
+    star.addEventListener("focus", function () {
+      const valor = Number(this.dataset.value);
+      atualizarEstrelas(valor);
+    });
+
+    star.addEventListener("keydown", function (event) {
+      const valor = Number(this.dataset.value);
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        salvarAvaliacao(valor);
+        return;
+      }
+
+      if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+        event.preventDefault();
+        const proxima = Math.min(estrelas.length, valor + 1);
+        estrelas[proxima - 1].focus();
+        atualizarEstrelas(proxima);
+        return;
+      }
+
+      if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+        event.preventDefault();
+        const anterior = Math.max(1, valor - 1);
+        estrelas[anterior - 1].focus();
+        atualizarEstrelas(anterior);
+        return;
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        estrelas[0].focus();
+        atualizarEstrelas(1);
+        return;
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        estrelas[estrelas.length - 1].focus();
+        atualizarEstrelas(estrelas.length);
+      }
     });
   });
 
-  document
-    .getElementById("avaliacaoEstrelas")
-    .addEventListener("mouseleave", function () {
+  container.addEventListener("mouseleave", function () {
+    atualizarEstrelas(avaliacaoAtual);
+  });
+
+  container.addEventListener("focusout", function (event) {
+    if (!container.contains(event.relatedTarget)) {
       atualizarEstrelas(avaliacaoAtual);
-    });
+    }
+  });
+
+  container.dataset.bound = "true";
+  atualizarEstrelas(avaliacaoAtual);
 }
 
 // Atualiza visualmente as estrelas
 function atualizarEstrelas(valor) {
   const estrelas = document.querySelectorAll("#avaliacaoEstrelas .star");
+  const avaliacaoTexto = document.getElementById("avaliacaoTexto");
+
   estrelas.forEach((star, index) => {
-    if (index < valor) {
-      star.style.opacity = "1";
-    } else {
-      star.style.opacity = "0.3";
-    }
+    const ativa = index < valor;
+    const selecionada = index + 1 === valor;
+
+    star.classList.toggle("is-active", ativa);
+    star.setAttribute("aria-pressed", selecionada ? "true" : "false");
+    star.tabIndex = selecionada || (valor === 0 && index === 0) ? 0 : -1;
   });
+
+  if (avaliacaoTexto) {
+    avaliacaoTexto.textContent =
+      valor > 0
+        ? `${valor} ${valor === 1 ? "estrela" : "estrelas"}`
+        : "Clique nas estrelas para avaliar";
+  }
 }
 
 // Salva avaliação no servidor
@@ -3207,11 +3264,11 @@ async function salvarAvaliacao(estrelas) {
     const usuarioId = getUsuarioLogadoId();
 
     if (!token || !usuarioId || !livroAtualId) {
-      exibirFeedbackOuAlert(
-        "avaliacaoSidebarFeedback",
-        "Você precisa estar logado.",
-        "error",
-      );
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para avaliar este livro.",
+      });
       return;
     }
 
@@ -3244,13 +3301,30 @@ async function salvarAvaliacao(estrelas) {
         "Avaliação salva!",
         "success",
       );
+      await exibirAlertaApp({
+        icon: "success",
+        title: "Avaliação registrada!",
+        text: `Você avaliou este livro com ${estrelas} ${estrelas === 1 ? "estrela" : "estrelas"}.`,
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
       console.log("Avaliação salva!");
+    } else {
+      const data = await response.json().catch(() => ({}));
+      const mensagem = data.mensagem || data.erro || "Erro desconhecido";
+      throw new Error(mensagem);
     }
   } catch (erro) {
     console.error("Erro ao salvar avaliação:", erro);
-    exibirFeedbackOuAlert(
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao salvar avaliação",
+      text: erro.message || String(erro),
+    });
+    atualizarFeedbackFormulario(
       "avaliacaoSidebarFeedback",
-      "Erro ao salvar avaliação: " + (erro.message || erro),
+      "Erro ao salvar avaliação",
       "error",
     );
   }
@@ -3383,16 +3457,20 @@ async function salvarResenha() {
     const texto = obterTextoSecao(document.getElementById("resenhaInput").value);
 
     if (!token || !usuarioId || !livroAtualId) {
-      exibirFeedbackOuAlert("resenhaFeedback", "Erro ao salvar resenha.", "error");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para salvar uma resenha.",
+      });
       return;
     }
 
     if (!texto) {
-      atualizarFeedbackFormulario(
-        "resenhaFeedback",
-        "Digite uma resenha antes de salvar.",
-        "error",
-      );
+      await exibirAlertaApp({
+        icon: "info",
+        title: "Resenha vazia",
+        text: "Digite uma resenha antes de salvar.",
+      });
       return;
     }
 
@@ -3435,12 +3513,25 @@ async function salvarResenha() {
         "Resenha salva!",
         "success",
       );
+      await exibirAlertaApp({
+        icon: "success",
+        title: "Resenha salva!",
+        text: "Sua resenha foi registrada com sucesso.",
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     }
   } catch (erro) {
     console.error("Erro ao salvar resenha:", erro);
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao salvar resenha",
+      text: erro.message || String(erro),
+    });
     atualizarFeedbackFormulario(
       "resenhaFeedback",
-      "Erro ao salvar resenha: " + (erro.message || erro),
+      "Erro ao salvar resenha",
       "error",
     );
   }
@@ -3483,7 +3574,11 @@ async function salvarFavorita() {
     const texto = obterTextoSecao(document.getElementById("favoritaInput").value);
 
     if (!token || !usuarioId || !livroAtualId) {
-      exibirFeedbackOuAlert("favoritaFeedback", "Erro ao salvar favorita.", "error");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Login necessário",
+        text: "Você precisa estar logado para salvar uma parte favorita.",
+      });
       return;
     }
 
@@ -3532,11 +3627,24 @@ async function salvarFavorita() {
       "Parte favorita salva!",
       "success",
     );
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Parte favorita salva!",
+      text: "Sua parte favorita foi registrada com sucesso.",
+      timer: 2000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
   } catch (erro) {
     console.error("Erro ao salvar favorita:", erro);
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao salvar parte favorita",
+      text: erro.message || String(erro),
+    });
     atualizarFeedbackFormulario(
       "favoritaFeedback",
-      "Erro ao salvar favorita: " + (erro.message || erro),
+      "Erro ao salvar favorita",
       "error",
     );
   }

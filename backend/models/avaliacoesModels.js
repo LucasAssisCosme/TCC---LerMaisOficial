@@ -7,6 +7,9 @@ module.exports = {
         const sql = `
         INSERT INTO avaliacoes(usuario_id, livro_id, estrelas)
         VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            id = LAST_INSERT_ID(id),
+            estrelas = VALUES(estrelas)
         `
 
         const valores = [usuario_id, livro_id, estrelas]
@@ -17,14 +20,14 @@ module.exports = {
                 return callback(erro, null)
             }
 
-            const novaAvaliacao = {
+            const avaliacaoSalva = {
                 id: resultados.insertId,
                 usuario_id,
                 livro_id,
                 estrelas
             }
 
-            callback(null, novaAvaliacao)
+            callback(null, avaliacaoSalva)
         })
     },
 
