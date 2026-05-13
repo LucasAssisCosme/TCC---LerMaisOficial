@@ -11,6 +11,8 @@ router.post("/cadastrar", autenticacao.verificarToken, validarAvaliacao, avaliac
 
 router.get("/", avaliacoesController.listarTodas)
 
+router.get("/livro/:livroId/publicas", avaliacoesController.listarPublicasPorLivro)
+
 router.get("/:id", validarIdLivro, avaliacoesController.buscarAvaliacao)
 
 router.patch("/:id", autenticacao.verificarToken, validarAvaliacao, avaliacoesController.atualizarAvaliacao)

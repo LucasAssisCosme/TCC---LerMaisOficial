@@ -2969,6 +2969,165 @@ function irParaInformacoes() {
   }
 }
 
+function obterNomeExibicaoAvaliacaoPublica(avaliacao) {
+  const apelido = String(avaliacao?.usuario_apelido || "").trim();
+  const nome = String(avaliacao?.usuario_nome || "").trim();
+
+  if (apelido) {
+    return apelido;
+  }
+
+  if (nome) {
+    return nome;
+  }
+
+  return "Leitor(a)";
+}
+
+function criarResumoEstrelasPublicas(estrelas) {
+  const container = document.createElement("div");
+  container.className = "community-review-stars";
+  container.setAttribute("aria-label", `${estrelas} de 5 estrelas`);
+
+  for (let indice = 1; indice <= 5; indice += 1) {
+    const estrela = document.createElement("span");
+    estrela.className = "community-review-star";
+    estrela.textContent = "★";
+
+    if (indice > estrelas) {
+      estrela.classList.add("is-empty");
+    }
+
+    container.appendChild(estrela);
+  }
+
+  const legenda = document.createElement("span");
+  legenda.className = "community-review-rating-label";
+  legenda.textContent = `${estrelas}/5`;
+  container.appendChild(legenda);
+
+  return container;
+}
+
+function criarBlocoTextoAvaliacaoPublica(rotulo, texto, textoPadrao) {
+  const bloco = document.createElement("div");
+  bloco.className = "community-review-block";
+
+  const titulo = document.createElement("span");
+  titulo.className = "community-review-label";
+  titulo.textContent = rotulo;
+
+  const conteudo = document.createElement("p");
+  conteudo.className = "community-review-text";
+  conteudo.textContent = obterTextoSecao(texto) || textoPadrao;
+
+  bloco.append(titulo, conteudo);
+  return bloco;
+}
+
+function renderizarAvaliacoesPublicas(avaliacoes = [], usuarioLogadoId = null) {
+  const lista = document.getElementById("avaliacoesPublicasLista");
+  if (!lista) {
+    return;
+  }
+
+  lista.replaceChildren();
+
+  if (!avaliacoes.length) {
+    const vazio = document.createElement("p");
+    vazio.className = "community-empty";
+    vazio.textContent = "Ainda não há avaliações para este livro.";
+    lista.appendChild(vazio);
+    return;
+  }
+
+  avaliacoes.forEach((avaliacao) => {
+    const ehUsuarioLogado =
+      !!usuarioLogadoId &&
+      Number(avaliacao?.usuario_id) === Number(usuarioLogadoId);
+    const nomeExibicao = ehUsuarioLogado
+      ? `${obterNomeExibicaoAvaliacaoPublica(avaliacao)} (você)`
+      : obterNomeExibicaoAvaliacaoPublica(avaliacao);
+    const card = document.createElement("article");
+    card.className = "community-review";
+
+    const header = document.createElement("div");
+    header.className = "community-review-header";
+
+    const userWrap = document.createElement("div");
+    userWrap.className = "community-review-user";
+
+    const avatar = document.createElement("img");
+    avatar.className = "community-review-avatar";
+    avatar.alt = `Foto de ${nomeExibicao}`;
+    avatar.src = avaliacao?.foto_perfil
+      ? normalizarUrlFoto(avaliacao.foto_perfil)
+      : "/User.png";
+
+    const nome = document.createElement("p");
+    nome.className = "community-review-name";
+    nome.textContent = nomeExibicao;
+
+    userWrap.append(avatar, nome);
+    header.append(
+      userWrap,
+      criarResumoEstrelasPublicas(Number(avaliacao?.estrelas || 0)),
+    );
+
+    const corpo = document.createElement("div");
+    corpo.className = "community-review-grid";
+    corpo.append(
+      criarBlocoTextoAvaliacaoPublica(
+        "Resenha",
+        avaliacao?.resenha,
+        "Este leitor ainda não escreveu uma resenha para este livro.",
+      ),
+      criarBlocoTextoAvaliacaoPublica(
+        "Parte favorita",
+        avaliacao?.parte_favorita,
+        "Este leitor ainda não compartilhou a parte favorita deste livro.",
+      ),
+    );
+
+    card.append(header, corpo);
+    lista.appendChild(card);
+  });
+}
+
+async function carregarAvaliacoesPublicasLivro(livroId, usuarioLogadoId = null) {
+  const lista = document.getElementById("avaliacoesPublicasLista");
+  if (lista) {
+    lista.replaceChildren();
+    const carregando = document.createElement("p");
+    carregando.className = "community-empty";
+    carregando.textContent = "Carregando avaliações deste livro...";
+    lista.appendChild(carregando);
+  }
+
+  try {
+    const resposta = await fetch(apiUrl(`/avaliacoes/livro/${livroId}/publicas`));
+
+    if (!resposta.ok) {
+      throw new Error("Não foi possível carregar as avaliações públicas.");
+    }
+
+    const dados = await resposta.json();
+    renderizarAvaliacoesPublicas(dados.avaliacoes || [], usuarioLogadoId);
+  } catch (erro) {
+    console.error("Erro ao carregar avaliações públicas:", erro);
+
+    if (!lista) {
+      return;
+    }
+
+    lista.replaceChildren();
+    const erroEl = document.createElement("p");
+    erroEl.className = "community-empty";
+    erroEl.textContent = "Não foi possível carregar as avaliações deste livro agora.";
+    lista.appendChild(erroEl);
+  }
+}
+
 // Carrega dados do livro na página de avaliação
 async function carregarDadosLivroAvaliacao() {
   showAvaliacaoSkeleton();
@@ -3009,6 +3168,7 @@ async function carregarDadosLivroAvaliacao() {
 
     // Atualizar UI
     preencherVisualizacaoLivro(livro);
+    await carregarAvaliacoesPublicasLivro(livroId, usuarioId);
 
     if (livro.imagem_capa && livro.imagem_capa.trim()) {
       // Remover qualquer versão anterior (com ?v=)
@@ -3296,6 +3456,7 @@ async function salvarAvaliacao(estrelas) {
     if (response.ok) {
       avaliacaoAtual = estrelas;
       atualizarEstrelas(estrelas);
+      await carregarAvaliacoesPublicasLivro(livroAtualId, usuarioId);
       atualizarFeedbackFormulario(
         "avaliacaoSidebarFeedback",
         "Avaliação salva!",
@@ -3507,6 +3668,7 @@ async function salvarResenha() {
         texto,
         TEXTO_PADRAO_RESENHA,
       );
+      await carregarAvaliacoesPublicasLivro(livroAtualId, usuarioId);
       cancelarResenha();
       atualizarFeedbackFormulario(
         "resenhaFeedback",
@@ -3621,6 +3783,7 @@ async function salvarFavorita() {
     }
 
     await carregarFavoritaLivro(usuarioId, livroAtualId, token);
+    await carregarAvaliacoesPublicasLivro(livroAtualId, usuarioId);
     cancelarFavorita();
     atualizarFeedbackFormulario(
       "favoritaFeedback",

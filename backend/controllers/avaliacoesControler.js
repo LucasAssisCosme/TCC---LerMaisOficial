@@ -70,6 +70,21 @@ module.exports = {
         })
     },
 
+    listarPublicasPorLivro(req, res) {
+        const { livroId } = req.params
+
+        avaliacoesModels.listarPublicasPorLivro(livroId, (erro, avaliacoes) => {
+            if (erro) {
+                return res.status(500).json({ mensagem: "Erro ao buscar avaliações públicas" })
+            }
+
+            res.json({
+                titulo: "Avaliações públicas do livro",
+                avaliacoes: avaliacoes || []
+            })
+        })
+    },
+
     atualizarAvaliacao(req, res) {
 
         const id = req.params.id

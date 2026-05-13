@@ -703,6 +703,115 @@ body {
   box-shadow: 0 0 0 4px rgba(255, 145, 101, 0.12);
 }
 
+.community-card {
+  grid-column: 1 / -1;
+  min-height: 0;
+  max-height: none;
+}
+
+.community-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.community-empty {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.community-review {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.community-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.community-review-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.community-review-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.community-review-name {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.community-review-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #ffbf5f;
+  font-size: 20px;
+  line-height: 1;
+  flex-wrap: wrap;
+}
+
+.community-review-star.is-empty {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.community-review-rating-label {
+  color: #ffe3b0;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.community-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.community-review-block {
+  min-width: 0;
+  padding: 14px 15px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.community-review-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.community-review-text {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .app-footer {
   display: flex;
   align-items: center;
@@ -801,8 +910,17 @@ body {
     max-height: 236px;
   }
 
+  .community-card {
+    min-height: 0;
+    max-height: none;
+  }
+
   .detail-card-body {
     display: flex;
+  }
+
+  .community-review-grid {
+    grid-template-columns: 1fr;
   }
 
   .detail-card-header {
