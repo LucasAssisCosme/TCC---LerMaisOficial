@@ -1185,18 +1185,22 @@ async function cadastrarLivro(formData) {
     console.log("Livro cadastrado com sucesso:", data);
 
     atualizarFeedbackFormulario("cadastroLivroFeedback");
-    await exibirAlertaApp({
+    const resultadoAlerta = await exibirAlertaApp({
       icon: "success",
       title: "Livro cadastrado",
       text: "Livro cadastrado com sucesso!",
+      showConfirmButton: true,
       confirmButtonText: "OK",
       allowOutsideClick: false,
       allowEscapeKey: false,
-      timer: 3500,
-      timerProgressBar: true,
+      allowEnterKey: false,
+      focusConfirm: false,
+      returnFocus: false,
     });
 
-    window.location.href = "/frontend/src/pages/index.html";
+    if (resultadoAlerta?.isConfirmed) {
+      window.location.href = "/frontend/src/pages/index.html";
+    }
   } catch (error) {
     console.error("Erro ao cadastrar livro:", error);
     await exibirAlertaApp({
@@ -2521,11 +2525,10 @@ async function salvarStatusBiblioteca(
       icon: "success",
       title: "Status atualizado",
       text: mensagemStatus,
-      timer: 1800,
-      timerProgressBar: true,
-      showConfirmButton: false,
-      toast: true,
-      position: "top-end",
+      showConfirmButton: true,
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
     });
 
     // Dispara evento para atualizar biblioteca com pequeno delay
@@ -3466,9 +3469,16 @@ async function salvarAvaliacao(estrelas) {
         icon: "success",
         title: "Avaliação registrada!",
         text: `Você avaliou este livro com ${estrelas} ${estrelas === 1 ? "estrela" : "estrelas"}.`,
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        width: 600,
+        padding: "3em",
+        confirmButtonColor: "#8b2a12",
+        color: "#f7f7fb",
+        background: "linear-gradient(145deg, #141928, #0f1625)",
+        backdrop: "rgba(18, 8, 5, 0.76)",
       });
       console.log("Avaliação salva!");
     } else {
