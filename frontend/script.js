@@ -2095,6 +2095,22 @@ async function carregarPerfil() {
       }
     }
 
+    // Atualizar elementos de exibição no lado esquerdo
+    const nomeExibicao = document.getElementById("nomeExibicao");
+    if (nomeExibicao) {
+      nomeExibicao.textContent = data.usuario.nome || "Usuário";
+    }
+
+    const usernameExibicao = document.getElementById("usernameExibicao");
+    if (usernameExibicao) {
+      usernameExibicao.textContent = `@${data.usuario.apelido || "usuario"}`;
+    }
+
+    const bioExibicao = document.getElementById("bioExibicao");
+    if (bioExibicao) {
+      bioExibicao.textContent = data.usuario.bio || "";
+    }
+
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
     await exibirAlertaApp({
@@ -2205,11 +2221,63 @@ function alternarModoEdicaoPerfil(estaEditando) {
     }
   }
 
+  const containerPerfil = document.querySelector(".perfil-container");
+  if (containerPerfil) {
+    containerPerfil.classList.toggle("is-editing", estaEditando);
+  }
+
+  const btnEditarPerfil = document.querySelector(".btn-editar-perfil");
+  if (btnEditarPerfil) {
+    btnEditarPerfil.disabled = estaEditando;
+    btnEditarPerfil.classList.toggle("is-active", estaEditando);
+    btnEditarPerfil.setAttribute(
+      "aria-pressed",
+      estaEditando ? "true" : "false",
+    );
+    btnEditarPerfil.innerHTML = estaEditando
+      ? '<i class="bi bi-pencil-square" aria-hidden="true"></i> Editando'
+      : '<i class="bi bi-pencil-square" aria-hidden="true"></i> Editar';
+  }
+
+  const btnSalvarAlteracoes = document.querySelector(".btn-salvar-alteracoes");
+  if (btnSalvarAlteracoes) {
+    btnSalvarAlteracoes.disabled = !estaEditando;
+  }
+
   alternarBotoesPerfil(estaEditando);
 }
 
 function habilitarEdicao() {
   alternarModoEdicaoPerfil(true);
+}
+
+function inicializarListenersAtualizacaoPerfilEmTempoReal() {
+  // Atualizar nome em tempo real
+  const nomeInput = document.getElementById("nome");
+  const nomeExibicao = document.getElementById("nomeExibicao");
+  if (nomeInput && nomeExibicao) {
+    nomeInput.addEventListener("input", (e) => {
+      nomeExibicao.textContent = e.target.value || "Usuário";
+    });
+  }
+
+  // Atualizar username em tempo real
+  const apelidoInput = document.getElementById("apelido");
+  const usernameExibicao = document.getElementById("usernameExibicao");
+  if (apelidoInput && usernameExibicao) {
+    apelidoInput.addEventListener("input", (e) => {
+      usernameExibicao.textContent = `@${e.target.value || "usuario"}`;
+    });
+  }
+
+  // Atualizar bio em tempo real
+  const bioInput = document.getElementById("bio");
+  const bioExibicao = document.getElementById("bioExibicao");
+  if (bioInput && bioExibicao) {
+    bioInput.addEventListener("input", (e) => {
+      bioExibicao.textContent = e.target.value || "";
+    });
+  }
 }
 
 async function salvarPerfil() {
@@ -4839,6 +4907,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (currentPage.includes("/frontend/src/pages/perfil.html")) {
     carregarPerfil();
     alternarModoEdicaoPerfil(false);
+    inicializarListenersAtualizacaoPerfilEmTempoReal();
   }
 
   // Apenas inicializa biblioteca se o usuário estiver logado (tem token)

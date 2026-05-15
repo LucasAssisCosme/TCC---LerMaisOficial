@@ -9,25 +9,27 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
-    >
-    <link rel="stylesheet" href="../css/perfil.css?v=20260427a" />
+    />
+    <link rel="stylesheet" href="../css/perfil.css?v=20260515j" />
   </head>
 
-  <body class="home-page">
+  <body class="perfil-page">
     <header>
       <div class="header">
         <div class="info-perfil">
-          <img src="../../logo.png" alt="">
-           <span class="logo-text">LER MAIS</span>
+          <div class="logo-container">
+            <img src="../../logo.png" alt="Logo Ler Mais" />
+            <span class="logo-text">LER MAIS</span>
+          </div>
+
           <div class="perfil">
             <img
               id="fotoPerfil"
               src="../../User.png"
               alt="Foto de perfil"
-              style="cursor: pointer;"
               onclick="document.getElementById('inputFotoPerfil').click()"
-            >
-            <input id="inputFotoPerfil" type="file" accept="image/*" style="display: none;">
+            />
+            <input id="inputFotoPerfil" type="file" accept="image/*" hidden />
             <a href="perfil.html">PERFIL</a>
           </div>
         </div>
@@ -73,79 +75,150 @@
       </div>
     </header>
 
-    <main class="perfil-container">
-      <h1 class="titulo">Editar Perfil</h1>
-
-      <br>
-
-      <div class="foto-perfil">
-        <label>Foto de perfil</label>
-        <button
-          class="foto-acao"
-          type="button"
-          onclick="document.getElementById('inputFoto').click()"
-          aria-label="Alterar foto de perfil"
-        >
-          <img
-            id="fotoPerfilMain"
-            src="../../User.png"
-            alt="Foto de perfil"
-          >
-          <span class="foto-icone">
-            <i class="bi bi-camera-fill"></i>
-          </span>
-        </button>
-        <input id="inputFoto" type="file" accept="image/*" style="display: none;">
-        <small class="foto-dica">Clique na foto para alterar</small>
-      </div>
-
-      <div class="grid-perfil">
-        <div class="campo">
-          <label>Nome</label>
-          <input id="nome" type="text" placeholder="Seu nome">
+    <main class="perfil-shell">
+      <section class="perfil-container">
+        <div class="perfil-toolbar">
+          <h1 class="titulo">Editar Perfil</h1>
         </div>
 
-        <div class="campo grande">
-          <label>Bio</label>
-          <textarea id="bio" placeholder="Escreva sobre você..."></textarea>
+        <div class="perfil-content">
+          <aside class="perfil-info-card">
+            <div class="foto-perfil">
+              <label for="inputFoto">Foto de Perfil</label>
+              <button
+                class="foto-acao"
+                type="button"
+                onclick="document.getElementById('inputFoto').click()"
+                aria-label="Alterar foto de perfil"
+              >
+                <img
+                  id="fotoPerfilMain"
+                  src="../../profile-reference.png"
+                  alt="Foto de perfil"
+                  onerror="this.src='../../User.png'"
+                />
+                <span class="foto-icone">
+                  <i class="bi bi-camera-fill" aria-hidden="true"></i>
+                </span>
+              </button>
+              <input id="inputFoto" type="file" accept="image/*" hidden />
+            </div>
+
+            <div class="info-usuario">
+              <h2 id="nomeExibicao">Samuel Ribeiro</h2>
+              <p id="usernameExibicao" class="username">@samuelzx</p>
+              <p id="bioExibicao" class="bio">
+                Apaixonado por livros, histórias épicas e universos fantásticos.
+                Sempre em busca de novas aventuras e conhecimento.
+              </p>
+            </div>
+          </aside>
+
+          <div class="perfil-main">
+            <section class="perfil-form-card">
+              <div class="perfil-formulario">
+                <div class="campo">
+                  <label for="nome">Nome</label>
+                  <input
+                    id="nome"
+                    type="text"
+                    placeholder="Seu nome"
+                    value="Samuel Ribeiro"
+                  />
+                </div>
+
+                <div class="campo">
+                  <label for="apelido">Username</label>
+                  <input
+                    id="apelido"
+                    type="text"
+                    placeholder="Como quer ser chamado?"
+                    value="samuelzx"
+                  />
+                </div>
+
+                <div class="campo">
+                  <label for="email">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="Seu email"
+                    value="samuel@gmail.com"
+                  />
+                </div>
+
+                <div class="campo">
+                  <label for="genero">Gênero Preferido</label>
+                  <div class="select-wrapper">
+                    <select id="genero">
+                      <option value="">Selecione um gênero</option>
+                      <option value="Romance">Romance</option>
+                      <option value="Fantasia">Fantasia</option>
+                      <option value="Terror">Terror</option>
+                      <option value="Aventura" selected>Aventura</option>
+                      <option value="Ficcao_Cientifica">Ficção Científica</option>
+                      <option value="Drama">Drama</option>
+                      <option value="Autoajuda">Autoajuda</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                  </div>
+                </div>
+
+                <div class="campo grande">
+                  <label for="bio">Bio</label>
+                  <textarea id="bio" placeholder="Escreva sobre você...">Apaixonado por livros, histórias épicas e universos fantásticos.
+Sempre em busca de novas aventuras e conhecimento.</textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="acoes-conta">
+              <div class="acoes-copy">
+                <h3>Ações da Conta</h3>
+                <p>
+                  Ao apagar sua conta, todos os seus dados serão removidos
+                  permanentemente.
+                </p>
+              </div>
+
+              <button
+                class="btn-apagar-perfil"
+                type="button"
+                onclick="excluirPerfil()"
+              >
+                <span>Apagar Perfil</span>
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </section>
+
+            <div class="perfil-acoes-finais">
+              <button
+                class="btn-editar-perfil"
+                type="button"
+                onclick="habilitarEdicao()"
+                aria-pressed="false"
+              >
+                <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                Editar
+              </button>
+
+              <button
+                class="btn-salvar-alteracoes"
+                type="button"
+                onclick="salvarPerfil()"
+              >
+                <span class="btn-salvar-texto">Salvar Alterações</span>
+                <span class="btn-salvar-icone">
+                  <i class="bi bi-floppy2" aria-hidden="true"></i>
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="campo">
-          <label>Email</label>
-          <input id="email" type="text" placeholder="Seu email">
-        </div>
-
-        <div class="campo">
-          <label>Username</label>
-          <input id="apelido" type="text" placeholder="Como quer ser chamado?">
-        </div>
-
-        <div class="campo">
-          <label>Gênero Preferido</label>
-          <select id="genero">
-            <option value="">Selecione um gênero</option>
-            <option value="Romance">Romance</option>
-            <option value="Fantasia">Fantasia</option>
-            <option value="Terror">Terror</option>
-            <option value="Aventura">Aventura</option>
-            <option value="Ficcao_Cientifica">Ficção Científica</option>
-            <option value="Drama">Drama</option>
-            <option value="Autoajuda">Autoajuda</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </div>
-      </div>
-
-      <br>
-      <br>
-
-      <div class="botoes">
-        <button class="btn-editar" onclick="habilitarEdicao()">Editar</button>
-        <button class="btn-excluir-perfil" onclick="excluirPerfil()">Apagar Perfil</button>
-        <button class="btn-cancelar" onclick="cancelarEdicao()" hidden>Cancelar</button>
-        <button class="btn-salvar" onclick="salvarPerfil()" hidden>Salvar</button>
-      </div>
-      <p id="perfilFeedback" class="form-feedback" aria-live="polite"></p>
+        <p id="perfilFeedback" class="form-feedback" aria-live="polite"></p>
+      </section>
     </main>
 
     <footer class="app-footer">
@@ -155,7 +228,7 @@
       </div>
 
       <div class="footer-center">
-        <img src="../../logo.png" alt="Logo" class="footer-logo">
+        <img src="../../logo.png" alt="Logo" class="footer-logo" />
       </div>
 
       <div class="footer-right">
@@ -164,6 +237,6 @@
     </footer>
 
     <script src="/frontend-config.js"></script>
-    <script src="../../script.js?v=20260504a"></script>
+    <script src="../../script.js?v=20260515a"></script>
   </body>
 </html>
