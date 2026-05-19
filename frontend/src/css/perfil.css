@@ -10,13 +10,11 @@
   --perfil-save-green: #188b3c;
   --perfil-save-green-hover: #20a54a;
 }
-
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
 * {
   margin: 0;
   padding: 0;
@@ -323,7 +321,7 @@ font-size:13px;
   overflow: hidden;
   border: 1px solid var(--perfil-border);
   border-radius: 22px;
-  background: linear-gradient(135deg, rgb(143, 17, 10), rgb(143, 10, 10));
+  background-color: #7c1901;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.03),
     0 30px 70px rgba(0, 0, 0, 0.48);
@@ -429,7 +427,7 @@ font-size:13px;
 }
 
 .foto-perfil label {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.96);
 }
@@ -506,6 +504,9 @@ font-size:13px;
   line-height: 1.65;
   color: #ffffff;
   white-space: pre-line;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
 }
 
 .perfil-main {
@@ -527,8 +528,6 @@ font-size:13px;
 }
 
 .campo {
-  min-width: 0;
-  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -547,9 +546,7 @@ font-size:13px;
 .campo input,
 .campo select,
 .campo textarea {
-  display: block;
   width: 100%;
-  max-width: 100%;
   border: 1px solid var(--perfil-field-border);
   border-radius: 12px;
   background-color: #7F1F0E;
@@ -593,14 +590,10 @@ font-size:13px;
 
 .select-wrapper {
   position: relative;
-  width: 100%;
-  min-width: 0;
 }
 
 .select-wrapper select {
   appearance: none;
-  display: block;
-  width: 100%;
   padding-right: 56px;
 }
 
@@ -647,22 +640,17 @@ font-size:13px;
   gap: 16px;
   padding: 18px 20px;
   border-radius: 12px;
-  border: 1px solid #ff4b4b;
-  background: linear-gradient(180deg, #ff3d32 0%, #cf1f18 100%);
-  color: #ffffff;
+
+  color: #eb2113;
   cursor: pointer;
   font-size: 18px;
   font-weight: 600;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
 }
 
 .btn-apagar-perfil:hover {
   transform: translateY(-1px);
-  background: linear-gradient(180deg, #ff544a 0%, #db241d 100%);
-  box-shadow: 0 12px 28px rgba(121, 14, 11, 0.34);
+  background: rgba(128, 16, 16, 0.986);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
 
 .perfil-acoes-finais {

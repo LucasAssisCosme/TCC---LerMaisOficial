@@ -1703,7 +1703,7 @@ function atualizarAcaoInformacoesAvaliacao() {
   }
 }
 
-function atualizarAcessoCadastroLivro() {
+async function atualizarAcessoCadastroLivro() {
   const podeCadastrar = isBibliotecariaLogada();
 
   // Seleciona todos os links que contenham "cadastroLivro.html" no href
@@ -1721,7 +1721,13 @@ function atualizarAcessoCadastroLivro() {
 
   // Verifica se usuário não autorizado está na página de cadastro
   if (!podeCadastrar && window.location.href.includes("cadastroLivro.html")) {
-    alert("Acesso negado: apenas bibliotecárias podem cadastrar livros.");
+    await exibirAlertaApp({
+      icon: "warning",
+      title: "Acesso negado",
+      text: "Apenas bibliotecárias podem cadastrar livros.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
     window.location.href = "/frontend/src/pages/index.html";
   }
 }
@@ -1951,7 +1957,13 @@ async function fetchBiblioteca() {
     console.log("[fetchBiblioteca] Status HTTP:", resposta.status);
 
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("Sessão expirada. Faça login novamente.");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Sessão expirada",
+        text: "Faça login novamente.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
       logout();
       return [];
     }
@@ -2750,7 +2762,13 @@ async function fetchRanking(usuarioId = 1) {
       },
     );
     if (resposta.status === 401 || resposta.status === 403) {
-      alert("Sessão expirada. Faça login novamente.");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Sessão expirada",
+        text: "Faça login novamente.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
       logout();
       return null;
     }
@@ -4438,28 +4456,54 @@ function cancelarEdicaoLivro() {
 // ==================== DELETAR LIVRO ====================
 async function deletarLivro() {
   if (!isBibliotecariaLogada()) {
-    alert("Acesso negado. Apenas bibliotecárias podem deletar livros.");
+    await exibirAlertaApp({
+      icon: "warning",
+      title: "Acesso negado",
+      text: "Apenas bibliotecárias podem deletar livros.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
     return;
   }
 
   const livroId = localStorage.getItem("livroAtualId");
   if (!livroId) {
-    alert("Livro não encontrado");
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Livro não encontrado",
+      text: "Não foi possível identificar o livro.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
     return;
   }
 
   // Confirmar deleção
-  const confirmar = confirm(
-    "Tem certeza que deseja deletar este livro? Esta ação não pode ser desfeita.",
-  );
-  if (!confirmar) {
+  const resultado = await exibirAlertaApp({
+    icon: "warning",
+    title: "Confirmar deleção",
+    text: "Tem certeza que deseja deletar este livro? Esta ação não pode ser desfeita.",
+    showCancelButton: true,
+    confirmButtonText: "Deletar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#d33",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+  });
+  if (!resultado?.isConfirmed) {
     return;
   }
 
   try {
     const token = getToken();
     if (!token) {
-      alert("Você precisa estar logado");
+      await exibirAlertaApp({
+        icon: "warning",
+        title: "Não autenticado",
+        text: "Você precisa estar logado.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
       return;
     }
 
@@ -4483,7 +4527,13 @@ async function deletarLivro() {
     const resultado = await response.json();
     console.log("[deletarLivro] Livro deletado com sucesso:", resultado);
 
-    alert("Livro deletado com sucesso!");
+    await exibirAlertaApp({
+      icon: "success",
+      title: "Livro deletado",
+      text: "Livro deletado com sucesso!",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
 
     // Redireciona para biblioteca após deletar
     setTimeout(() => {
@@ -4491,7 +4541,13 @@ async function deletarLivro() {
     }, 500);
   } catch (erro) {
     console.error("[deletarLivro] Erro ao deletar livro:", erro);
-    alert("Erro ao deletar livro: " + erro.message);
+    await exibirAlertaApp({
+      icon: "error",
+      title: "Erro ao deletar",
+      text: "Erro ao deletar livro: " + erro.message,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
   }
 }
 
@@ -4502,7 +4558,13 @@ async function carregarDadosLivroInformacoes() {
   try {
     const livroId = localStorage.getItem("livroAtualId");
     if (!livroId) {
-      alert("Livro nao especificado");
+      await exibirAlertaApp({
+        icon: "error",
+        title: "Livro não especificado",
+        text: "Não foi possível identificar qual livro consultar.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
       return;
     }
 
